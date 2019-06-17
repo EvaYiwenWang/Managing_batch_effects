@@ -1,0 +1,8 @@
+"0","sponge.b.cof = c()"
+"0","for(i in 1:ncol(sponge.tss.clr)){"
+"0","  res = lm(sponge.tss.clr[,i] ~ sponge.trt + sponge.batch)"
+"0","  sum.res = summary(res)"
+"0","  sponge.b.cof[i] = sum.res$coefficients[3,1]"
+"0","}"
+"0","par(mfrow=c(2,2))"
+"0","hist(sponge.b.cof,col = 'gray')"

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Managing Batch Effects in Microbiome Data</title>
+  <meta name="description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Managing Batch Effects in Microbiome Data" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Managing Batch Effects in Microbiome Data" />
+  
+  <meta name="twitter:description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’" />
+  
+
+<meta name="author" content="Yiwen Wang">
+
+
+<meta name="date" content="2019-06-18">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+
+<link rel="next" href="detect.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Batch Effects Management</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Examples of microbiome studies with batch effects</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#study-description"><i class="fa fa-check"></i><b>1.1</b> Study description</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#sponge-aplysina-aerophoba-study"><i class="fa fa-check"></i><b>1.1.1</b> Sponge <em>Aplysina aerophoba</em> study</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#anaerobic-digestion-study"><i class="fa fa-check"></i><b>1.1.2</b> Anaerobic digestion study</a></li>
+<li class="chapter" data-level="1.1.3" data-path="index.html"><a href="index.html#huntingtons-disease-study"><i class="fa fa-check"></i><b>1.1.3</b> Huntington’s disease study</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#data-processing"><i class="fa fa-check"></i><b>1.2</b> Data processing</a><ul>
+<li class="chapter" data-level="1.2.1" data-path="index.html"><a href="index.html#prefiltering"><i class="fa fa-check"></i><b>1.2.1</b> Prefiltering</a></li>
+<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#total-sum-scaling"><i class="fa fa-check"></i><b>1.2.2</b> Total sum scaling</a></li>
+<li class="chapter" data-level="1.2.3" data-path="index.html"><a href="index.html#centered-log-ratio-transformation"><i class="fa fa-check"></i><b>1.2.3</b> Centered log-ratio transformation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="detect.html"><a href="detect.html"><i class="fa fa-check"></i><b>2</b> Batch effect detection</a><ul>
+<li class="chapter" data-level="2.1" data-path="detect.html"><a href="detect.html#principal-component-analysis-pca-with-density-plot-per-component"><i class="fa fa-check"></i><b>2.1</b> Principal component analysis (PCA) with density plot per component</a></li>
+<li class="chapter" data-level="2.2" data-path="detect.html"><a href="detect.html#density-plot-and-box-plot"><i class="fa fa-check"></i><b>2.2</b> Density plot and box plot</a></li>
+<li class="chapter" data-level="2.3" data-path="detect.html"><a href="detect.html#rle-plots"><i class="fa fa-check"></i><b>2.3</b> RLE plots</a></li>
+<li class="chapter" data-level="2.4" data-path="detect.html"><a href="detect.html#heatmap"><i class="fa fa-check"></i><b>2.4</b> Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="adjust.html"><a href="adjust.html"><i class="fa fa-check"></i><b>3</b> Batch effect adjustment</a><ul>
+<li class="chapter" data-level="3.1" data-path="adjust.html"><a href="adjust.html#accounting-for-batch-effects"><i class="fa fa-check"></i><b>3.1</b> Accounting for batch effects</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="adjust.html"><a href="adjust.html#linear-model-and-linear-mixed-model"><i class="fa fa-check"></i><b>3.1.1</b> Linear model and linear mixed model</a></li>
+<li class="chapter" data-level="3.1.2" data-path="adjust.html"><a href="adjust.html#sva"><i class="fa fa-check"></i><b>3.1.2</b> SVA</a></li>
+<li class="chapter" data-level="3.1.3" data-path="adjust.html"><a href="adjust.html#ruv2"><i class="fa fa-check"></i><b>3.1.3</b> RUV2</a></li>
+<li class="chapter" data-level="3.1.4" data-path="adjust.html"><a href="adjust.html#ruv4"><i class="fa fa-check"></i><b>3.1.4</b> RUV4</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="adjust.html"><a href="adjust.html#correcting-for-batch-effects"><i class="fa fa-check"></i><b>3.2</b> Correcting for batch effects</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="adjust.html"><a href="adjust.html#bmc-batch-mean-centering"><i class="fa fa-check"></i><b>3.2.1</b> BMC (batch mean centering)</a></li>
+<li class="chapter" data-level="3.2.2" data-path="adjust.html"><a href="adjust.html#combat"><i class="fa fa-check"></i><b>3.2.2</b> ComBat</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="adjust.html"><a href="adjust.html#removebatcheffect"><i class="fa fa-check"></i><b>3.3</b> removeBatchEffect</a></li>
+<li class="chapter" data-level="3.4" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.4</b> percentile normalisation</a></li>
+<li class="chapter" data-level="3.5" data-path="adjust.html"><a href="adjust.html#svd-based-method"><i class="fa fa-check"></i><b>3.5</b> SVD-based method</a></li>
+<li class="chapter" data-level="3.6" data-path="adjust.html"><a href="adjust.html#ruviii"><i class="fa fa-check"></i><b>3.6</b> RUVIII</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="eval.html"><a href="eval.html"><i class="fa fa-check"></i><b>4</b> Methods evaluation</a><ul>
+<li class="chapter" data-level="4.1" data-path="eval.html"><a href="eval.html#diagnostic-plots"><i class="fa fa-check"></i><b>4.1</b> Diagnostic plots</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="eval.html"><a href="eval.html#principal-component-analysis-pca-with-density-plot-per-component-1"><i class="fa fa-check"></i><b>4.1.1</b> Principal component analysis (PCA) with density plot per component</a></li>
+<li class="chapter" data-level="4.1.2" data-path="eval.html"><a href="eval.html#density-plot-and-box-plot-1"><i class="fa fa-check"></i><b>4.1.2</b> Density plot and box plot</a></li>
+<li class="chapter" data-level="4.1.3" data-path="eval.html"><a href="eval.html#rle-plots-1"><i class="fa fa-check"></i><b>4.1.3</b> RLE plots</a></li>
+<li class="chapter" data-level="4.1.4" data-path="eval.html"><a href="eval.html#heatmap-1"><i class="fa fa-check"></i><b>4.1.4</b> Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="eval.html"><a href="eval.html#variance-calculation"><i class="fa fa-check"></i><b>4.2</b> Variance calculation</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="eval.html"><a href="eval.html#rda"><i class="fa fa-check"></i><b>4.2.1</b> RDA</a></li>
+<li class="chapter" data-level="4.2.2" data-path="eval.html"><a href="eval.html#pvca"><i class="fa fa-check"></i><b>4.2.2</b> PVCA</a></li>
+<li class="chapter" data-level="4.2.3" data-path="eval.html"><a href="eval.html#variance-partition-per-variable"><i class="fa fa-check"></i><b>4.2.3</b> Variance partition per variable</a></li>
+<li class="chapter" data-level="4.2.4" data-path="eval.html"><a href="eval.html#silhouette-coefficient"><i class="fa fa-check"></i><b>4.2.4</b> Silhouette coefficient</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="simu.html"><a href="simu.html"><i class="fa fa-check"></i><b>5</b> Simulations of systematic and non-systematic batch effects</a><ul>
+<li class="chapter" data-level="5.1" data-path="simu.html"><a href="simu.html#mean5unequal-variance"><i class="fa fa-check"></i><b>5.1</b> Mean=5,unequal variance</a></li>
+<li class="chapter" data-level="5.2" data-path="simu.html"><a href="simu.html#mean05unequal-variance"><i class="fa fa-check"></i><b>5.2</b> Mean=0&amp;5,unequal variance</a></li>
+<li class="chapter" data-level="5.3" data-path="simu.html"><a href="simu.html#sponge-data"><i class="fa fa-check"></i><b>5.3</b> Sponge data</a></li>
+<li class="chapter" data-level="5.4" data-path="simu.html"><a href="simu.html#ad-data"><i class="fa fa-check"></i><b>5.4</b> AD data</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i>Bibliography</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/EvaYiwenWang/vignette" target="blank">Source codes on github</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Managing Batch Effects in Microbiome Data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Managing Batch Effects in Microbiome Data</h1>
+<p class="author"><em>Yiwen Wang</em></p>
+<p class="date"><em>2019-06-18</em></p>
+</div>
+<div id="examples-of-microbiome-studies-with-batch-effects" class="section level1">
+<h1><span class="header-section-number">Chapter 1</span> Examples of microbiome studies with batch effects</h1>
+<p>This vignette provides all the analyses performed in the paper “Managing Batch Effects in Microbiome Data”.</p>
+<p><strong>Packages installation and loading</strong></p>
+<p>First, you will need to install then load the following packages:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#cran.packages = c(&#39;knitr&#39;,&#39;mixOmics&#39;,&#39;xtable&#39;,&#39;ggplot2&#39;,&#39;vegan&#39;,&#39;cluster&#39;,&#39;gridExtra&#39;,&#39;pheatmap&#39;,&#39;ruv&#39;,&#39;lmerTest&#39;)</span>
+<span class="co">#install.packages(cran.packages)</span>
+<span class="co">#bioconductor.packages = c(&#39;sva&#39;,&#39;limma&#39;,&#39;AgiMicroRna&#39;,&#39;variancePartition&#39;,&#39;pvca&#39;)</span>
+<span class="co">#if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE))</span>
+<span class="co">#    install.packages(&quot;BiocManager&quot;)</span>
+<span class="co">#BiocManager::install(bioconductor.packages, version = &quot;3.8&quot;)</span>
+
+<span class="kw">library</span>(knitr)
+<span class="kw">library</span>(xtable) <span class="co"># table</span>
+<span class="kw">library</span>(mixOmics)
+<span class="kw">library</span>(sva) <span class="co"># ComBat</span>
+<span class="kw">library</span>(ggplot2) <span class="co"># PCA sample plot with density</span>
+<span class="kw">library</span>(gridExtra) <span class="co"># PCA sample plot with density</span>
+<span class="kw">library</span>(limma) <span class="co"># removeBatchEffect (LIMMA)</span>
+<span class="kw">library</span>(vegan) <span class="co"># RDA</span>
+<span class="kw">library</span>(AgiMicroRna) <span class="co"># RLE plot</span>
+<span class="kw">library</span>(cluster) <span class="co"># silhouette coefficient</span>
+<span class="kw">library</span>(variancePartition) <span class="co"># variance calculation</span>
+<span class="kw">library</span>(pvca) <span class="co"># PVCA</span>
+<span class="kw">library</span>(pheatmap) <span class="co"># heatmap</span>
+<span class="kw">library</span>(ruv) <span class="co"># RUVIII</span>
+<span class="kw">library</span>(lmerTest) <span class="co">#lmer</span></code></pre></div>
+<div id="study-description" class="section level2">
+<h2><span class="header-section-number">1.1</span> Study description</h2>
+<div id="sponge-aplysina-aerophoba-study" class="section level3">
+<h3><span class="header-section-number">1.1.1</span> Sponge <em>Aplysina aerophoba</em> study</h3>
+<p>Sacristán-Soriano <em>et al.</em> studied the potential involvement of bacterial communities from the sponge species <em>A. aerophoba</em> in the biosynthesis of brominated alkaloids (BAs) <span class="citation">(Sacristán-Soriano et al. <a href="#ref-sacristan2011exploring">2011</a>)</span>. They compared the microbial composition and BA concentration in two different tissues (ectosome and choanosome) to investigate the relationship between bacterial composition and BA concentration. The authors concluded that differences in bacterial profiles were not only due to tissue variation (the main effect of interest), but also because the samples were run on two separate denaturing gradient gels during processing. Gel thus acted as a technical batch effect as described in Table 1.</p>
+</div>
+<div id="anaerobic-digestion-study" class="section level3">
+<h3><span class="header-section-number">1.1.2</span> Anaerobic digestion study</h3>
+<p>Anaerobic Digestion (AD) is a microbiological process of organic matter degradation that produces a biogas used in electrical and thermal energy production. However, the AD bioprocess undergoes inhibition during its developmental stage that is not well characterised: Chapleur <em>et al.</em> explored microbial indicators that could improve the AD bioprocess’s efficacy and prevent its failure <span class="citation">(Chapleur et al. <a href="#ref-chapleur2016increasing">2016</a>)</span>. They profiled the microbiota of 75 AD samples in various conditions. Here we consider two different ranges of phenol concentration as treatments. The experiment was conducted at different dates (5), which constitutes a technical source of unwanted variation (Table 1).</p>
+</div>
+<div id="huntingtons-disease-study" class="section level3">
+<h3><span class="header-section-number">1.1.3</span> Huntington’s disease study</h3>
+<p>In their study, Kong <em>et al.</em> reported differences in microbial composition between Huntington’s disease (HD) and wild-type (WT) mice <span class="citation">(Kong et al. <a href="#ref-kong2018microbiome">2018</a>)</span>. However, the establishment of microbial communities was also driven by biological batch effects: the cage environment and sex. Here we consider only female mice to illustrate a special case of a batch <span class="math inline">\(\times\)</span> treatment unbalanced design. The HD data include 13 faecal mice samples hosted across 4 cages (Table 1).</p>
+<p>We load the data and functions that are provided <em>outside</em> the packages.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load the data</span>
+<span class="kw">load</span>(<span class="dt">file =</span> <span class="st">&#39;./datasets/microbiome_datasets.RData&#39;</span>)
+
+<span class="co"># load the extra functions</span>
+<span class="kw">source</span>(<span class="dt">file =</span> <span class="st">&#39;./Functions.R&#39;</span>)
+<span class="kw">dim</span>(sponge.tss)</code></pre></div>
+<pre><code>## [1] 32 24</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(ad.count)</code></pre></div>
+<pre><code>## [1]  75 567</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dim</span>(hd.count)</code></pre></div>
+<pre><code>## [1]  13 368</code></pre>
+<p><strong>Note:</strong> the AD data and HD data loaded are raw counts, while sponge data are total sum scaling (TSS) scaled data calculated on raw counts, with no offset.</p>
+</div>
+</div>
+<div id="data-processing" class="section level2">
+<h2><span class="header-section-number">1.2</span> Data processing</h2>
+<p><strong>Data processing steps for microbiome data</strong>:</p>
+<ol style="list-style-type: decimal">
+<li>Prefilter the count data to remove features with excess zeroes across all samples<br />
+</li>
+<li>Add an offset of 1 to the whole data matrix<br />
+</li>
+<li>Total Sum Scaling transformation<br />
+</li>
+<li>Log-ratio transformation</li>
+</ol>
+<div id="prefiltering" class="section level3">
+<h3><span class="header-section-number">1.2.1</span> Prefiltering</h3>
+<p>We use a prefiltering step to remove OTUs for which the sum of counts are below a set threshold (0.01%) compared to the total sum of all counts from <span class="citation">(Arumugam et al. <a href="#ref-arumugam2011enterotypes">2011</a>)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
+ad.index.keep =<span class="st"> </span><span class="kw">which</span>(<span class="kw">colSums</span>(ad.count)<span class="op">*</span><span class="dv">100</span><span class="op">/</span>(<span class="kw">sum</span>(<span class="kw">colSums</span>(ad.count))) <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.01</span>)
+ad.count.keep =<span class="st"> </span>ad.count[,ad.index.keep]
+<span class="kw">dim</span>(ad.count.keep)</code></pre></div>
+<pre><code>## [1]  75 231</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data</span>
+<span class="co">#hd.index.keep = which(colSums(hd.count)*100/(sum(colSums(hd.count))) &gt; 0.001)</span>
+hd.count.keep =<span class="st"> </span>hd.count
+<span class="kw">dim</span>(hd.count.keep)</code></pre></div>
+<pre><code>## [1]  13 368</code></pre>
+<p>Compared with the raw counts, many OTUs below the threshold are removed. As HD data are small part of a big dataset and only have 13 samples, it is too strict to use the threshold 0.01% to filter the OTUs. We then maintained all the OTUs in HD data.</p>
+</div>
+<div id="total-sum-scaling" class="section level3">
+<h3><span class="header-section-number">1.2.2</span> Total sum scaling</h3>
+<p>Now, let’s apply a TSS scaling on the filtered data:</p>
+<p><strong>Note:</strong> We need to add an offset of 1 to all count data (i.e. count data = count.keep + 1). Although sponge data are already TSS data, a ‘tiny’ offset is added and then TSS is redone. Because the presence of zeroes will make the next step – log-ratio transformation impossible.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
+sponge.tss =<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(sponge.tss <span class="op">+</span><span class="st"> </span><span class="fl">0.01</span>, <span class="dv">1</span>, TSS.divide))
+
+<span class="co"># ad data</span>
+ad.tss =<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(ad.count.keep <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>, TSS.divide))
+
+<span class="co"># hd data</span>
+hd.tss =<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(hd.count.keep <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>, TSS.divide))</code></pre></div>
+<p>Check the library size sums to 1 for each sample. We now have compositional data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
+sponge.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(sponge.tss, <span class="dv">1</span>, sum)
+<span class="kw">barplot</span>(sponge.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;Sponge data&#39;</span>,<span class="dt">las=</span><span class="dv">2</span>)</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
+ad.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss, <span class="dv">1</span>, sum)
+<span class="kw">barplot</span>(ad.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;AD data&#39;</span>,<span class="dt">las=</span><span class="dv">2</span>)</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data</span>
+hd.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(hd.tss, <span class="dv">1</span>, sum)
+<span class="kw">barplot</span>(hd.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;HD data&#39;</span>,<span class="dt">las=</span><span class="dv">2</span>)</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+</div>
+<div id="centered-log-ratio-transformation" class="section level3">
+<h3><span class="header-section-number">1.2.3</span> Centered log-ratio transformation</h3>
+<p>TSS results in compositional data (or proportions) that are restricted to a space where the sum of all OTU proportions for a given sample sums to 1. Using standard statistical methods on such data may lead to spurious results and therefore the data must be further transformed. The CLR is the transformation of choice.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
+sponge.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(sponge.tss,<span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
+<span class="kw">class</span>(sponge.tss.clr) &lt;-<span class="st"> &#39;matrix&#39;</span> 
+
+<span class="co"># ad data</span>
+ad.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(ad.tss,<span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
+<span class="kw">class</span>(ad.tss.clr) &lt;-<span class="st"> &#39;matrix&#39;</span> 
+
+<span class="co"># hd data</span>
+hd.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(hd.tss,<span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
+<span class="kw">class</span>(hd.tss.clr) &lt;-<span class="st"> &#39;matrix&#39;</span></code></pre></div>
+<p>The final TSS-CLR data of sponge study, AD study and HD study contain 32 samples and 24 OTUs, 75 samples and 231 OTUs, 13 samples and 368 OTUs, respectively as described in Table 1.</p>
+<p><strong>Table 1. Overview of exemplar datasets with batch effects.</strong> We considered microbiome studies from sponge <em>Aplysina aerophoba</em>; organic matter in anaerobic digestion (AD) and mice models with Huntington’s disease (HD).</p>
+<p><img src="figures/table.png" style="display: block; margin: auto;" /></p>
+
+</div>
+</div>
+</div>
+<h3>Bibliography</h3>
+<div id="refs" class="references">
+<div id="ref-sacristan2011exploring">
+<p>Sacristán-Soriano, Oriol, Bernard Banaigs, Emilio O Casamayor, and Mikel A Becerro. 2011. “Exploring the Links Between Natural Products and Bacterial Assemblages in the Sponge Aplysina Aerophoba.” <em>Applied and Environmental Microbiology</em> 77 (3). Am Soc Microbiol: 862–70.</p>
+</div>
+<div id="ref-chapleur2016increasing">
+<p>Chapleur, Olivier, Céline Madigou, Raphaël Civade, Yohan Rodolphe, Laurent Mazéas, and Théodore Bouchez. 2016. “Increasing Concentrations of Phenol Progressively Affect Anaerobic Digestion of Cellulose and Associated Microbial Communities.” <em>Biodegradation</em> 27 (1). Springer: 15–27.</p>
+</div>
+<div id="ref-kong2018microbiome">
+<p>Kong, Geraldine, Kim-Anh Lê Cao, Louise M Judd, ShanShan Li, Thibault Renoir, and Anthony J Hannan. 2018. “Microbiome Profiling Reveals Gut Dysbiosis in a Transgenic Mouse Model of Huntington’s Disease.” <em>Neurobiology of Disease</em>. Elsevier.</p>
+</div>
+<div id="ref-arumugam2011enterotypes">
+<p>Arumugam, Manimozhiyan, Jeroen Raes, Eric Pelletier, Denis Le Paslier, Takuji Yamada, Daniel R Mende, Gabriel R Fernandes, et al. 2011. “Enterotypes of the Human Gut Microbiome.” <em>Nature</em> 473 (7346). Nature Publishing Group: 174.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="detect.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["vignette.pdf"],
+"toc": {
+"collapse": "subsection",
+"edit": "https://github.com/EvaYiwenWang/vignette"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

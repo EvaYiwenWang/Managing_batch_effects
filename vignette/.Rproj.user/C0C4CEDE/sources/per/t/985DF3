@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1560786562091.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "314888481",
+    "id" : "985DF3",
+    "lastKnownWriteTime" : 1560782857,
+    "last_content_update" : 1560782857,
+    "path" : "~/Documents/GitHub/vignette/vignette/02-Batch_effect_adjustment.Rmd",
+    "project_path" : "02-Batch_effect_adjustment.Rmd",
+    "properties" : {
+        "cursorPosition" : "90,0",
+        "docOutlineVisible" : "1",
+        "scrollLine" : "84"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

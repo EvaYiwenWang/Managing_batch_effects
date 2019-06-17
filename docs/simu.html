@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 5 Simulations of systematic and non-systematic batch effects | Managing Batch Effects in Microbiome Data</title>
+  <meta name="description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 5 Simulations of systematic and non-systematic batch effects | Managing Batch Effects in Microbiome Data" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 5 Simulations of systematic and non-systematic batch effects | Managing Batch Effects in Microbiome Data" />
+  
+  <meta name="twitter:description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’" />
+  
+
+<meta name="author" content="Yiwen Wang">
+
+
+<meta name="date" content="2019-06-18">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="eval.html">
+<link rel="next" href="bibliography.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Batch Effects Management</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Examples of microbiome studies with batch effects</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#study-description"><i class="fa fa-check"></i><b>1.1</b> Study description</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#sponge-aplysina-aerophoba-study"><i class="fa fa-check"></i><b>1.1.1</b> Sponge <em>Aplysina aerophoba</em> study</a></li>
+<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#anaerobic-digestion-study"><i class="fa fa-check"></i><b>1.1.2</b> Anaerobic digestion study</a></li>
+<li class="chapter" data-level="1.1.3" data-path="index.html"><a href="index.html#huntingtons-disease-study"><i class="fa fa-check"></i><b>1.1.3</b> Huntington’s disease study</a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#data-processing"><i class="fa fa-check"></i><b>1.2</b> Data processing</a><ul>
+<li class="chapter" data-level="1.2.1" data-path="index.html"><a href="index.html#prefiltering"><i class="fa fa-check"></i><b>1.2.1</b> Prefiltering</a></li>
+<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#total-sum-scaling"><i class="fa fa-check"></i><b>1.2.2</b> Total sum scaling</a></li>
+<li class="chapter" data-level="1.2.3" data-path="index.html"><a href="index.html#centered-log-ratio-transformation"><i class="fa fa-check"></i><b>1.2.3</b> Centered log-ratio transformation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="detect.html"><a href="detect.html"><i class="fa fa-check"></i><b>2</b> Batch effect detection</a><ul>
+<li class="chapter" data-level="2.1" data-path="detect.html"><a href="detect.html#principal-component-analysis-pca-with-density-plot-per-component"><i class="fa fa-check"></i><b>2.1</b> Principal component analysis (PCA) with density plot per component</a></li>
+<li class="chapter" data-level="2.2" data-path="detect.html"><a href="detect.html#density-plot-and-box-plot"><i class="fa fa-check"></i><b>2.2</b> Density plot and box plot</a></li>
+<li class="chapter" data-level="2.3" data-path="detect.html"><a href="detect.html#rle-plots"><i class="fa fa-check"></i><b>2.3</b> RLE plots</a></li>
+<li class="chapter" data-level="2.4" data-path="detect.html"><a href="detect.html#heatmap"><i class="fa fa-check"></i><b>2.4</b> Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="adjust.html"><a href="adjust.html"><i class="fa fa-check"></i><b>3</b> Batch effect adjustment</a><ul>
+<li class="chapter" data-level="3.1" data-path="adjust.html"><a href="adjust.html#accounting-for-batch-effects"><i class="fa fa-check"></i><b>3.1</b> Accounting for batch effects</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="adjust.html"><a href="adjust.html#linear-model-and-linear-mixed-model"><i class="fa fa-check"></i><b>3.1.1</b> Linear model and linear mixed model</a></li>
+<li class="chapter" data-level="3.1.2" data-path="adjust.html"><a href="adjust.html#sva"><i class="fa fa-check"></i><b>3.1.2</b> SVA</a></li>
+<li class="chapter" data-level="3.1.3" data-path="adjust.html"><a href="adjust.html#ruv2"><i class="fa fa-check"></i><b>3.1.3</b> RUV2</a></li>
+<li class="chapter" data-level="3.1.4" data-path="adjust.html"><a href="adjust.html#ruv4"><i class="fa fa-check"></i><b>3.1.4</b> RUV4</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="adjust.html"><a href="adjust.html#correcting-for-batch-effects"><i class="fa fa-check"></i><b>3.2</b> Correcting for batch effects</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="adjust.html"><a href="adjust.html#bmc-batch-mean-centering"><i class="fa fa-check"></i><b>3.2.1</b> BMC (batch mean centering)</a></li>
+<li class="chapter" data-level="3.2.2" data-path="adjust.html"><a href="adjust.html#combat"><i class="fa fa-check"></i><b>3.2.2</b> ComBat</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="adjust.html"><a href="adjust.html#removebatcheffect"><i class="fa fa-check"></i><b>3.3</b> removeBatchEffect</a></li>
+<li class="chapter" data-level="3.4" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.4</b> percentile normalisation</a></li>
+<li class="chapter" data-level="3.5" data-path="adjust.html"><a href="adjust.html#svd-based-method"><i class="fa fa-check"></i><b>3.5</b> SVD-based method</a></li>
+<li class="chapter" data-level="3.6" data-path="adjust.html"><a href="adjust.html#ruviii"><i class="fa fa-check"></i><b>3.6</b> RUVIII</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="eval.html"><a href="eval.html"><i class="fa fa-check"></i><b>4</b> Methods evaluation</a><ul>
+<li class="chapter" data-level="4.1" data-path="eval.html"><a href="eval.html#diagnostic-plots"><i class="fa fa-check"></i><b>4.1</b> Diagnostic plots</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="eval.html"><a href="eval.html#principal-component-analysis-pca-with-density-plot-per-component-1"><i class="fa fa-check"></i><b>4.1.1</b> Principal component analysis (PCA) with density plot per component</a></li>
+<li class="chapter" data-level="4.1.2" data-path="eval.html"><a href="eval.html#density-plot-and-box-plot-1"><i class="fa fa-check"></i><b>4.1.2</b> Density plot and box plot</a></li>
+<li class="chapter" data-level="4.1.3" data-path="eval.html"><a href="eval.html#rle-plots-1"><i class="fa fa-check"></i><b>4.1.3</b> RLE plots</a></li>
+<li class="chapter" data-level="4.1.4" data-path="eval.html"><a href="eval.html#heatmap-1"><i class="fa fa-check"></i><b>4.1.4</b> Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="eval.html"><a href="eval.html#variance-calculation"><i class="fa fa-check"></i><b>4.2</b> Variance calculation</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="eval.html"><a href="eval.html#rda"><i class="fa fa-check"></i><b>4.2.1</b> RDA</a></li>
+<li class="chapter" data-level="4.2.2" data-path="eval.html"><a href="eval.html#pvca"><i class="fa fa-check"></i><b>4.2.2</b> PVCA</a></li>
+<li class="chapter" data-level="4.2.3" data-path="eval.html"><a href="eval.html#variance-partition-per-variable"><i class="fa fa-check"></i><b>4.2.3</b> Variance partition per variable</a></li>
+<li class="chapter" data-level="4.2.4" data-path="eval.html"><a href="eval.html#silhouette-coefficient"><i class="fa fa-check"></i><b>4.2.4</b> Silhouette coefficient</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="simu.html"><a href="simu.html"><i class="fa fa-check"></i><b>5</b> Simulations of systematic and non-systematic batch effects</a><ul>
+<li class="chapter" data-level="5.1" data-path="simu.html"><a href="simu.html#mean5unequal-variance"><i class="fa fa-check"></i><b>5.1</b> Mean=5,unequal variance</a></li>
+<li class="chapter" data-level="5.2" data-path="simu.html"><a href="simu.html#mean05unequal-variance"><i class="fa fa-check"></i><b>5.2</b> Mean=0&amp;5,unequal variance</a></li>
+<li class="chapter" data-level="5.3" data-path="simu.html"><a href="simu.html#sponge-data"><i class="fa fa-check"></i><b>5.3</b> Sponge data</a></li>
+<li class="chapter" data-level="5.4" data-path="simu.html"><a href="simu.html#ad-data"><i class="fa fa-check"></i><b>5.4</b> AD data</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i>Bibliography</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/EvaYiwenWang/vignette" target="blank">Source codes on github</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Managing Batch Effects in Microbiome Data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="simu" class="section level1">
+<h1><span class="header-section-number">Chapter 5</span> Simulations of systematic and non-systematic batch effects</h1>
+<div id="mean5unequal-variance" class="section level2">
+<h2><span class="header-section-number">5.1</span> Mean=5,unequal variance</h2>
+<ul>
+<li><span class="math inline">\(\beta_{j} \sim N(5,1^{2})\)</span> for <span class="math inline">\(j=1,...,p\)</span> OTUs;<br />
+</li>
+<li><span class="math inline">\(\sigma_{j} \sim N(0,2^{2})\)</span> for <span class="math inline">\(j=1,...,p\)</span> OTUs;<br />
+</li>
+<li><span class="math inline">\(\beta_{ij} \sim N(\beta_{j}, \sigma_{j}^{2})\)</span> for <span class="math inline">\(i = 1,...,n\)</span> samples.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Create the simulated data
+m =<span class="st"> </span><span class="dv">50</span>
+n =<span class="st"> </span><span class="dv">10000</span>
+nc =<span class="st"> </span><span class="dv">1000</span> <span class="co">#negative controls without treatment effects</span>
+p =<span class="st"> </span><span class="dv">1</span>
+k =<span class="st"> </span><span class="dv">1</span>
+ctl =<span class="st"> </span><span class="kw">rep</span>(<span class="ot">FALSE</span>, n)
+ctl[<span class="dv">1</span><span class="op">:</span>nc] =<span class="st"> </span><span class="ot">TRUE</span>
+<span class="co"># treatment effect</span>
+X =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">floor</span>(m<span class="op">/</span><span class="dv">2</span>)), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="kw">ceiling</span>(m<span class="op">/</span><span class="dv">2</span>))), m, p)
+beta =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(p<span class="op">*</span>n,<span class="dv">5</span>,<span class="dv">1</span>), p, n) <span class="co">#treatment coefficients</span>
+beta[,ctl] =<span class="st"> </span><span class="dv">0</span>
+<span class="co"># batch effect</span>
+W =<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>,m),m,k)
+W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>),<span class="dv">1</span>] =<span class="st">  </span><span class="dv">1</span>
+alpha =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(k<span class="op">*</span>n,<span class="dv">5</span>,<span class="dv">1</span>),k,n)
+Y_alpha =<span class="st"> </span><span class="kw">sapply</span>(alpha, <span class="cf">function</span>(alpha){<span class="kw">rnorm</span>(m, <span class="dt">mean =</span>  alpha, <span class="kw">abs</span>(<span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">2</span>)))})
+YY_alpha =<span class="st"> </span><span class="kw">apply</span>(Y_alpha,<span class="dv">2</span>,<span class="cf">function</span>(x){x<span class="op">*</span>W})
+
+epsilon =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(m<span class="op">*</span>n,<span class="dv">0</span>,<span class="dv">1</span>),m,n)
+Y =<span class="st"> </span>X<span class="op">%*%</span>beta <span class="op">+</span><span class="st"> </span>YY_alpha <span class="op">+</span><span class="st"> </span>epsilon
+
+
+<span class="co"># estimate batch coefficient for each OTU</span>
+w.cof =<span class="st"> </span><span class="kw">c</span>()
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(Y)){
+  res =<span class="st"> </span><span class="kw">lm</span>(Y[,i] <span class="op">~</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span>W)
+  sum.res =<span class="st"> </span><span class="kw">summary</span>(res)
+  w.cof[i] =<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
+}
+
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(w.cof,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
+<span class="kw">plot</span>(<span class="kw">density</span>(w.cof))
+<span class="kw">qqnorm</span>(w.cof)
+<span class="kw">qqline</span>(w.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-63-1.png" width="672" /></p>
+</div>
+<div id="mean05unequal-variance" class="section level2">
+<h2><span class="header-section-number">5.2</span> Mean=0&amp;5,unequal variance</h2>
+<ul>
+<li><span class="math inline">\(\beta_{t} \sim N(0,1^{2})\)</span> and <span class="math inline">\(\beta_{k} \sim N(5,1^{2})\)</span> for <span class="math inline">\(t=1,...,T\)</span> OTUs, <span class="math inline">\(k=1,...,K\)</span> OTUs and <span class="math inline">\(T=\frac{3}{4}p\)</span>, <span class="math inline">\(K=\frac{1}{4}p\)</span>;<br />
+</li>
+<li><span class="math inline">\(\sigma_{j} \sim N(0,2^{2})\)</span> for <span class="math inline">\(j=1,...,p\)</span> OTUs;<br />
+</li>
+<li><span class="math inline">\(\beta_{ij} \sim N(\beta_{j}, \sigma_{j}^{2})\)</span> for <span class="math inline">\(i = 1,...,n\)</span> samples.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Create the simulated data
+m =<span class="st"> </span><span class="dv">50</span>
+n =<span class="st"> </span><span class="dv">10000</span>
+nc =<span class="st"> </span><span class="dv">1000</span> <span class="co">#negative controls without treatment effects</span>
+p =<span class="st"> </span><span class="dv">1</span>
+k =<span class="st"> </span><span class="dv">1</span>
+ctl =<span class="st"> </span><span class="kw">rep</span>(<span class="ot">FALSE</span>, n)
+ctl[<span class="dv">1</span><span class="op">:</span>nc] =<span class="st"> </span><span class="ot">TRUE</span>
+<span class="co"># treatment effect</span>
+X =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">floor</span>(m<span class="op">/</span><span class="dv">2</span>)), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="kw">ceiling</span>(m<span class="op">/</span><span class="dv">2</span>))), m, p)
+beta =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(p<span class="op">*</span>n,<span class="dv">5</span>,<span class="dv">1</span>), p, n) <span class="co">#treatment coefficients</span>
+beta[,ctl] =<span class="st"> </span><span class="dv">0</span>
+<span class="co"># batch effect</span>
+W =<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>,m),m,k)
+W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>),<span class="dv">1</span>] =<span class="st">  </span><span class="dv">1</span>
+alpha2 =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="kw">c</span>(<span class="kw">rnorm</span>(k<span class="op">*</span>(<span class="dv">3</span><span class="op">*</span>n<span class="op">/</span><span class="dv">4</span>),<span class="dv">0</span>,<span class="dv">1</span>),<span class="kw">rnorm</span>(k<span class="op">*</span>(n<span class="op">/</span><span class="dv">4</span>),<span class="dv">5</span>,<span class="dv">1</span>)),n),k,n)
+Y_alpha2 =<span class="st"> </span><span class="kw">sapply</span>(alpha2, <span class="cf">function</span>(alpha){<span class="kw">rnorm</span>(m, <span class="dt">mean =</span>  alpha, <span class="dt">sd =</span> <span class="kw">abs</span>(<span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">2</span>)) )})
+YY_alpha2 =<span class="st"> </span><span class="kw">apply</span>(Y_alpha2,<span class="dv">2</span>,<span class="cf">function</span>(x){x<span class="op">*</span>W})
+
+epsilon =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(m<span class="op">*</span>n,<span class="dv">0</span>,<span class="dv">1</span>),m,n)
+Y2 =<span class="st"> </span>X<span class="op">%*%</span>beta <span class="op">+</span><span class="st"> </span>YY_alpha2 <span class="op">+</span><span class="st"> </span>epsilon
+
+
+
+
+w.cof2 =<span class="st"> </span><span class="kw">c</span>()
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(Y2)){
+  res =<span class="st"> </span><span class="kw">lm</span>(Y2[,i] <span class="op">~</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span>W)
+  sum.res =<span class="st"> </span><span class="kw">summary</span>(res)
+  w.cof2[i] =<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
+}
+
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(w.cof2,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
+<span class="kw">plot</span>(<span class="kw">density</span>(w.cof2))
+<span class="kw">qqnorm</span>(w.cof2)
+<span class="kw">qqline</span>(w.cof2, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+</div>
+<div id="sponge-data" class="section level2">
+<h2><span class="header-section-number">5.3</span> Sponge data</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.b.cof =<span class="st"> </span><span class="kw">c</span>()
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(sponge.tss.clr)){
+  res =<span class="st"> </span><span class="kw">lm</span>(sponge.tss.clr[,i] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
+  sum.res =<span class="st"> </span><span class="kw">summary</span>(res)
+  sponge.b.cof[i] =<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
+}
+
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(sponge.b.cof,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
+<span class="kw">plot</span>(<span class="kw">density</span>(sponge.b.cof))
+<span class="kw">qqnorm</span>(sponge.b.cof)
+<span class="kw">qqline</span>(sponge.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
+</div>
+<div id="ad-data" class="section level2">
+<h2><span class="header-section-number">5.4</span> AD data</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.b.cof =<span class="st"> </span><span class="kw">c</span>()
+ad.batch.relevel =<span class="st"> </span><span class="kw">relevel</span>(ad.batch, <span class="st">&#39;01/07/2016&#39;</span>)
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.tss.clr)){
+  res =<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[,i] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch.relevel)
+  sum.res =<span class="st"> </span><span class="kw">summary</span>(res)
+  ad.b.cof[i] =<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">4</span>,<span class="dv">1</span>]
+}
+
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(ad.b.cof,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
+<span class="kw">plot</span>(<span class="kw">density</span>(ad.b.cof))
+<span class="kw">qqnorm</span>(ad.b.cof)
+<span class="kw">qqline</span>(ad.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="eval.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="bibliography.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["vignette.pdf"],
+"toc": {
+"collapse": "subsection",
+"edit": "https://github.com/EvaYiwenWang/vignette"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

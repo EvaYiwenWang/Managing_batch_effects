@@ -1,0 +1,5 @@
+"0","# sponge data"
+"0","sponge.before.df = data.frame(value = sponge.tss.clr[,9], batch = sponge.batch)"
+"0","box_plot_fun(data = sponge.before.df,x=sponge.before.df$batch,"
+"0","             y=sponge.before.df$value,title = 'OTU9 (Sponge)',"
+"0","             batch.legend.title = 'Gel (batch)')"

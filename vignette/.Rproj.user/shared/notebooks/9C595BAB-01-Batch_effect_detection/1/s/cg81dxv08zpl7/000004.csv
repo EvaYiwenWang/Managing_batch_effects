@@ -1,0 +1,3 @@
+"0","dat.otu1 <- data.frame(dens = c(sponge.tss.clr[,9])"
+"0","                   , lines = gel.batch)"
+"0","ggplot(dat.otu1, aes(x = dens, fill = lines)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + scale_x_continuous('Value') + labs(title = 'OTU9 (Sponge data)') + theme_bw() + theme(plot.title = element_text(hjust=0.5)) + labs(fill = 'Gel (batch)')"

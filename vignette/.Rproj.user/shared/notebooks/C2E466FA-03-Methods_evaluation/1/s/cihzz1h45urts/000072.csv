@@ -1,0 +1,2 @@
+"0","# ad data"
+"0","plot.pca.before.ad = Scatter_Density(data = pca.ad.before$variates$X, batch = ad.batch, trt = ad.trt, expl.var = pca.ad.before$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Before batch correction (AD)')"

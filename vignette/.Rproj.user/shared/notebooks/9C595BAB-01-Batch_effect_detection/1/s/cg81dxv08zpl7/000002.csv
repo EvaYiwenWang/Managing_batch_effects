@@ -1,0 +1,2 @@
+"0","# sponge data"
+"0","boxplot(sponge.tss.clr[,9]~gel.batch, col = color.mixo(1:2),ylab = 'Value',main = 'OTU9 (Sponge data)')"

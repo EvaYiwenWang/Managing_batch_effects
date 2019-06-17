@@ -1,0 +1,1 @@
+"0","plot.pca.percentile.ad = Scatter_Density(data = pca.ad.percentile$variates$X,batch = ad.batch, trt = ad.trt, expl.var = pca.ad.percentile$explained_variance,xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with PN (AD)')"

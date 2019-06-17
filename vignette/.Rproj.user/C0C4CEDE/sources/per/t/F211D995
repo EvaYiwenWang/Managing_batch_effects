@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1560786530793.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "335465339",
+    "id" : "F211D995",
+    "lastKnownWriteTime" : 1560771797,
+    "last_content_update" : 1560786532138,
+    "path" : "~/Documents/GitHub/vignette/vignette/index.Rmd",
+    "project_path" : "index.Rmd",
+    "properties" : {
+        "cursorPosition" : "49,280",
+        "docOutlineSize" : "128.93076268447552",
+        "docOutlineVisible" : "1",
+        "scrollLine" : "18",
+        "source_window_id" : ""
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

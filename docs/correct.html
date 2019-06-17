@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 3 Batch effect correction | Managing Batch Effects in Microbiome Data</title>
+  <meta name="description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 3 Batch effect correction | Managing Batch Effects in Microbiome Data" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’" />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Batch effect correction | Managing Batch Effects in Microbiome Data" />
+  
+  <meta name="twitter:description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’" />
+  
+
+<meta name="author" content="Yiwen Wang">
+
+
+<meta name="date" content="2019-06-17">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="detect.html">
+<link rel="next" href="eval.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Analyses in study</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#packages-installation-and-loading"><i class="fa fa-check"></i><b>1.1</b> Packages installation and loading</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#example-datasets"><i class="fa fa-check"></i><b>1.2</b> Example datasets</a><ul>
+<li class="chapter" data-level="1.2.1" data-path="index.html"><a href="index.html#sponge-data"><i class="fa fa-check"></i><b>1.2.1</b> Sponge data</a></li>
+<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#ad-data"><i class="fa fa-check"></i><b>1.2.2</b> AD data</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#preliminary-normalisation"><i class="fa fa-check"></i><b>1.3</b> Preliminary normalisation</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="index.html"><a href="index.html#pre-filtering"><i class="fa fa-check"></i><b>1.3.1</b> Pre-filtering</a></li>
+<li class="chapter" data-level="1.3.2" data-path="index.html"><a href="index.html#total-sum-scaling"><i class="fa fa-check"></i><b>1.3.2</b> Total sum scaling</a></li>
+<li class="chapter" data-level="1.3.3" data-path="index.html"><a href="index.html#centered-log-ratio-transformation"><i class="fa fa-check"></i><b>1.3.3</b> Centered log ratio transformation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="detect.html"><a href="detect.html"><i class="fa fa-check"></i><b>2</b> Batch effect detection</a><ul>
+<li class="chapter" data-level="2.1" data-path="detect.html"><a href="detect.html#principal-component-analysis-pca-with-density-plot-per-component"><i class="fa fa-check"></i><b>2.1</b> Principal component analysis (PCA) with density plot per component</a></li>
+<li class="chapter" data-level="2.2" data-path="detect.html"><a href="detect.html#density-plot-and-box-plot"><i class="fa fa-check"></i><b>2.2</b> Density plot and box plot</a></li>
+<li class="chapter" data-level="2.3" data-path="detect.html"><a href="detect.html#rle-plots"><i class="fa fa-check"></i><b>2.3</b> RLE plots</a></li>
+<li class="chapter" data-level="2.4" data-path="detect.html"><a href="detect.html#heatmap"><i class="fa fa-check"></i><b>2.4</b> Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="correct.html"><a href="correct.html"><i class="fa fa-check"></i><b>3</b> Batch effect correction</a><ul>
+<li class="chapter" data-level="3.1" data-path="correct.html"><a href="correct.html#bmc-batch-mean-centering"><i class="fa fa-check"></i><b>3.1</b> BMC (batch mean centering)</a></li>
+<li class="chapter" data-level="3.2" data-path="correct.html"><a href="correct.html#combat"><i class="fa fa-check"></i><b>3.2</b> ComBat</a></li>
+<li class="chapter" data-level="3.3" data-path="correct.html"><a href="correct.html#removebatcheffect"><i class="fa fa-check"></i><b>3.3</b> removeBatchEffect</a></li>
+<li class="chapter" data-level="3.4" data-path="correct.html"><a href="correct.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.4</b> percentile normalisation</a></li>
+<li class="chapter" data-level="3.5" data-path="correct.html"><a href="correct.html#svd-based-method"><i class="fa fa-check"></i><b>3.5</b> SVD-based method</a></li>
+<li class="chapter" data-level="3.6" data-path="correct.html"><a href="correct.html#ruviii"><i class="fa fa-check"></i><b>3.6</b> RUVIII</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="eval.html"><a href="eval.html"><i class="fa fa-check"></i><b>4</b> Methods evaluation</a><ul>
+<li class="chapter" data-level="4.1" data-path="eval.html"><a href="eval.html#diagnostic-plots"><i class="fa fa-check"></i><b>4.1</b> Diagnostic plots</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="eval.html"><a href="eval.html#principal-component-analysis-pca-with-density-plot-per-component-1"><i class="fa fa-check"></i><b>4.1.1</b> Principal component analysis (PCA) with density plot per component</a></li>
+<li class="chapter" data-level="4.1.2" data-path="eval.html"><a href="eval.html#density-plot-and-box-plot-1"><i class="fa fa-check"></i><b>4.1.2</b> Density plot and box plot</a></li>
+<li class="chapter" data-level="4.1.3" data-path="eval.html"><a href="eval.html#rle-plots-1"><i class="fa fa-check"></i><b>4.1.3</b> RLE plots</a></li>
+<li class="chapter" data-level="4.1.4" data-path="eval.html"><a href="eval.html#heatmap-1"><i class="fa fa-check"></i><b>4.1.4</b> Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="eval.html"><a href="eval.html#variance-calculation"><i class="fa fa-check"></i><b>4.2</b> Variance calculation</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="eval.html"><a href="eval.html#rda"><i class="fa fa-check"></i><b>4.2.1</b> RDA</a></li>
+<li class="chapter" data-level="4.2.2" data-path="eval.html"><a href="eval.html#pvca"><i class="fa fa-check"></i><b>4.2.2</b> PVCA</a></li>
+<li class="chapter" data-level="4.2.3" data-path="eval.html"><a href="eval.html#variance-partition-per-variable"><i class="fa fa-check"></i><b>4.2.3</b> Variance partition per variable</a></li>
+<li class="chapter" data-level="4.2.4" data-path="eval.html"><a href="eval.html#silhouette-coefficient"><i class="fa fa-check"></i><b>4.2.4</b> Silhouette coefficient</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="simu.html"><a href="simu.html"><i class="fa fa-check"></i><b>5</b> Simulations of systematic and non-systematic batch effects</a><ul>
+<li class="chapter" data-level="5.1" data-path="simu.html"><a href="simu.html#mean5unequal-variance"><i class="fa fa-check"></i><b>5.1</b> Mean=5,unequal variance</a></li>
+<li class="chapter" data-level="5.2" data-path="simu.html"><a href="simu.html#mean05unequal-variance"><i class="fa fa-check"></i><b>5.2</b> Mean=0&amp;5,unequal variance</a></li>
+<li class="chapter" data-level="5.3" data-path="simu.html"><a href="simu.html#sponge-data-1"><i class="fa fa-check"></i><b>5.3</b> Sponge data</a></li>
+<li class="chapter" data-level="5.4" data-path="simu.html"><a href="simu.html#ad-data-1"><i class="fa fa-check"></i><b>5.4</b> AD data</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/EvaYiwenWang/vignette" target="blank">Source codes on github</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Managing Batch Effects in Microbiome Data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="correct" class="section level1">
+<h1><span class="header-section-number">Chapter 3</span> Batch effect correction</h1>
+<div id="bmc-batch-mean-centering" class="section level2">
+<h2><span class="header-section-number">3.1</span> BMC (batch mean centering)</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
+sponge.b1 =<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr[gel.batch<span class="op">==</span><span class="st"> </span><span class="dv">1</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+sponge.b2 =<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr[gel.batch<span class="op">==</span><span class="st"> </span><span class="dv">2</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+sponge.bmc =<span class="st"> </span><span class="kw">rbind</span>(sponge.b1,sponge.b2)
+sponge.bmc =<span class="st"> </span>sponge.bmc[<span class="kw">rownames</span>(sponge.tss.clr),]
+
+##############
+<span class="co"># AD data</span>
+ad.b1 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[time.batch<span class="op">==</span><span class="st">&quot;01/07/2016&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b2 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[time.batch<span class="op">==</span><span class="st">&quot;09/04/2015&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b3 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[time.batch<span class="op">==</span><span class="st">&quot;14/04/2016&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b4 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[time.batch<span class="op">==</span><span class="st">&quot;14/11/2016&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b5 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[time.batch<span class="op">==</span><span class="st">&quot;21/09/2017&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.bmc =<span class="st"> </span><span class="kw">rbind</span>(ad.b1,ad.b2,ad.b3,ad.b4,ad.b5)
+ad.bmc =<span class="st"> </span>ad.bmc[<span class="kw">rownames</span>(ad.tss.clr),]</code></pre></div>
+</div>
+<div id="combat" class="section level2">
+<h2><span class="header-section-number">3.2</span> ComBat</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
+mod.sponge =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span>Tissue.trt)
+sponge.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">ComBat</span>(<span class="kw">t</span>(sponge.tss.clr),<span class="dt">batch=</span>gel.batch,<span class="dt">mod =</span> mod.sponge,<span class="dt">par.prior=</span>F,<span class="dt">prior.plots =</span> F))</code></pre></div>
+<pre><code>## Found2batches</code></pre>
+<pre><code>## Adjusting for1covariate(s) or covariate level(s)</code></pre>
+<pre><code>## Standardizing Data across genes</code></pre>
+<pre><code>## Fitting L/S model and finding priors</code></pre>
+<pre><code>## Finding nonparametric adjustments</code></pre>
+<pre><code>## Adjusting the Data</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##############
+<span class="co"># AD data</span>
+mod.ad =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span>concentration.trt)
+ad.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">ComBat</span>(<span class="kw">t</span>(ad.tss.clr),<span class="dt">batch=</span>time.batch,<span class="dt">mod =</span> mod.ad, <span class="dt">par.prior=</span>F,<span class="dt">prior.plots =</span> F))</code></pre></div>
+<pre><code>## Found5batches</code></pre>
+<pre><code>## Adjusting for1covariate(s) or covariate level(s)</code></pre>
+<pre><code>## Standardizing Data across genes</code></pre>
+<pre><code>## Fitting L/S model and finding priors</code></pre>
+<pre><code>## Finding nonparametric adjustments</code></pre>
+<pre><code>## Adjusting the Data</code></pre>
+</div>
+<div id="removebatcheffect" class="section level2">
+<h2><span class="header-section-number">3.3</span> removeBatchEffect</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
+design.sponge =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span>Tissue.trt)
+sponge.limma &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">removeBatchEffect</span>(<span class="kw">t</span>(sponge.tss.clr),<span class="dt">batch =</span> gel.batch,<span class="dt">design =</span> design.sponge))
+
+#############
+design.ad =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span>concentration.trt)
+ad.limma &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">removeBatchEffect</span>(<span class="kw">t</span>(ad.tss.clr),<span class="dt">batch =</span> time.batch,<span class="dt">design =</span> design.ad))</code></pre></div>
+</div>
+<div id="percentile-normalisation" class="section level2">
+<h2><span class="header-section-number">3.4</span> percentile normalisation</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.percentile =<span class="st"> </span><span class="kw">percentile_norm</span>(<span class="dt">data =</span> sponge.tss, <span class="dt">batch =</span> gel.batch, <span class="dt">trt =</span> Tissue.trt)
+
+
+<span class="co"># ad data</span>
+ad.percentile =<span class="st"> </span><span class="kw">percentile_norm</span>(<span class="dt">data =</span> ad.tss, <span class="dt">batch =</span> time.batch, <span class="dt">trt =</span> concentration.trt)</code></pre></div>
+</div>
+<div id="svd-based-method" class="section level2">
+<h2><span class="header-section-number">3.5</span> SVD-based method</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">#################
+<span class="co"># sponge data</span>
+sponge.sd =<span class="st"> </span><span class="kw">apply</span>(sponge.tss.clr,<span class="dv">2</span>,sd)
+sponge.mean =<span class="st"> </span><span class="kw">apply</span>(sponge.tss.clr,<span class="dv">2</span>,mean)
+X.sponge =<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr,<span class="dt">center =</span> T,<span class="dt">scale =</span> T)
+
+m.sponge =<span class="st"> </span><span class="kw">crossprod</span>(X.sponge)
+m.svd.sponge =<span class="st"> </span><span class="kw">svd</span>(m.sponge)
+<span class="kw">barplot</span>(m.svd.sponge<span class="op">$</span>d)</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a1.sponge =<span class="st"> </span>m.svd.sponge<span class="op">$</span>u[,<span class="dv">1</span>]
+b1.sponge =<span class="st"> </span>m.svd.sponge<span class="op">$</span>v[,<span class="dv">1</span>]
+
+<span class="co"># component 1</span>
+t1.sponge =<span class="st"> </span>X.sponge <span class="op">%*%</span><span class="st"> </span>a1.sponge <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">sqrt</span>(<span class="kw">crossprod</span>(a1.sponge)))
+c1.sponge =<span class="st"> </span><span class="kw">crossprod</span>(X.sponge, t1.sponge) <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">crossprod</span>(t1.sponge))
+defl.matrix_svd1.sponge  =<span class="st"> </span>X.sponge <span class="op">-</span><span class="st"> </span>t1.sponge <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(c1.sponge)
+
+<span class="co"># #</span>
+sponge.svd =<span class="st"> </span>defl.matrix_svd1.sponge
+sponge.svd[<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(sponge.svd),<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(sponge.svd)] =<span class="st"> </span><span class="ot">NA</span>
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(defl.matrix_svd1.sponge)){
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(defl.matrix_svd1.sponge)){
+    sponge.svd[j,i] =<span class="st"> </span>defl.matrix_svd1.sponge[j,i]<span class="op">*</span>sponge.sd[i] <span class="op">+</span><span class="st"> </span>sponge.mean[i]
+  }
+}
+
+#####################
+<span class="co"># ad data</span>
+ad.sd =<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr,<span class="dv">2</span>,sd)
+ad.mean =<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr,<span class="dv">2</span>,mean)
+X.ad =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr,<span class="dt">center =</span> T,<span class="dt">scale =</span> T)
+
+m.ad =<span class="st"> </span><span class="kw">crossprod</span>(X.ad)
+m.svd.ad =<span class="st"> </span><span class="kw">svd</span>(m.ad)
+<span class="kw">barplot</span>(m.svd.ad<span class="op">$</span>d)</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-16-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a1.ad =<span class="st"> </span>m.svd.ad<span class="op">$</span>u[,<span class="dv">1</span>]
+b1.ad =<span class="st"> </span>m.svd.ad<span class="op">$</span>v[,<span class="dv">1</span>]
+
+<span class="co"># component 1</span>
+t1.ad =<span class="st"> </span>X.ad <span class="op">%*%</span><span class="st"> </span>a1.ad <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">sqrt</span>(<span class="kw">crossprod</span>(a1.ad)))
+c1.ad =<span class="st"> </span><span class="kw">crossprod</span>(X.ad, t1.ad) <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">crossprod</span>(t1.ad))
+defl.matrix_svd1.ad  =<span class="st"> </span>X.ad <span class="op">-</span><span class="st"> </span>t1.ad <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(c1.ad)
+
+<span class="co"># #</span>
+ad.svd =<span class="st"> </span>defl.matrix_svd1.ad
+ad.svd[<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ad.svd),<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.svd)] =<span class="st"> </span><span class="ot">NA</span>
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(defl.matrix_svd1.ad)){
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(defl.matrix_svd1.ad)){
+    ad.svd[j,i] =<span class="st"> </span>defl.matrix_svd1.ad[j,i]<span class="op">*</span>ad.sd[i] <span class="op">+</span><span class="st"> </span>ad.mean[i]
+  }
+}</code></pre></div>
+</div>
+<div id="ruviii" class="section level2">
+<h2><span class="header-section-number">3.6</span> RUVIII</h2>
+<p>RUVIII needs technical sample replicates and negative control variables. As only AD data have sample replicates, RUVIII is only applied on AD data. We use linear model to find variables with less probability of treatment effects, and these variables are treated as negative control variables to fit the assumptions of RUVIII.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">#####################
+<span class="co"># ad data only</span>
+replicates.ad =<span class="st"> </span>metadata.ad<span class="op">$</span>sample_name.data.extraction
+replicates.ad.matrix =<span class="st"> </span><span class="kw">replicate.matrix</span>(replicates.ad)
+
+p.ad =<span class="st"> </span><span class="kw">matrix</span>(<span class="ot">NA</span>,<span class="dt">nrow =</span> <span class="dv">2</span>, <span class="dt">ncol =</span> <span class="kw">ncol</span>(ad.tss.clr))
+<span class="kw">rownames</span>(p.ad) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;concentration.trt&#39;</span>,<span class="st">&#39;time.batch&#39;</span>)
+<span class="kw">colnames</span>(p.ad) =<span class="st"> </span><span class="kw">colnames</span>(ad.tss.clr)
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.tss.clr)){
+  res =<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[,i] <span class="op">~</span><span class="st"> </span>concentration.trt <span class="op">+</span><span class="st"> </span>time.batch)
+  summ.res =<span class="st"> </span><span class="kw">summary</span>(res)
+  anova.res =<span class="st"> </span><span class="kw">anova</span>(res)
+  p.ad[<span class="dv">1</span>,i] =<span class="st"> </span>anova.res<span class="op">$</span><span class="st">`</span><span class="dt">Pr(&gt;F)</span><span class="st">`</span>[<span class="dv">1</span>]
+  p.ad[<span class="dv">2</span>,i] =<span class="st"> </span>anova.res<span class="op">$</span><span class="st">`</span><span class="dt">Pr(&gt;F)</span><span class="st">`</span>[<span class="dv">2</span>]
+}
+
+p.adj.ad =<span class="st"> </span><span class="kw">apply</span>(p.ad,<span class="dv">1</span>,p.adjust,<span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)
+p.adj.ad1 =<span class="st"> </span><span class="kw">sort</span>(p.adj.ad[,<span class="dv">1</span>],<span class="dt">decreasing =</span> T)
+nc.otu1 =<span class="st"> </span><span class="kw">names</span>(p.adj.ad1[<span class="dv">1</span><span class="op">:</span><span class="dv">75</span>]) <span class="co">#negative control genes need be equal or more than samples</span>
+nc1 =<span class="st"> </span><span class="kw">rep</span>(<span class="ot">FALSE</span>, <span class="kw">ncol</span>(ad.tss.clr))
+<span class="kw">names</span>(nc1) =<span class="st"> </span><span class="kw">colnames</span>(ad.tss.clr)
+nc1[nc.otu1] =<span class="st"> </span><span class="ot">TRUE</span>
+
+ad.ruv &lt;-<span class="st"> </span><span class="kw">RUVIII</span>(<span class="dt">Y=</span>ad.tss.clr,<span class="dt">M =</span> replicates.ad.matrix, <span class="dt">ctl =</span> nc1)
+<span class="kw">rownames</span>(ad.ruv) =<span class="st"> </span><span class="kw">rownames</span>(ad.tss.clr)</code></pre></div>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="detect.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="eval.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["vignette.pdf"],
+"toc": {
+"collapse": "subsection",
+"edit": "https://github.com/EvaYiwenWang/vignette"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

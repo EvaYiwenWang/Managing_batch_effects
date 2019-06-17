@@ -1,0 +1,241 @@
+# Batch effect adjustment {#adjust}
+
+## Accounting for batch effects
+
+Methods that account for batch effects estimate unknown batch effects through matrix decomposition and / or assign a known or estimated batch as a covariate with linear models. 
+
+### Linear model and linear mixed model
+
+```{r, warning=F, message=F,error=FALSE}
+# Sponge data
+sponge.trt_p <- apply(sponge.tss.clr, 2, FUN = function(x){
+  res.lm <- lm(x ~ sponge.trt + sponge.batch)
+  summary.res = summary(res.lm)
+  p = summary.res$coefficients[2,4]
+})
+
+sponge.trt_q = p.adjust(sponge.trt_p,method = 'fdr')
+
+# AD data
+ad.trt_p <- apply(ad.tss.clr, 2, FUN = function(x){
+  res.lm <- lm(x ~ ad.trt + ad.batch)
+  summary.res = summary(res.lm)
+  p = summary.res$coefficients[2,4]
+})
+
+ad.trt_q = p.adjust(ad.trt_p,method = 'fdr')
+
+# HD data
+hd.trt_p <- apply(hd.tss.clr, 2, FUN = function(x){
+  res.lmm <- lmer(x ~ hd.trt + 1|hd.batch)
+  summary.res = summary(res.lmm)
+  p = summary.res$coefficients[1,5]
+})
+
+hd.trt_q = p.adjust(hd.trt_p,method = 'fdr')
+```
+
+### SVA
+
+The *sva* function performs two different steps. First it identifies the number of latent factors that need to be estimated. The number of factors can be estimated using the *num.sv*.
+
+```{r}
+# sponge data
+sponge.mod = model.matrix(~sponge.trt)
+sponge.mod0 = model.matrix(~1,data = sponge.trt)
+sponge.sva.n <- num.sv(dat = t(sponge.tss.clr), mod = sponge.mod)
+```
+
+Next we apply the *sva* function to estimate the surrogate variables:
+
+```{r}
+sponge.sva = sva(t(sponge.tss.clr), sponge.mod, sponge.mod0, n.sv = sponge.sva.n)
+```
+
+We include the estimated surrogate variables in both the null and full models. The reason is that we want to adjust for the surrogate variables, so we treat them as adjustment variables that must be included in both models. The *f.pvalue* function is then used to calculate parametric F-test P-values and Q-values (adjusted P-values) for each OTU of sponge data. 
+
+```{r}
+sponge.mod.bat = cbind(sponge.mod,sponge.sva$sv)
+sponge.mod0.bat = cbind(sponge.mod0,sponge.sva$sv)
+
+sponge.sva.trt_p = f.pvalue(t(sponge.tss.clr),sponge.mod.bat,sponge.mod0.bat)
+sponge.sva.trt_q = p.adjust(sponge.sva.trt_p,method="fdr")
+```
+
+Now these P-values and Q-values are accounting for surrogate variables (estimated batch effects).
+
+```{r}
+# ad data
+ad.mod = model.matrix(~ad.trt)
+ad.mod0 = model.matrix(~1,data = ad.trt)
+ad.sva.n <- num.sv(dat = t(ad.tss.clr), mod = ad.mod)
+ad.sva = sva(t(ad.tss.clr), ad.mod, ad.mod0, n.sv = ad.sva.n)
+ad.mod.bat = cbind(ad.mod,ad.sva$sv)
+ad.mod0.bat = cbind(ad.mod0,ad.sva$sv)
+ad.sva.trt_p = f.pvalue(t(ad.tss.clr),ad.mod.bat,ad.mod0.bat)
+ad.sva.trt_q = p.adjust(ad.sva.trt_p,method="fdr")
+
+# hd data
+hd.mod = model.matrix(~hd.trt)
+hd.mod0 = model.matrix(~1,data = hd.trt)
+hd.sva.n <- num.sv(dat = t(hd.tss.clr), mod = hd.mod)
+hd.sva = sva(t(hd.tss.clr), hd.mod, hd.mod0, n.sv = hd.sva.n)
+hd.mod.bat = cbind(hd.mod,hd.sva$sv)
+hd.mod0.bat = cbind(hd.mod0,hd.sva$sv)
+hd.sva.trt_p = f.pvalue(t(hd.tss.clr),hd.mod.bat,hd.mod0.bat)
+hd.sva.trt_q = p.adjust(hd.sva.trt_p,method="fdr")
+```
+
+### RUV2
+
+### RUV4
+
+
+## Correcting for batch effects
+
+### BMC (batch mean centering)
+
+```{r}
+# Sponge data
+sponge.b1 = scale(sponge.tss.clr[sponge.batch== 1,],center = TRUE, scale = FALSE)
+sponge.b2 = scale(sponge.tss.clr[sponge.batch== 2,],center = TRUE, scale = FALSE)
+sponge.bmc = rbind(sponge.b1,sponge.b2)
+sponge.bmc = sponge.bmc[rownames(sponge.tss.clr),]
+
+##############
+# AD data
+ad.b1 = scale(ad.tss.clr[ad.batch=="09/04/2015",],center = TRUE, scale = FALSE)
+ad.b2 = scale(ad.tss.clr[ad.batch=="14/04/2016",],center = TRUE, scale = FALSE)
+ad.b3 = scale(ad.tss.clr[ad.batch=="14/11/2016",],center = TRUE, scale = FALSE)
+ad.b4 = scale(ad.tss.clr[ad.batch=="01/07/2016",],center = TRUE, scale = FALSE)
+ad.b5 = scale(ad.tss.clr[ad.batch=="21/09/2017",],center = TRUE, scale = FALSE)
+ad.bmc = rbind(ad.b1,ad.b2,ad.b3,ad.b4,ad.b5)
+ad.bmc = ad.bmc[rownames(ad.tss.clr),]
+```
+
+### ComBat
+
+```{r}
+# Sponge data
+sponge.combat <- t(ComBat(t(sponge.tss.clr),batch=sponge.batch,mod = sponge.mod,par.prior=F,prior.plots = F))
+
+##############
+# AD data
+ad.combat <- t(ComBat(t(ad.tss.clr),batch=ad.batch,mod = ad.mod, par.prior=F,prior.plots = F))
+```
+
+
+## removeBatchEffect
+
+```{r}
+# Sponge data
+sponge.limma <- t(removeBatchEffect(t(sponge.tss.clr),batch = sponge.batch,design = sponge.mod))
+
+#############
+ad.limma <- t(removeBatchEffect(t(ad.tss.clr),batch = ad.batch,design = ad.mod))
+```
+
+
+## percentile normalisation
+
+```{r}
+sponge.percentile = percentile_norm(data = sponge.tss, batch = sponge.batch, trt = sponge.trt)
+
+# ad data
+ad.percentile = percentile_norm(data = ad.tss, batch = ad.batch, trt = ad.trt)
+```
+
+
+## SVD-based method
+
+```{r}
+#################
+# sponge data
+sponge.sd = apply(sponge.tss.clr,2,sd)
+sponge.mean = apply(sponge.tss.clr,2,mean)
+X.sponge = scale(sponge.tss.clr,center = T,scale = T)
+
+m.sponge = crossprod(X.sponge)
+m.svd.sponge = svd(m.sponge)
+barplot(m.svd.sponge$d)
+
+a1.sponge = m.svd.sponge$u[,1]
+b1.sponge = m.svd.sponge$v[,1]
+
+# component 1
+t1.sponge = X.sponge %*% a1.sponge / drop(sqrt(crossprod(a1.sponge)))
+c1.sponge = crossprod(X.sponge, t1.sponge) / drop(crossprod(t1.sponge))
+defl.matrix_svd1.sponge  = X.sponge - t1.sponge %*% t(c1.sponge)
+
+# #
+sponge.svd = defl.matrix_svd1.sponge
+sponge.svd[1:nrow(sponge.svd),1:ncol(sponge.svd)] = NA
+for(i in 1:ncol(defl.matrix_svd1.sponge)){
+  for(j in 1:nrow(defl.matrix_svd1.sponge)){
+    sponge.svd[j,i] = defl.matrix_svd1.sponge[j,i]*sponge.sd[i] + sponge.mean[i]
+  }
+}
+
+#####################
+# ad data
+ad.sd = apply(ad.tss.clr,2,sd)
+ad.mean = apply(ad.tss.clr,2,mean)
+X.ad = scale(ad.tss.clr,center = T,scale = T)
+
+m.ad = crossprod(X.ad)
+m.svd.ad = svd(m.ad)
+barplot(m.svd.ad$d)
+
+a1.ad = m.svd.ad$u[,1]
+b1.ad = m.svd.ad$v[,1]
+
+# component 1
+t1.ad = X.ad %*% a1.ad / drop(sqrt(crossprod(a1.ad)))
+c1.ad = crossprod(X.ad, t1.ad) / drop(crossprod(t1.ad))
+defl.matrix_svd1.ad  = X.ad - t1.ad %*% t(c1.ad)
+
+# #
+ad.svd = defl.matrix_svd1.ad
+ad.svd[1:nrow(ad.svd),1:ncol(ad.svd)] = NA
+for(i in 1:ncol(defl.matrix_svd1.ad)){
+  for(j in 1:nrow(defl.matrix_svd1.ad)){
+    ad.svd[j,i] = defl.matrix_svd1.ad[j,i]*ad.sd[i] + ad.mean[i]
+  }
+}
+
+```
+
+
+## RUVIII
+
+RUVIII needs technical sample replicates and negative control variables. As only AD data have sample replicates, RUVIII is only applied on AD data. We use linear model to find variables with less probability of treatment effects, and these variables are treated as negative control variables to fit the assumptions of RUVIII.
+
+```{r}
+#####################
+# ad data only
+replicates.ad = ad.metadata$sample_name.data.extraction
+replicates.ad.matrix = replicate.matrix(replicates.ad)
+
+p.ad = matrix(NA,nrow = 2, ncol = ncol(ad.tss.clr))
+rownames(p.ad) = c('ad.trt','ad.batch')
+colnames(p.ad) = colnames(ad.tss.clr)
+for(i in 1:ncol(ad.tss.clr)){
+  res = lm(ad.tss.clr[,i] ~ ad.trt + ad.batch)
+  summ.res = summary(res)
+  anova.res = anova(res)
+  p.ad[1,i] = anova.res$`Pr(>F)`[1]
+  p.ad[2,i] = anova.res$`Pr(>F)`[2]
+}
+
+p.adj.ad = apply(p.ad,1,p.adjust,method = 'fdr')
+p.adj.ad1 = sort(p.adj.ad[,1],decreasing = T)
+nc.otu1 = names(p.adj.ad1[1:75]) #negative control genes need be equal or more than samples
+nc1 = rep(FALSE, ncol(ad.tss.clr))
+names(nc1) = colnames(ad.tss.clr)
+nc1[nc.otu1] = TRUE
+
+ad.ruv <- RUVIII(Y=ad.tss.clr,M = replicates.ad.matrix, ctl = nc1)
+rownames(ad.ruv) = rownames(ad.tss.clr)
+
+```
+

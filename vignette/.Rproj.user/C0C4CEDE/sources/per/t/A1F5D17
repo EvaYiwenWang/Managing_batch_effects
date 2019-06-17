@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1560786552605.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2906755376",
+    "id" : "A1F5D17",
+    "lastKnownWriteTime" : 1560784828,
+    "last_content_update" : 1560784828,
+    "path" : "~/Documents/GitHub/vignette/vignette/03-Methods_evaluation.Rmd",
+    "project_path" : "03-Methods_evaluation.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "cursorPosition" : "1098,72",
+        "docOutlineSize" : "131.78348211201768",
+        "docOutlineVisible" : "1",
+        "scrollLine" : "986"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

@@ -1,0 +1,8 @@
+"0","#################"
+"0","# sponge data"
+"0","sponge.sd = apply(sponge.tss.clr,2,sd)"
+"0","sponge.mean = apply(sponge.tss.clr,2,mean)"
+"0","X.sponge = scale(sponge.tss.clr,center = T,scale = T)"
+"0","m.sponge = crossprod(X.sponge)"
+"0","m.svd.sponge = svd(m.sponge)"
+"0","barplot(m.svd.sponge$d)"

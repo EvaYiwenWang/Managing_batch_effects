@@ -1,0 +1,1 @@
+"0","Scatter_Density(data = sponge.pca.before$variates$X, batch = sponge.batch, trt = sponge.trt, expl.var = sponge.pca.before$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Before batch effect correction (Sponge)')"
