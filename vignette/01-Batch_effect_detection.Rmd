@@ -86,7 +86,6 @@ Batch effects in AD data are also visualised.
 ```{r}
 ad.lm = lm(ad.tss.clr[,1]~ ad.trt + ad.batch)
 anova(ad.lm)
-#
 ```
 
 The difference between batches is statistically significant (P < 0.001, as tested with ANOVA). We can also obtain P values between each two batch categories.
@@ -112,11 +111,12 @@ ggplot(hd.before.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) +
 It is easy to detect the differences between samples within different batches.
 
 ```{r}
-hd.lmm = lmer(hd.tss.clr[,1]~ hd.batch + 1|hd.trt)
-summary(hd.lmm)
+hd.lm = lm(hd.tss.clr[,1]~ hd.batch)
+anova(hd.lm)
 ```
 
-As the batch $\times$ treatment design of HD data is nested and unbalanced, the linear model is unable to fit. We therefore fit a linear mixed model with treatment (genotype) effect as random effect to obtain the P value of batch (cage) effect. The difference between cages is statistically significant (P < 0.001). 
+As the batch $\times$ treatment design of HD data is nested and unbalanced, the linear model with both treatment (genotype) and batch (cage) is unable to fit. We therefore fit a linear model with batch effect only. The difference between cages is statistically significant (P < 0.05). But the difference may also be influenced by treatment and we are unable to exclude this influence.
+
 
 ## RLE plots
 

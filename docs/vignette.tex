@@ -173,7 +173,7 @@ First, you will need to install then load the following packages:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{#cran.packages = c('knitr','mixOmics','xtable','ggplot2','vegan','cluster','gridExtra','pheatmap','ruv','lmerTest')}
+\CommentTok{#cran.packages = c('knitr','mixOmics','xtable','ggplot2','vegan','cluster','gridExtra','pheatmap','ruv','lmerTest','bapred')}
 \CommentTok{#install.packages(cran.packages)}
 \CommentTok{#bioconductor.packages = c('sva','limma','AgiMicroRna','variancePartition','pvca')}
 \CommentTok{#if (!requireNamespace("BiocManager", quietly = TRUE))}
@@ -195,6 +195,7 @@ First, you will need to install then load the following packages:
 \KeywordTok{library}\NormalTok{(pheatmap) }\CommentTok{# heatmap}
 \KeywordTok{library}\NormalTok{(ruv) }\CommentTok{# RUVIII}
 \KeywordTok{library}\NormalTok{(lmerTest) }\CommentTok{#lmer}
+\KeywordTok{library}\NormalTok{(bapred) }\CommentTok{# FAbatch}
 \end{Highlighting}
 \end{Shaded}
 
@@ -608,12 +609,6 @@ Batch effects in AD data are also visualised.
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{#}
-\end{Highlighting}
-\end{Shaded}
-
 The difference between batches is statistically significant (P
 \textless{} 0.001, as tested with ANOVA). We can also obtain P values
 between each two batch categories.
@@ -676,54 +671,28 @@ batches.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{hd.lmm =}\StringTok{ }\KeywordTok{lmer}\NormalTok{(hd.tss.clr[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{hd.batch }\OperatorTok{+}\StringTok{ }\DecValTok{1}\OperatorTok{|}\NormalTok{hd.trt)}
+\NormalTok{hd.lm =}\StringTok{ }\KeywordTok{lm}\NormalTok{(hd.tss.clr[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{hd.batch)}
+\KeywordTok{anova}\NormalTok{(hd.lm)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## singular fit
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{summary}\NormalTok{(hd.lmm)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Linear mixed model fit by REML. t-tests use Satterthwaite's method [
-## lmerModLmerTest]
-## Formula: hd.tss.clr[, 1] ~ hd.batch + 1 | hd.trt
+## Analysis of Variance Table
 ## 
-## REML criterion at convergence: 14.6
-## 
-## Scaled residuals: 
-##      Min       1Q   Median       3Q      Max 
-## -1.30197 -0.60295  0.03918  0.72511  1.59025 
-## 
-## Random effects:
-##  Groups   Name        Variance Std.Dev. Corr             
-##  hd.trt   (Intercept) 0.93174  0.9653                    
-##           hd.batchG   0.93308  0.9660   -1.00            
-##           hd.batchH   0.93313  0.9660   -1.00  1.00      
-##           hd.batchJ   0.06522  0.2554   -1.00  1.00  1.00
-##  Residual             0.12518  0.3538                    
-## Number of obs: 13, groups:  hd.trt, 2
-## 
-## Fixed effects:
-##             Estimate Std. Error      df t value Pr(>|t|)    
-## (Intercept)   7.6549     0.1406 11.1055   54.46  7.7e-15 ***
+## Response: hd.tss.clr[, 1]
+##           Df Sum Sq Mean Sq F value  Pr(>F)  
+## hd.batch   3 2.4108 0.80359  5.2569 0.02276 *
+## Residuals  9 1.3758 0.15286                  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## convergence code: 0
-## singular fit
 \end{verbatim}
 
 As the batch \(\times\) treatment design of HD data is nested and
-unbalanced, the linear model is unable to fit. We therefore fit a linear
-mixed model with treatment (genotype) effect as random effect to obtain
-the P value of batch (cage) effect. The difference between cages is
-statistically significant (P \textless{} 0.001).
+unbalanced, the linear model with both treatment (genotype) and batch
+(cage) is unable to fit. We therefore fit a linear model with batch
+effect only. The difference between cages is statistically significant
+(P \textless{} 0.05). But the difference may also be influenced by
+treatment and we are unable to exclude this influence.
 
 \section{RLE plots}\label{rle-plots}
 
@@ -941,6 +910,14 @@ as a covariate with linear models.
 \subsection{Linear model and linear mixed
 model}\label{linear-model-and-linear-mixed-model}
 
+LM and LMM are suitable for known batch effects, and can consider batch
+x treatment interaction and deal with unbalanced batch x treatment
+design. But they are univariate and rely on a Gaussian likelihood
+assumption, which may not apply to zero-inflated microbiome data despite
+CLR transformation.
+
+We fit a linear model for both sponge and AD data.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Sponge data}
@@ -960,12 +937,19 @@ model}\label{linear-model-and-linear-mixed-model}
 \NormalTok{\})}
 
 \NormalTok{ad.trt_q =}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.trt_p,}\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
+As the batch x treatment design of AD data is unbalaced, we fit a linear
+mixed model considering batch (cage) as random effects.
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# HD data}
 \NormalTok{hd.trt_p <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(hd.tss.clr, }\DecValTok{2}\NormalTok{, }\DataTypeTok{FUN =} \ControlFlowTok{function}\NormalTok{(x)\{}
-\NormalTok{  res.lmm <-}\StringTok{ }\KeywordTok{lmer}\NormalTok{(x }\OperatorTok{~}\StringTok{ }\NormalTok{hd.trt }\OperatorTok{+}\StringTok{ }\DecValTok{1}\OperatorTok{|}\NormalTok{hd.batch)}
+\NormalTok{  res.lmm <-}\StringTok{ }\KeywordTok{lmer}\NormalTok{(x }\OperatorTok{~}\StringTok{ }\NormalTok{hd.trt }\OperatorTok{+}\StringTok{ }\NormalTok{(}\DecValTok{1}\OperatorTok{|}\NormalTok{hd.batch))}
 \NormalTok{  summary.res =}\StringTok{ }\KeywordTok{summary}\NormalTok{(res.lmm)}
-\NormalTok{  p =}\StringTok{ }\NormalTok{summary.res}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{]}
+\NormalTok{  p =}\StringTok{ }\NormalTok{summary.res}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{,}\DecValTok{5}\NormalTok{]}
 \NormalTok{\})}
 
 \NormalTok{hd.trt_q =}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.trt_p,}\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
@@ -974,6 +958,10 @@ model}\label{linear-model-and-linear-mixed-model}
 
 \subsection{SVA}\label{sva}
 
+SVA can account for unknown batch effects. But it is univariate, relies
+on a Gaussian likelihood assumption and implicitly introduces a
+correlation between treatment and batch.
+
 The \emph{sva} function performs two different steps. First it
 identifies the number of latent factors that need to be estimated. The
 number of factors can be estimated using the \emph{num.sv}.
@@ -981,8 +969,8 @@ number of factors can be estimated using the \emph{num.sv}.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# sponge data}
-\NormalTok{sponge.mod =}\StringTok{ }\KeywordTok{model.matrix}\NormalTok{(}\OperatorTok{~}\NormalTok{sponge.trt)}
-\NormalTok{sponge.mod0 =}\StringTok{ }\KeywordTok{model.matrix}\NormalTok{(}\OperatorTok{~}\DecValTok{1}\NormalTok{,}\DataTypeTok{data =}\NormalTok{ sponge.trt)}
+\NormalTok{sponge.mod =}\StringTok{ }\KeywordTok{model.matrix}\NormalTok{(}\OperatorTok{~}\NormalTok{sponge.trt) }\CommentTok{# full model}
+\NormalTok{sponge.mod0 =}\StringTok{ }\KeywordTok{model.matrix}\NormalTok{(}\OperatorTok{~}\DecValTok{1}\NormalTok{,}\DataTypeTok{data =}\NormalTok{ sponge.trt) }\CommentTok{# null model}
 \NormalTok{sponge.sva.n <-}\StringTok{ }\KeywordTok{num.sv}\NormalTok{(}\DataTypeTok{dat =} \KeywordTok{t}\NormalTok{(sponge.tss.clr), }\DataTypeTok{mod =}\NormalTok{ sponge.mod)}
 \end{Highlighting}
 \end{Shaded}
@@ -997,7 +985,7 @@ variables:
 \end{Shaded}
 
 \begin{verbatim}
-## Number of significant surrogate variables is:  3 
+## Number of significant surrogate variables is:  1 
 ## Iteration (out of 5 ):1  2  3  4  5
 \end{verbatim}
 
@@ -1020,6 +1008,8 @@ for each OTU of sponge data.
 
 Now these P-values and Q-values are accounting for surrogate variables
 (estimated batch effects).
+
+We also apply SVA on both AD and HD data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1067,7 +1057,70 @@ Now these P-values and Q-values are accounting for surrogate variables
 
 \subsection{RUV2}\label{ruv2}
 
+RUV2 estimates and accounts for unknown batch effects. But it needs
+negative control variables that are affected by batch effects but not
+treatment effects.
+
+In the real world, we design negative control variables that are not
+affected by treatment effects only, we are not sure but assume these
+controls are affected by batch effects. RUV2 can only account for the
+difference captured by these controls.
+
+Since our three datasets do not have negative control variables, we use
+a linear model (or linear mixed model) to identify OTUs less likely to
+be affected by treatment effects as negative controls.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# sponge data}
+\NormalTok{sponge.nc =}\StringTok{ }\NormalTok{sponge.trt_q }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
+\NormalTok{sponge.ruv2 <-}\StringTok{ }\KeywordTok{RUV2}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ sponge.tss.clr, }\DataTypeTok{X =}\NormalTok{ sponge.trt, }\DataTypeTok{ctl =}\NormalTok{ sponge.nc, }\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\CommentTok{# k is subjective}
+\NormalTok{sponge.ruv2.trt_p <-}\StringTok{ }\NormalTok{sponge.ruv2}\OperatorTok{$}\NormalTok{p}
+\NormalTok{sponge.ruv2.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.ruv2.trt_p,}\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+
+\CommentTok{# AD data}
+\NormalTok{ad.nc =}\StringTok{ }\NormalTok{ad.trt_q }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
+\NormalTok{ad.ruv2 <-}\StringTok{ }\KeywordTok{RUV2}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ ad.tss.clr, }\DataTypeTok{X =}\NormalTok{ ad.trt, }\DataTypeTok{ctl =}\NormalTok{ ad.nc, }\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\CommentTok{# k is subjective}
+\NormalTok{ad.ruv2.trt_p <-}\StringTok{ }\NormalTok{ad.ruv2}\OperatorTok{$}\NormalTok{p}
+\NormalTok{ad.ruv2.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.ruv2.trt_p,}\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+
+\CommentTok{# HD data}
+\NormalTok{hd.nc =}\StringTok{ }\NormalTok{hd.trt_p }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
+\NormalTok{hd.ruv2 <-}\StringTok{ }\KeywordTok{RUV2}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ hd.tss.clr, }\DataTypeTok{X =}\NormalTok{ hd.trt, }\DataTypeTok{ctl =}\NormalTok{ hd.nc, }\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\CommentTok{# k is subjective}
+\NormalTok{hd.ruv2.trt_p <-}\StringTok{ }\NormalTok{hd.ruv2}\OperatorTok{$}\NormalTok{p}
+\NormalTok{hd.ruv2.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.ruv2.trt_p,}\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 \subsection{RUV4}\label{ruv4}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# sponge data}
+\NormalTok{sponge.k.obj =}\StringTok{ }\KeywordTok{getK}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ sponge.tss.clr, }\DataTypeTok{X =}\NormalTok{ sponge.trt, }\DataTypeTok{ctl =}\NormalTok{ sponge.nc)}
+\NormalTok{sponge.k =}\StringTok{ }\NormalTok{sponge.k.obj}\OperatorTok{$}\NormalTok{k}
+\NormalTok{sponge.k =}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(sponge.k }\OperatorTok{!=}\DecValTok{0}\NormalTok{, sponge.k, }\DecValTok{1}\NormalTok{)}
+\NormalTok{sponge.ruv4 <-}\StringTok{ }\KeywordTok{RUV4}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ sponge.tss.clr, }\DataTypeTok{X =}\NormalTok{ sponge.trt, }\DataTypeTok{ctl =}\NormalTok{ sponge.nc, }\DataTypeTok{k =}\NormalTok{ sponge.k) }
+\NormalTok{sponge.ruv4.trt_p <-}\StringTok{ }\NormalTok{sponge.ruv4}\OperatorTok{$}\NormalTok{p}
+\NormalTok{sponge.ruv4.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.ruv4.trt_p,}\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+
+\CommentTok{# AD data}
+\NormalTok{ad.k.obj =}\StringTok{ }\KeywordTok{getK}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ ad.tss.clr, }\DataTypeTok{X =}\NormalTok{ ad.trt, }\DataTypeTok{ctl =}\NormalTok{ ad.nc)}
+\NormalTok{ad.k =ad.k.obj}\OperatorTok{$}\NormalTok{k}
+\NormalTok{ad.k =}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(ad.k }\OperatorTok{!=}\DecValTok{0}\NormalTok{, ad.k, }\DecValTok{1}\NormalTok{)}
+\NormalTok{ad.ruv4 <-}\StringTok{ }\KeywordTok{RUV4}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ ad.tss.clr, }\DataTypeTok{X =}\NormalTok{ ad.trt, }\DataTypeTok{ctl =}\NormalTok{ ad.nc, }\DataTypeTok{k =}\NormalTok{ ad.k) }
+\NormalTok{ad.ruv4.trt_p <-}\StringTok{ }\NormalTok{ad.ruv4}\OperatorTok{$}\NormalTok{p}
+\NormalTok{ad.ruv4.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.ruv4.trt_p,}\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+
+\CommentTok{# HD data}
+\NormalTok{hd.k.obj =}\StringTok{ }\KeywordTok{getK}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ hd.tss.clr, }\DataTypeTok{X =}\NormalTok{ hd.trt, }\DataTypeTok{ctl =}\NormalTok{ hd.nc)}
+\NormalTok{hd.k =}\StringTok{ }\NormalTok{hd.k.obj}\OperatorTok{$}\NormalTok{k}
+\NormalTok{hd.k =}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(hd.k }\OperatorTok{!=}\DecValTok{0}\NormalTok{, hd.k, }\DecValTok{1}\NormalTok{)}
+\NormalTok{hd.ruv4 <-}\StringTok{ }\KeywordTok{RUV4}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ hd.tss.clr, }\DataTypeTok{X =}\NormalTok{ hd.trt, }\DataTypeTok{ctl =}\NormalTok{ hd.nc, }\DataTypeTok{k =}\NormalTok{ hd.k) }
+\NormalTok{hd.ruv4.trt_p <-}\StringTok{ }\NormalTok{hd.ruv4}\OperatorTok{$}\NormalTok{p}
+\NormalTok{hd.ruv4.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.ruv4.trt_p,}\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \section{Correcting for batch
 effects}\label{correcting-for-batch-effects}
@@ -1159,7 +1212,7 @@ effects}\label{correcting-for-batch-effects}
 ## Adjusting the Data
 \end{verbatim}
 
-\section{removeBatchEffect}\label{removebatcheffect}
+\subsection{removeBatchEffect}\label{removebatcheffect}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1171,7 +1224,24 @@ effects}\label{correcting-for-batch-effects}
 \end{Highlighting}
 \end{Shaded}
 
-\section{percentile normalisation}\label{percentile-normalisation}
+\subsection{FAbatch}\label{fabatch}
+
+FAbatch is unable to converge on both sponge data and AD data. This may
+influence the effect of batch correction.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# sponge data}
+\NormalTok{sponge.fabatch.obj =}\StringTok{ }\KeywordTok{fabatch}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ sponge.tss.clr,}\DataTypeTok{y =} \KeywordTok{as.factor}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(sponge.trt)), }\DataTypeTok{batch =}\NormalTok{ sponge.batch)}
+\NormalTok{sponge.fabatch <-}\StringTok{ }\NormalTok{sponge.fabatch.obj}\OperatorTok{$}\NormalTok{xadj}
+
+\CommentTok{# ad data}
+\NormalTok{ad.fabatch.obj =}\StringTok{ }\KeywordTok{fabatch}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ ad.tss.clr,}\DataTypeTok{y =} \KeywordTok{as.factor}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(ad.trt)), }\DataTypeTok{batch =} \KeywordTok{as.factor}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(ad.batch)))}
+\NormalTok{ad.fabatch <-}\StringTok{ }\NormalTok{ad.fabatch.obj}\OperatorTok{$}\NormalTok{xadj}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{percentile normalisation}\label{percentile-normalisation}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1182,7 +1252,7 @@ effects}\label{correcting-for-batch-effects}
 \end{Highlighting}
 \end{Shaded}
 
-\section{SVD-based method}\label{svd-based-method}
+\subsection{SVD-based method}\label{svd-based-method}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1198,7 +1268,7 @@ effects}\label{correcting-for-batch-effects}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-33-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-37-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1231,7 +1301,7 @@ effects}\label{correcting-for-batch-effects}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-33-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-37-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1254,7 +1324,7 @@ effects}\label{correcting-for-batch-effects}
 \end{Highlighting}
 \end{Shaded}
 
-\section{RUVIII}\label{ruviii}
+\subsection{RUVIII}\label{ruviii}
 
 RUVIII needs technical sample replicates and negative control variables.
 As only AD data have sample replicates, RUVIII is only applied on AD
@@ -1326,7 +1396,7 @@ component}\label{principal-component-analysis-pca-with-density-plot-per-componen
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-37-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-41-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1334,7 +1404,7 @@ component}\label{principal-component-analysis-pca-with-density-plot-per-componen
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-37-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-41-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1342,7 +1412,7 @@ component}\label{principal-component-analysis-pca-with-density-plot-per-componen
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-39-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-43-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1350,7 +1420,7 @@ component}\label{principal-component-analysis-pca-with-density-plot-per-componen
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-39-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-43-2.pdf}
 
 \subsection{Density plot and box
 plot}\label{density-plot-and-box-plot-1}
@@ -1399,7 +1469,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-41-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-45-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1407,7 +1477,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-41-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-45-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1442,7 +1512,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-43-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-47-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1450,7 +1520,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-43-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-47-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1691,7 +1761,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-45-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-49-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1699,7 +1769,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-45-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-49-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1738,7 +1808,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-47-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-51-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1746,7 +1816,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-47-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-51-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2138,7 +2208,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-49-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-53-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2164,7 +2234,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-50-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2218,7 +2288,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-52-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-56-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2232,7 +2302,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-52-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-56-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2248,7 +2318,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-53-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-57-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2262,7 +2332,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-53-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-57-2.pdf}
 
 \subsection{Heatmap}\label{heatmap-1}
 
@@ -2293,7 +2363,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2317,7 +2387,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2341,7 +2411,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-3.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-3.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2365,7 +2435,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-4.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-4.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2389,7 +2459,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-5.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-5.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2413,7 +2483,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-6.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-6.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2443,7 +2513,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-7.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-7.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2467,7 +2537,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-8.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-8.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2491,7 +2561,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-9.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-9.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2515,7 +2585,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-10.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-10.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2539,7 +2609,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-11.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-11.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2563,7 +2633,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-12.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-12.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2587,7 +2657,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-13.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-13.pdf}
 
 \section{Variance calculation}\label{variance-calculation}
 
@@ -2679,7 +2749,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-56-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-60-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2779,7 +2849,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-1.pdf}
 
 \subsection{PVCA}\label{pvca}
 
@@ -2863,7 +2933,7 @@ be applied on Sponge data.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-60-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-64-1.pdf}
 
 \subsection{Variance partition per
 variable}\label{variance-partition-per-variable}
@@ -2918,7 +2988,7 @@ variable}\label{variance-partition-per-variable}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-61-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-65-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2975,7 +3045,7 @@ variable}\label{variance-partition-per-variable}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-61-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-65-2.pdf}
 
 \subsection{Silhouette coefficient}\label{silhouette-coefficient}
 
@@ -3009,7 +3079,7 @@ variable}\label{variance-partition-per-variable}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-66-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3041,7 +3111,7 @@ variable}\label{variance-partition-per-variable}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-66-2.pdf}
 
 \chapter{Simulations of systematic and non-systematic batch
 effects}\label{simu}
@@ -3101,7 +3171,7 @@ effects}\label{simu}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-63-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-67-1.pdf}
 
 \section{Mean=0\&5,unequal variance}\label{mean05unequal-variance}
 
@@ -3161,7 +3231,7 @@ effects}\label{simu}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-64-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-68-1.pdf}
 
 \section{Sponge data}\label{sponge-data}
 
@@ -3183,7 +3253,7 @@ effects}\label{simu}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-65-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-69-1.pdf}
 
 \section{AD data}\label{ad-data}
 
@@ -3206,7 +3276,7 @@ effects}\label{simu}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-66-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-70-1.pdf}
 
 \bibliography{book.bib,packages.bib}
 

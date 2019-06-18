@@ -1,3 +1,0 @@
-"0","# sponge data"
-"0","sponge.lib.size.tss <- apply(sponge.tss, 1, sum)"
-"0","barplot(sponge.lib.size.tss, main =  'Sponge data',las=2)"

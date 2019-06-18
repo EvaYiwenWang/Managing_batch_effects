@@ -1,3 +1,0 @@
-"0","# hd data"
-"0","hd.lib.size.tss <- apply(hd.tss, 1, sum)"
-"0","barplot(hd.lib.size.tss, main =  'HD data',las=2)"

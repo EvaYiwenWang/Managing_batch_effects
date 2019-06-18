@@ -1,4 +1,4 @@
-"0","#cran.packages = c('knitr','mixOmics','xtable','ggplot2','vegan','cluster','gridExtra','pheatmap','ruv','lmerTest')"
+"0","#cran.packages = c('knitr','mixOmics','xtable','ggplot2','vegan','cluster','gridExtra','pheatmap','ruv','lmerTest','bapred')"
 "0","#install.packages(cran.packages)"
 "0","#bioconductor.packages = c('sva','limma','AgiMicroRna','variancePartition','pvca')"
 "0","#if (!requireNamespace(""BiocManager"", quietly = TRUE))"
@@ -19,3 +19,4 @@
 "0","library(pheatmap) # heatmap"
 "0","library(ruv) # RUVIII"
 "0","library(lmerTest) #lmer"
+"0","library(bapred) # FAbatch"

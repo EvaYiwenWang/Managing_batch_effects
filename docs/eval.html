@@ -132,11 +132,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2" data-path="adjust.html"><a href="adjust.html#correcting-for-batch-effects"><i class="fa fa-check"></i><b>3.2</b> Correcting for batch effects</a><ul>
 <li class="chapter" data-level="3.2.1" data-path="adjust.html"><a href="adjust.html#bmc-batch-mean-centering"><i class="fa fa-check"></i><b>3.2.1</b> BMC (batch mean centering)</a></li>
 <li class="chapter" data-level="3.2.2" data-path="adjust.html"><a href="adjust.html#combat"><i class="fa fa-check"></i><b>3.2.2</b> ComBat</a></li>
+<li class="chapter" data-level="3.2.3" data-path="adjust.html"><a href="adjust.html#removebatcheffect"><i class="fa fa-check"></i><b>3.2.3</b> removeBatchEffect</a></li>
+<li class="chapter" data-level="3.2.4" data-path="adjust.html"><a href="adjust.html#fabatch"><i class="fa fa-check"></i><b>3.2.4</b> FAbatch</a></li>
+<li class="chapter" data-level="3.2.5" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.2.5</b> percentile normalisation</a></li>
+<li class="chapter" data-level="3.2.6" data-path="adjust.html"><a href="adjust.html#svd-based-method"><i class="fa fa-check"></i><b>3.2.6</b> SVD-based method</a></li>
+<li class="chapter" data-level="3.2.7" data-path="adjust.html"><a href="adjust.html#ruviii"><i class="fa fa-check"></i><b>3.2.7</b> RUVIII</a></li>
 </ul></li>
-<li class="chapter" data-level="3.3" data-path="adjust.html"><a href="adjust.html#removebatcheffect"><i class="fa fa-check"></i><b>3.3</b> removeBatchEffect</a></li>
-<li class="chapter" data-level="3.4" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.4</b> percentile normalisation</a></li>
-<li class="chapter" data-level="3.5" data-path="adjust.html"><a href="adjust.html#svd-based-method"><i class="fa fa-check"></i><b>3.5</b> SVD-based method</a></li>
-<li class="chapter" data-level="3.6" data-path="adjust.html"><a href="adjust.html#ruviii"><i class="fa fa-check"></i><b>3.6</b> RUVIII</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="eval.html"><a href="eval.html"><i class="fa fa-check"></i><b>4</b> Methods evaluation</a><ul>
 <li class="chapter" data-level="4.1" data-path="eval.html"><a href="eval.html#diagnostic-plots"><i class="fa fa-check"></i><b>4.1</b> Diagnostic plots</a><ul>
@@ -202,13 +203,13 @@ pca.ad.percentile =<span class="st"> </span><span class="kw">pca</span>(ad.perce
 pca.ad.svd =<span class="st"> </span><span class="kw">pca</span>(ad.svd, <span class="dt">ncomp =</span> <span class="dv">3</span>)
 pca.ad.ruv =<span class="st"> </span><span class="kw">pca</span>(ad.ruv, <span class="dt">ncomp =</span> <span class="dv">3</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(plot.pca.before.sponge, plot.pca.bmc.sponge, plot.pca.combat.sponge,plot.pca.limma.sponge,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-37-1.png" width="864" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-41-1.png" width="864" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(plot.pca.before.sponge, plot.pca.percentile.sponge,plot.pca.svd.sponge,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-37-2.png" width="864" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-41-2.png" width="864" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(plot.pca.before.ad, plot.pca.bmc.ad, plot.pca.combat.ad,plot.pca.limma.ad,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-39-1.png" width="864" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-43-1.png" width="864" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(plot.pca.before.ad, plot.pca.percentile.ad,plot.pca.svd.ad,plot.pca.ruv.ad,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-39-2.png" width="864" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-43-2.png" width="864" /></p>
 </div>
 <div id="density-plot-and-box-plot-1" class="section level3">
 <h3><span class="header-section-number">4.1.2</span> Density plot and box plot</h3>
@@ -246,9 +247,9 @@ sponge.svd.boxplot &lt;-<span class="kw">box_plot_fun</span>(<span class="dt">da
              <span class="dt">y=</span>sponge.svd.df<span class="op">$</span>value,<span class="dt">title =</span> <span class="st">&#39;OTU9 - SVD (Sponge)&#39;</span>,
              <span class="dt">batch.legend.title =</span> <span class="st">&#39;Gel (batch)&#39;</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(sponge.before.boxplot, sponge.bmc.boxplot, sponge.combat.boxplot, sponge.limma.boxplot,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(sponge.before.boxplot, sponge.percentile.boxplot,sponge.svd.boxplot,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-41-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-45-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## density plot
 <span class="co"># before</span>
 plot.sponge.before &lt;-<span class="st"> </span><span class="kw">ggplot</span>(sponge.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU9 - before (Sponge)&#39;</span>,<span class="dt">x=</span><span class="st">&#39;Value&#39;</span>,<span class="dt">fill =</span> <span class="st">&#39;Gel (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust=</span><span class="fl">0.5</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())
@@ -272,9 +273,9 @@ plot.sponge.percentile &lt;-<span class="st"> </span><span class="kw">ggplot</sp
 <span class="co"># SVD</span>
 plot.sponge.svd &lt;-<span class="st"> </span><span class="kw">ggplot</span>(sponge.svd.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU9 - SVD (Sponge)&#39;</span>,<span class="dt">x=</span><span class="st">&#39;Value&#39;</span>,<span class="dt">fill =</span> <span class="st">&#39;Gel (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust=</span><span class="fl">0.5</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(plot.sponge.before, plot.sponge.bmc, plot.sponge.combat,plot.sponge.limma,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(plot.sponge.before, plot.sponge.percentile, plot.sponge.svd,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-43-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-47-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">######### p-values
 linearm.sponge.before =<span class="st"> </span><span class="kw">lm</span>(sponge.tss.clr[,<span class="dv">9</span>]<span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
 <span class="kw">summary</span>(linearm.sponge.before)</code></pre></div>
@@ -456,9 +457,9 @@ ad.ruv.boxplot &lt;-<span class="st"> </span><span class="kw">box_plot_fun</span
              <span class="dt">batch.legend.title =</span> <span class="st">&#39;Date (batch)&#39;</span>,
              <span class="dt">x.angle =</span> <span class="dv">45</span>, <span class="dt">x.hjust =</span> <span class="dv">1</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(ad.before.boxplot, ad.bmc.boxplot, ad.combat.boxplot, ad.limma.boxplot,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-49-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(ad.before.boxplot, ad.percentile.boxplot,ad.svd.boxplot,ad.ruv.boxplot,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-45-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-49-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># density plot</span>
 <span class="co"># before</span>
 plot.ad.before =<span class="st"> </span><span class="kw">ggplot</span>(ad.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU12 - before (AD)&#39;</span>,<span class="dt">x =</span> <span class="st">&#39;Value&#39;</span>,<span class="dt">fill =</span> <span class="st">&#39;Date (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust=</span><span class="fl">0.5</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())
@@ -486,9 +487,9 @@ plot.ad.svd =<span class="st"> </span><span class="kw">ggplot</span>(ad.svd.df, 
 <span class="co"># RUVIII</span>
 plot.ad.ruv =<span class="st"> </span><span class="kw">ggplot</span>(ad.ruv.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU12 - RUVIII (AD)&#39;</span>,<span class="dt">x =</span> <span class="st">&#39;Value&#39;</span>,<span class="dt">fill =</span> <span class="st">&#39;Date (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust=</span><span class="fl">0.5</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(plot.ad.before, plot.ad.bmc, plot.ad.combat,plot.ad.limma,<span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-51-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(plot.ad.before, plot.ad.percentile, plot.ad.svd,plot.ad.ruv, <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-47-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-51-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#p-values</span>
 linearm.ad.before =<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[,<span class="dv">1</span>]<span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
 <span class="kw">anova</span>(linearm.ad.before)</code></pre></div>
@@ -758,7 +759,7 @@ sponge.svd_e =<span class="st"> </span>sponge.svd[sponge.trt <span class="op">==
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.percentile_c),<span class="dt">batch =</span> sponge.batch_c,<span class="dt">maintitle =</span> <span class="st">&#39;Sponge: PN (choanosome)&#39;</span>,<span class="dt">title.cex =</span> <span class="dv">1</span>)
 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.svd_c),<span class="dt">batch =</span> sponge.batch_c,<span class="dt">maintitle =</span> <span class="st">&#39;Sponge: SVD (choanosome)&#39;</span>,<span class="dt">title.cex =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-49-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>), <span class="dt">mai=</span><span class="kw">c</span>(<span class="fl">0.4</span>,<span class="fl">0.6</span>,<span class="fl">0.3</span>,<span class="fl">0.1</span>))
 
@@ -773,7 +774,7 @@ sponge.svd_e =<span class="st"> </span>sponge.svd[sponge.trt <span class="op">==
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.percentile_e),<span class="dt">batch =</span> sponge.batch_e,<span class="dt">maintitle =</span> <span class="st">&#39;Sponge: PN (ectosome)&#39;</span>,<span class="dt">title.cex =</span> <span class="dv">1</span>)
 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.svd_e),<span class="dt">batch =</span> sponge.batch_e,<span class="dt">maintitle =</span> <span class="st">&#39;Sponge: SVD (ectosome)&#39;</span>,<span class="dt">title.cex =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-50-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-54-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">################
 <span class="co"># ad data</span>
@@ -811,7 +812,7 @@ ad.ruv_<span class="dv">2</span> =<span class="st"> </span>ad.ruv[ad.trt <span c
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.combat_<span class="dv">05</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">05</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: ComBat (0-0.5 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.5</span>)
 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.limma_<span class="dv">05</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">05</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: rBE (0-0.5 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.5</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-52-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.percentile_<span class="dv">05</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">05</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: PN (0-0.5 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.5</span>)
 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.svd_<span class="dv">05</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">05</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: SVD (0-0.5 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.5</span>)
@@ -819,7 +820,7 @@ ad.ruv_<span class="dv">2</span> =<span class="st"> </span>ad.ruv[ad.trt <span c
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.ruv_<span class="dv">05</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">05</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: RUVIII (0-0.5 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.5</span>)
 
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-52-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-56-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">mai=</span><span class="kw">c</span>(<span class="fl">0.35</span>,<span class="fl">0.8</span>,<span class="fl">0.3</span>,<span class="fl">0.1</span>))
 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.before_<span class="dv">2</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">2</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: before (1-2 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.3</span>)
@@ -829,7 +830,7 @@ ad.ruv_<span class="dv">2</span> =<span class="st"> </span>ad.ruv[ad.trt <span c
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.combat_<span class="dv">2</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">2</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: ComBat (1-2 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.3</span>)
 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.limma_<span class="dv">2</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">2</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: rBE (1-2 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.3</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-57-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.percentile_<span class="dv">2</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">2</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: PN (1-2 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.3</span>)
 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.svd_<span class="dv">2</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">2</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: SVD (1-2 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.3</span>)
@@ -837,7 +838,7 @@ ad.ruv_<span class="dv">2</span> =<span class="st"> </span>ad.ruv[ad.trt <span c
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.ruv_<span class="dv">2</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">2</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD: RUVIII (1-2 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.4</span>, <span class="dt">cex.xaxis =</span> <span class="fl">0.3</span>)
 
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-53-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-57-2.png" width="672" /></p>
 </div>
 <div id="heatmap-1" class="section level3">
 <h3><span class="header-section-number">4.1.4</span> Heatmap</h3>
@@ -863,7 +864,7 @@ anno_metabo_colors.sponge =<span class="st"> </span><span class="kw">list</span>
          <span class="dt">annotation_colors=</span>anno_metabo_colors.sponge,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - before&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># BMC </span>
 sponge.bmc.scale =<span class="st"> </span><span class="kw">scale</span>(sponge.bmc,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 sponge.bmc.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.bmc.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -881,7 +882,7 @@ sponge.bmc.scale =<span class="st"> </span><span class="kw">scale</span>(<span c
          <span class="dt">annotation_colors=</span>anno_metabo_colors.sponge,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - BMC&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ComBat </span>
 sponge.combat.scale =<span class="st"> </span><span class="kw">scale</span>(sponge.combat,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 sponge.combat.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.combat.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -899,7 +900,7 @@ sponge.combat.scale =<span class="st"> </span><span class="kw">scale</span>(<spa
          <span class="dt">annotation_colors=</span>anno_metabo_colors.sponge,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - ComBat&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-3.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-3.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># removeBatchEffect</span>
 sponge.limma.scale =<span class="st"> </span><span class="kw">scale</span>(sponge.limma,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 sponge.limma.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.limma.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -917,7 +918,7 @@ sponge.limma.scale =<span class="st"> </span><span class="kw">scale</span>(<span
          <span class="dt">annotation_colors=</span>anno_metabo_colors.sponge,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - removeBatchEffect&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-4.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-4.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># percentile normalisation</span>
 sponge.percentile.scale =<span class="st"> </span><span class="kw">scale</span>(sponge.percentile,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 sponge.percentile.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.percentile.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -935,7 +936,7 @@ sponge.percentile.scale =<span class="st"> </span><span class="kw">scale</span>(
          <span class="dt">annotation_colors=</span>anno_metabo_colors.sponge,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - percentile norm&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-5.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-5.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SVD</span>
 sponge.svd.scale =<span class="st"> </span><span class="kw">scale</span>(sponge.svd,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 sponge.svd.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.svd.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -953,7 +954,7 @@ sponge.svd.scale =<span class="st"> </span><span class="kw">scale</span>(<span c
          <span class="dt">annotation_colors=</span>anno_metabo_colors.sponge,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - SVD&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-6.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-6.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">#################
 <span class="co"># AD data</span>
 <span class="co"># before </span>
@@ -977,7 +978,7 @@ anno_metabo_colors.ad =<span class="st"> </span><span class="kw">list</span>(<sp
          <span class="dt">annotation_colors=</span>anno_metabo_colors.ad,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - Scaled&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-7.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-7.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># BMC</span>
 ad.bmc.scale =<span class="st"> </span><span class="kw">scale</span>(ad.bmc,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.bmc.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.bmc.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -995,7 +996,7 @@ ad.bmc.scale =<span class="st"> </span><span class="kw">scale</span>(<span class
          <span class="dt">annotation_colors=</span>anno_metabo_colors.ad,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - BMC&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-8.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-8.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ComBat</span>
 ad.combat.scale =<span class="st"> </span><span class="kw">scale</span>(ad.combat,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.combat.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.combat.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -1013,7 +1014,7 @@ ad.combat.scale =<span class="st"> </span><span class="kw">scale</span>(<span cl
          <span class="dt">annotation_colors=</span>anno_metabo_colors.ad,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - ComBat&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-9.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-9.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># removeBatchEffect</span>
 ad.limma.scale =<span class="st"> </span><span class="kw">scale</span>(ad.limma,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.limma.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.limma.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -1031,7 +1032,7 @@ ad.limma.scale =<span class="st"> </span><span class="kw">scale</span>(<span cla
          <span class="dt">annotation_colors=</span>anno_metabo_colors.ad,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - removeBatchEffect&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-10.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-10.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># percentile normalisation</span>
 ad.percentile.scale =<span class="st"> </span><span class="kw">scale</span>(ad.percentile,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.percentile.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.percentile.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -1049,7 +1050,7 @@ ad.percentile.scale =<span class="st"> </span><span class="kw">scale</span>(<spa
          <span class="dt">annotation_colors=</span>anno_metabo_colors.ad,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - percentile norm&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-11.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-11.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SVD</span>
 ad.svd.scale =<span class="st"> </span><span class="kw">scale</span>(ad.svd,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.svd.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.svd.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -1067,7 +1068,7 @@ ad.svd.scale =<span class="st"> </span><span class="kw">scale</span>(<span class
          <span class="dt">annotation_colors=</span>anno_metabo_colors.ad,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - SVD&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-12.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-12.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># RUVIII</span>
 ad.ruv.scale =<span class="st"> </span><span class="kw">scale</span>(ad.ruv,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.ruv.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.ruv.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -1085,7 +1086,7 @@ ad.ruv.scale =<span class="st"> </span><span class="kw">scale</span>(<span class
          <span class="dt">annotation_colors=</span>anno_metabo_colors.ad,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - RUVIII&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-54-13.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-58-13.png" width="672" /></p>
 </div>
 </div>
 <div id="variance-calculation" class="section level2">
@@ -1168,7 +1169,7 @@ rda.prop.sponge =<span class="st"> </span><span class="kw">data.frame</span>(<sp
 rda.prop.sponge<span class="op">$</span>Method =<span class="st">  </span><span class="kw">factor</span>(rda.prop.sponge<span class="op">$</span>Method, <span class="dt">levels =</span> <span class="kw">unique</span>(rda.prop.sponge<span class="op">$</span>Method))
 
 <span class="kw">ggplot</span>(<span class="dt">data =</span> rda.prop.sponge, <span class="kw">aes</span>(<span class="dt">x=</span>Method,<span class="dt">y=</span>prop,<span class="dt">fill =</span> Type)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&quot;identity&quot;</span>,<span class="dt">position =</span> <span class="st">&#39;dodge&#39;</span>, <span class="dt">colour =</span> <span class="st">&#39;black&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_text</span>(<span class="dt">data=</span>rda.prop.sponge, <span class="kw">aes</span>(Method, prop<span class="op">+</span><span class="fl">2.5</span>, <span class="dt">label=</span>prop.r), <span class="dt">position =</span> <span class="kw">position_dodge</span>(<span class="dt">width=</span><span class="fl">0.9</span>), <span class="dt">size=</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">&quot;Variance explained (%)&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">60</span>, <span class="dt">hjust =</span> <span class="dv">1</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(),<span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),<span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">100</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-60-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># AD data</span>
 data.design.ad =<span class="st"> </span><span class="kw">numeric</span>()
 data.design.ad<span class="op">$</span>group =<span class="st"> </span>ad.trt
@@ -1257,7 +1258,7 @@ rda.prop.ad =<span class="st"> </span><span class="kw">data.frame</span>(<span c
 rda.prop.ad<span class="op">$</span>Method =<span class="st">  </span><span class="kw">factor</span>(rda.prop.ad<span class="op">$</span>Method, <span class="dt">levels =</span> <span class="kw">unique</span>(rda.prop.ad<span class="op">$</span>Method))
 
 <span class="kw">ggplot</span>(<span class="dt">data =</span> rda.prop.ad, <span class="kw">aes</span>(<span class="dt">x=</span>Method,<span class="dt">y=</span>prop,<span class="dt">fill =</span> Type)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&quot;identity&quot;</span>,<span class="dt">position =</span> <span class="st">&#39;dodge&#39;</span>, <span class="dt">colour =</span> <span class="st">&#39;black&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_text</span>(<span class="dt">data=</span>rda.prop.ad, <span class="kw">aes</span>(Method, prop<span class="op">+</span><span class="fl">2.5</span>, <span class="dt">label=</span>prop.r), <span class="dt">position =</span> <span class="kw">position_dodge</span>(<span class="dt">width=</span><span class="dv">1</span>), <span class="dt">size=</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">&quot;Variance explained (%)&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">60</span>, <span class="dt">hjust =</span> <span class="dv">1</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(),<span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),<span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_hue</span>(<span class="dt">l=</span><span class="dv">40</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">100</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-58-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-62-1.png" width="672" /></p>
 </div>
 <div id="pvca" class="section level3">
 <h3><span class="header-section-number">4.2.2</span> PVCA</h3>
@@ -1329,7 +1330,7 @@ pvca.prop.ad =<span class="st"> </span><span class="kw">data.frame</span>(<span 
 pvca.prop.ad<span class="op">$</span>Method =<span class="st">  </span><span class="kw">factor</span>(pvca.prop.ad<span class="op">$</span>Method, <span class="dt">levels =</span> <span class="kw">unique</span>(pvca.prop.ad<span class="op">$</span>Method))
 
 <span class="kw">ggplot</span>(<span class="dt">data =</span> pvca.prop.ad, <span class="kw">aes</span>(<span class="dt">x=</span>Method,<span class="dt">y=</span>prop,<span class="dt">fill =</span> Type)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&quot;identity&quot;</span>,<span class="dt">position =</span> <span class="st">&#39;dodge&#39;</span>,<span class="dt">colour =</span> <span class="st">&#39;black&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">geom_text</span>(<span class="dt">data=</span>pvca.prop.ad, <span class="kw">aes</span>(Method, prop<span class="op">+</span><span class="fl">0.03</span>, <span class="dt">label=</span>prop.r), <span class="dt">position =</span> <span class="kw">position_dodge</span>(<span class="dt">width=</span><span class="fl">0.9</span>), <span class="dt">size=</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">&quot;Weighted average proportion variance&quot;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">60</span>, <span class="dt">hjust =</span> <span class="dv">1</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(),<span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),<span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_hue</span>(<span class="dt">l=</span><span class="dv">40</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-60-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
 </div>
 <div id="variance-partition-per-variable" class="section level3">
 <h3><span class="header-section-number">4.2.3</span> Variance partition per variable</h3>
@@ -1378,7 +1379,7 @@ variance.sponge<span class="op">$</span>method =<span class="st"> </span><span c
 variance.sponge<span class="op">$</span>variance =<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(variance.sponge<span class="op">$</span>variance))
 
 <span class="kw">ggplot</span>(variance.sponge, <span class="kw">aes</span>(<span class="dt">x=</span>Type, <span class="dt">y=</span>variance,<span class="dt">fill=</span>Type)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">facet_grid</span>(<span class="dt">cols =</span> <span class="kw">vars</span>(method)) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">60</span>, <span class="dt">hjust =</span> <span class="dv">1</span>), <span class="dt">strip.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(),<span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),<span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Type&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Proportion Variance&quot;</span>,<span class="dt">name=</span><span class="st">&#39;Type&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-61-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##########
 <span class="co"># AD data</span>
 form.ad &lt;-<span class="st"> </span><span class="er">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch
@@ -1429,7 +1430,7 @@ variance.ad<span class="op">$</span>method =<span class="st"> </span><span class
 variance.ad<span class="op">$</span>variance =<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(variance.ad<span class="op">$</span>variance))
 
 <span class="kw">ggplot</span>(variance.ad, <span class="kw">aes</span>(<span class="dt">x=</span>Type, <span class="dt">y=</span>variance,<span class="dt">fill=</span>Type)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_boxplot</span>() <span class="op">+</span><span class="st"> </span><span class="kw">facet_grid</span>(<span class="dt">cols =</span> <span class="kw">vars</span>(method)) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">60</span>, <span class="dt">hjust =</span> <span class="dv">1</span>), <span class="dt">strip.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">11</span>),<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(),<span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),<span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Type&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Proportion Variance&quot;</span>,<span class="dt">name=</span><span class="st">&#39;Type&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_hue</span>(<span class="dt">l=</span><span class="dv">40</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-61-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-65-2.png" width="672" /></p>
 </div>
 <div id="silhouette-coefficient" class="section level3">
 <h3><span class="header-section-number">4.2.4</span> Silhouette coefficient</h3>
@@ -1458,7 +1459,7 @@ data.plot.sponge<span class="op">$</span>Type =<span class="st">  </span><span c
 
 
 <span class="kw">ggplot</span>(data.plot.sponge, <span class="kw">aes</span>(<span class="dt">x=</span>Type, <span class="dt">y=</span>silh.coeff, <span class="dt">color =</span> Cluster, <span class="dt">shape =</span> Type)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">facet_grid</span>(<span class="dt">cols =</span> <span class="kw">vars</span>(method)) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">60</span>, <span class="dt">hjust =</span> <span class="dv">1</span>), <span class="dt">strip.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),<span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;#388ECC&quot;</span>,<span class="st">&quot;#F68B33&quot;</span>,<span class="st">&quot;#F0E442&quot;</span>,<span class="st">&quot;#D55E00&quot;</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Type&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Silhouette Coefficient&quot;</span>, <span class="dt">name=</span><span class="st">&quot;Type&quot;</span>) </code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-62-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">############
 <span class="co"># AD data</span>
 silh.ad.before =<span class="st"> </span><span class="kw">calc.sil</span>(pca.ad.before<span class="op">$</span>variates<span class="op">$</span>X,<span class="dt">y1 =</span> ad.batch, <span class="dt">y2=</span> ad.trt, <span class="dt">name.y1 =</span> <span class="st">&#39;Batch&#39;</span>,<span class="dt">name.y2 =</span> <span class="st">&#39;Treatment&#39;</span>)
@@ -1484,7 +1485,7 @@ data.plot.ad<span class="op">$</span>Cluster =<span class="st">  </span><span cl
 data.plot.ad<span class="op">$</span>Type =<span class="st">  </span><span class="kw">factor</span>(data.plot.ad<span class="op">$</span>Type, <span class="dt">levels =</span> <span class="kw">unique</span>(data.plot.ad<span class="op">$</span>Type))
 
 <span class="kw">ggplot</span>(data.plot.ad, <span class="kw">aes</span>(<span class="dt">x=</span>Type, <span class="dt">y=</span>silh.coeff, <span class="dt">color =</span> Cluster, <span class="dt">shape =</span> Type)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">facet_grid</span>(<span class="dt">cols =</span> <span class="kw">vars</span>(method)) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">60</span>, <span class="dt">hjust =</span> <span class="dv">1</span>), <span class="dt">strip.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>),<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(),<span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">10</span>),<span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">15</span>),<span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;#388ECC&quot;</span>, <span class="st">&quot;#F68B33&quot;</span>, <span class="st">&quot;#C2C2C2&quot;</span>, <span class="st">&quot;#009E73&quot;</span>, <span class="st">&quot;#CC79A7&quot;</span>,<span class="st">&quot;#0072B2&quot;</span>, <span class="st">&quot;#999999&quot;</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Type&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Silhouette Coefficient&quot;</span>, <span class="dt">name=</span><span class="st">&quot;Type&quot;</span>) </code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-62-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-66-2.png" width="672" /></p>
 
 </div>
 </div>

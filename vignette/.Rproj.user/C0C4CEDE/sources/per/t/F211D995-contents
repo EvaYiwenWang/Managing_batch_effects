@@ -19,7 +19,7 @@ This vignette provides all the analyses performed in the paper "Managing Batch E
 First, you will need to install then load the following packages:
 
 ```{r, message = FALSE, warning = FALSE}
-#cran.packages = c('knitr','mixOmics','xtable','ggplot2','vegan','cluster','gridExtra','pheatmap','ruv','lmerTest')
+#cran.packages = c('knitr','mixOmics','xtable','ggplot2','vegan','cluster','gridExtra','pheatmap','ruv','lmerTest','bapred')
 #install.packages(cran.packages)
 #bioconductor.packages = c('sva','limma','AgiMicroRna','variancePartition','pvca')
 #if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -41,6 +41,7 @@ library(pvca) # PVCA
 library(pheatmap) # heatmap
 library(ruv) # RUVIII
 library(lmerTest) #lmer
+library(bapred) # FAbatch
 ```
 
 ## Study description          

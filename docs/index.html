@@ -132,11 +132,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2" data-path="adjust.html"><a href="adjust.html#correcting-for-batch-effects"><i class="fa fa-check"></i><b>3.2</b> Correcting for batch effects</a><ul>
 <li class="chapter" data-level="3.2.1" data-path="adjust.html"><a href="adjust.html#bmc-batch-mean-centering"><i class="fa fa-check"></i><b>3.2.1</b> BMC (batch mean centering)</a></li>
 <li class="chapter" data-level="3.2.2" data-path="adjust.html"><a href="adjust.html#combat"><i class="fa fa-check"></i><b>3.2.2</b> ComBat</a></li>
+<li class="chapter" data-level="3.2.3" data-path="adjust.html"><a href="adjust.html#removebatcheffect"><i class="fa fa-check"></i><b>3.2.3</b> removeBatchEffect</a></li>
+<li class="chapter" data-level="3.2.4" data-path="adjust.html"><a href="adjust.html#fabatch"><i class="fa fa-check"></i><b>3.2.4</b> FAbatch</a></li>
+<li class="chapter" data-level="3.2.5" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.2.5</b> percentile normalisation</a></li>
+<li class="chapter" data-level="3.2.6" data-path="adjust.html"><a href="adjust.html#svd-based-method"><i class="fa fa-check"></i><b>3.2.6</b> SVD-based method</a></li>
+<li class="chapter" data-level="3.2.7" data-path="adjust.html"><a href="adjust.html#ruviii"><i class="fa fa-check"></i><b>3.2.7</b> RUVIII</a></li>
 </ul></li>
-<li class="chapter" data-level="3.3" data-path="adjust.html"><a href="adjust.html#removebatcheffect"><i class="fa fa-check"></i><b>3.3</b> removeBatchEffect</a></li>
-<li class="chapter" data-level="3.4" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.4</b> percentile normalisation</a></li>
-<li class="chapter" data-level="3.5" data-path="adjust.html"><a href="adjust.html#svd-based-method"><i class="fa fa-check"></i><b>3.5</b> SVD-based method</a></li>
-<li class="chapter" data-level="3.6" data-path="adjust.html"><a href="adjust.html#ruviii"><i class="fa fa-check"></i><b>3.6</b> RUVIII</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="eval.html"><a href="eval.html"><i class="fa fa-check"></i><b>4</b> Methods evaluation</a><ul>
 <li class="chapter" data-level="4.1" data-path="eval.html"><a href="eval.html#diagnostic-plots"><i class="fa fa-check"></i><b>4.1</b> Diagnostic plots</a><ul>
@@ -189,7 +190,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>This vignette provides all the analyses performed in the paper “Managing Batch Effects in Microbiome Data”.</p>
 <p><strong>Packages installation and loading</strong></p>
 <p>First, you will need to install then load the following packages:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#cran.packages = c(&#39;knitr&#39;,&#39;mixOmics&#39;,&#39;xtable&#39;,&#39;ggplot2&#39;,&#39;vegan&#39;,&#39;cluster&#39;,&#39;gridExtra&#39;,&#39;pheatmap&#39;,&#39;ruv&#39;,&#39;lmerTest&#39;)</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#cran.packages = c(&#39;knitr&#39;,&#39;mixOmics&#39;,&#39;xtable&#39;,&#39;ggplot2&#39;,&#39;vegan&#39;,&#39;cluster&#39;,&#39;gridExtra&#39;,&#39;pheatmap&#39;,&#39;ruv&#39;,&#39;lmerTest&#39;,&#39;bapred&#39;)</span>
 <span class="co">#install.packages(cran.packages)</span>
 <span class="co">#bioconductor.packages = c(&#39;sva&#39;,&#39;limma&#39;,&#39;AgiMicroRna&#39;,&#39;variancePartition&#39;,&#39;pvca&#39;)</span>
 <span class="co">#if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE))</span>
@@ -210,7 +211,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">library</span>(pvca) <span class="co"># PVCA</span>
 <span class="kw">library</span>(pheatmap) <span class="co"># heatmap</span>
 <span class="kw">library</span>(ruv) <span class="co"># RUVIII</span>
-<span class="kw">library</span>(lmerTest) <span class="co">#lmer</span></code></pre></div>
+<span class="kw">library</span>(lmerTest) <span class="co">#lmer</span>
+<span class="kw">library</span>(bapred) <span class="co"># FAbatch</span></code></pre></div>
 <div id="study-description" class="section level2">
 <h2><span class="header-section-number">1.1</span> Study description</h2>
 <div id="sponge-aplysina-aerophoba-study" class="section level3">

@@ -6,7 +6,11 @@ Methods that account for batch effects estimate unknown batch effects through ma
 
 ### Linear model and linear mixed model
 
-```{r, warning=F, message=F,error=FALSE}
+LM and LMM are suitable for known batch effects, and can consider batch x treatment interaction and deal with unbalanced batch x treatment design. But they are univariate and rely on a Gaussian likelihood assumption, which may not apply to zero-inflated microbiome data despite CLR transformation.
+
+We fit a linear model for both sponge and AD data.
+
+```{r}
 # Sponge data
 sponge.trt_p <- apply(sponge.tss.clr, 2, FUN = function(x){
   res.lm <- lm(x ~ sponge.trt + sponge.batch)
@@ -24,12 +28,16 @@ ad.trt_p <- apply(ad.tss.clr, 2, FUN = function(x){
 })
 
 ad.trt_q = p.adjust(ad.trt_p,method = 'fdr')
+```
 
+As the batch x treatment design of AD data is unbalaced, we fit a linear mixed model considering batch (cage) as random effects.
+
+```{r, warning=F, message=F,error=FALSE}
 # HD data
 hd.trt_p <- apply(hd.tss.clr, 2, FUN = function(x){
-  res.lmm <- lmer(x ~ hd.trt + 1|hd.batch)
+  res.lmm <- lmer(x ~ hd.trt + (1|hd.batch))
   summary.res = summary(res.lmm)
-  p = summary.res$coefficients[1,5]
+  p = summary.res$coefficients[2,5]
 })
 
 hd.trt_q = p.adjust(hd.trt_p,method = 'fdr')
@@ -37,12 +45,14 @@ hd.trt_q = p.adjust(hd.trt_p,method = 'fdr')
 
 ### SVA
 
+SVA can account for unknown batch effects. But it is univariate, relies on a Gaussian likelihood assumption and implicitly introduces a correlation between treatment and batch. 
+
 The *sva* function performs two different steps. First it identifies the number of latent factors that need to be estimated. The number of factors can be estimated using the *num.sv*.
 
 ```{r}
 # sponge data
-sponge.mod = model.matrix(~sponge.trt)
-sponge.mod0 = model.matrix(~1,data = sponge.trt)
+sponge.mod = model.matrix(~sponge.trt) # full model
+sponge.mod0 = model.matrix(~1,data = sponge.trt) # null model
 sponge.sva.n <- num.sv(dat = t(sponge.tss.clr), mod = sponge.mod)
 ```
 
@@ -63,6 +73,8 @@ sponge.sva.trt_q = p.adjust(sponge.sva.trt_p,method="fdr")
 ```
 
 Now these P-values and Q-values are accounting for surrogate variables (estimated batch effects).
+
+We also apply SVA on both AD and HD data.
 
 ```{r}
 # ad data
@@ -88,7 +100,61 @@ hd.sva.trt_q = p.adjust(hd.sva.trt_p,method="fdr")
 
 ### RUV2
 
+RUV2 estimates and accounts for unknown batch effects. But it needs negative control variables that are affected by batch effects but not treatment effects. 
+
+In the real world, we design negative control variables that are not affected by treatment effects only, we are not sure but assume these controls are affected by batch effects. RUV2 can only account for the difference captured by these controls.
+
+Since our three datasets do not have negative control variables, we use a linear model (or linear mixed model) to identify OTUs less likely to be affected by treatment effects as negative controls. 
+
+```{r, warning=F, message=F,error=FALSE}
+# sponge data
+sponge.nc = sponge.trt_q > 0.05
+sponge.ruv2 <- RUV2(Y = sponge.tss.clr, X = sponge.trt, ctl = sponge.nc, k = 3) # k is subjective
+sponge.ruv2.trt_p <- sponge.ruv2$p
+sponge.ruv2.trt_q <- p.adjust(sponge.ruv2.trt_p,method="fdr")
+
+# AD data
+ad.nc = ad.trt_q > 0.05
+ad.ruv2 <- RUV2(Y = ad.tss.clr, X = ad.trt, ctl = ad.nc, k = 3) # k is subjective
+ad.ruv2.trt_p <- ad.ruv2$p
+ad.ruv2.trt_q <- p.adjust(ad.ruv2.trt_p,method="fdr")
+
+# HD data
+hd.nc = hd.trt_p > 0.05
+hd.ruv2 <- RUV2(Y = hd.tss.clr, X = hd.trt, ctl = hd.nc, k = 3) # k is subjective
+hd.ruv2.trt_p <- hd.ruv2$p
+hd.ruv2.trt_q <- p.adjust(hd.ruv2.trt_p,method="fdr")
+
+```
+
+
 ### RUV4
+
+```{r, message=F,warning=F,error=F}
+# sponge data
+sponge.k.obj = getK(Y = sponge.tss.clr, X = sponge.trt, ctl = sponge.nc)
+sponge.k = sponge.k.obj$k
+sponge.k = ifelse(sponge.k !=0, sponge.k, 1)
+sponge.ruv4 <- RUV4(Y = sponge.tss.clr, X = sponge.trt, ctl = sponge.nc, k = sponge.k) 
+sponge.ruv4.trt_p <- sponge.ruv4$p
+sponge.ruv4.trt_q <- p.adjust(sponge.ruv4.trt_p,method="fdr")
+
+# AD data
+ad.k.obj = getK(Y = ad.tss.clr, X = ad.trt, ctl = ad.nc)
+ad.k =ad.k.obj$k
+ad.k = ifelse(ad.k !=0, ad.k, 1)
+ad.ruv4 <- RUV4(Y = ad.tss.clr, X = ad.trt, ctl = ad.nc, k = ad.k) 
+ad.ruv4.trt_p <- ad.ruv4$p
+ad.ruv4.trt_q <- p.adjust(ad.ruv4.trt_p,method="fdr")
+
+# HD data
+hd.k.obj = getK(Y = hd.tss.clr, X = hd.trt, ctl = hd.nc)
+hd.k = hd.k.obj$k
+hd.k = ifelse(hd.k !=0, hd.k, 1)
+hd.ruv4 <- RUV4(Y = hd.tss.clr, X = hd.trt, ctl = hd.nc, k = hd.k) 
+hd.ruv4.trt_p <- hd.ruv4$p
+hd.ruv4.trt_q <- p.adjust(hd.ruv4.trt_p,method="fdr")
+```
 
 
 ## Correcting for batch effects
@@ -125,7 +191,7 @@ ad.combat <- t(ComBat(t(ad.tss.clr),batch=ad.batch,mod = ad.mod, par.prior=F,pri
 ```
 
 
-## removeBatchEffect
+### removeBatchEffect
 
 ```{r}
 # Sponge data
@@ -135,8 +201,22 @@ sponge.limma <- t(removeBatchEffect(t(sponge.tss.clr),batch = sponge.batch,desig
 ad.limma <- t(removeBatchEffect(t(ad.tss.clr),batch = ad.batch,design = ad.mod))
 ```
 
+### FAbatch
 
-## percentile normalisation
+FAbatch is unable to converge on both sponge data and AD data. This may influence the effect of batch correction.
+
+```{r, message=F,warning=F,error=F}
+# sponge data
+sponge.fabatch.obj = fabatch(x = sponge.tss.clr,y = as.factor(as.numeric(sponge.trt)), batch = sponge.batch)
+sponge.fabatch <- sponge.fabatch.obj$xadj
+
+# ad data
+ad.fabatch.obj = fabatch(x = ad.tss.clr,y = as.factor(as.numeric(ad.trt)), batch = as.factor(as.numeric(ad.batch)))
+ad.fabatch <- ad.fabatch.obj$xadj
+```
+
+
+### percentile normalisation
 
 ```{r}
 sponge.percentile = percentile_norm(data = sponge.tss, batch = sponge.batch, trt = sponge.trt)
@@ -146,7 +226,7 @@ ad.percentile = percentile_norm(data = ad.tss, batch = ad.batch, trt = ad.trt)
 ```
 
 
-## SVD-based method
+### SVD-based method
 
 ```{r}
 #################
@@ -206,7 +286,7 @@ for(i in 1:ncol(defl.matrix_svd1.ad)){
 ```
 
 
-## RUVIII
+### RUVIII
 
 RUVIII needs technical sample replicates and negative control variables. As only AD data have sample replicates, RUVIII is only applied on AD data. We use linear model to find variables with less probability of treatment effects, and these variables are treated as negative control variables to fit the assumptions of RUVIII.
 
