@@ -17,7 +17,7 @@ TSS.divide = function(x){
 Scatter_Density <- function(data = data,batch = batch, trt = trt,expl.var = expl.var,
                             xlim=xlim,ylim=ylim, batch.legend.title = 'Batch', 
                             trt.legend.title = 'Treatment', density.lwd = 0.2,
-                            title = NULL){
+                            title = NULL, title.cex = 1.5, legend.cex = 0.7, legend.title.cex =0.75){
   data = as.data.frame(data)
   pMain <- ggplot(data = data, aes(x=data[,1], y=data[,2], colour = batch,shape = trt)) + 
     geom_point() + xlab(paste0('PC1: ',round(as.numeric(expl.var[1])*100),'% expl.var')) + 
@@ -28,7 +28,7 @@ Scatter_Density <- function(data = data,batch = batch, trt = trt,expl.var = expl
   pTop <- ggplot(data,aes(x=data[,1], fill=batch,linetype = trt)) + 
     geom_density(size = density.lwd,alpha=0.5) + ylab('Density') + 
     theme(axis.title.x  = element_blank(), axis.title.y = element_text(size = rel(0.8)), 
-          plot.title = element_text(hjust = 0.5,size = rel(1.2)), 
+          plot.title = element_text(hjust = 0.5,size = rel(title.cex)), 
           axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(),
           panel.background = element_blank()) + scale_fill_manual(values=color.mixo(1:10)) +
     xlim(xlim[1],xlim[2]) + labs(title = title)
@@ -43,11 +43,12 @@ Scatter_Density <- function(data = data,batch = batch, trt = trt,expl.var = expl
   
   g <- ggplotGrob(pMain + theme(legend.position="right",legend.box='horizontal',
                                 legend.direction = 'vertical', 
-                                legend.key.height = unit(0.3, 'cm'),
+                                legend.key.height = unit(0.2, 'cm'),
                                 legend.key.width = unit(0.1, 'cm'),
-                                legend.title = element_text(size = rel(0.75)),
+                                legend.title = element_text(size = rel(legend.title.cex)),
                                 legend.spacing.x = unit(0.1, 'cm'),
-                                legend.text = element_text(size = rel(0.7))))$grobs
+                                legend.spacing.y = unit(0.1, 'cm'),
+                                legend.text = element_text(size = rel(legend.cex))))$grobs
   legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
   
   grid.arrange(pTop+ theme(legend.position="none"), legend, pMain + 

@@ -9,73 +9,78 @@ editor_options:
 
 ### Principal component analysis (PCA) with density plot per component
 
+We apply PCA on both sponge and AD data before and after correction with different methods.
 
 ```{r}
 # sponge data
-pca.sponge.before = pca(sponge.tss.clr, ncomp = 3)
-pca.sponge.bmc = pca(sponge.bmc, ncomp = 3)
-pca.sponge.combat = pca(sponge.combat, ncomp = 3)
-pca.sponge.limma = pca(sponge.limma, ncomp = 3)
-pca.sponge.percentile = pca(sponge.percentile, ncomp = 3)
-pca.sponge.svd = pca(sponge.svd, ncomp = 3)
+sponge.pca.before = pca(sponge.tss.clr, ncomp = 3)
+sponge.pca.bmc = pca(sponge.bmc, ncomp = 3)
+sponge.pca.combat = pca(sponge.combat, ncomp = 3)
+sponge.pca.limma = pca(sponge.limma, ncomp = 3)
+sponge.pca.percentile = pca(sponge.percentile, ncomp = 3)
+sponge.pca.svd = pca(sponge.svd, ncomp = 3)
 
 # ad data
-pca.ad.before = pca(ad.tss.clr, ncomp = 3)
-pca.ad.bmc = pca(ad.bmc, ncomp = 3)
-pca.ad.combat = pca(ad.combat, ncomp = 3)
-pca.ad.limma = pca(ad.limma, ncomp = 3)
-pca.ad.percentile = pca(ad.percentile, ncomp = 3)
-pca.ad.svd = pca(ad.svd, ncomp = 3)
-pca.ad.ruv = pca(ad.ruv, ncomp = 3)
+ad.pca.before = pca(ad.tss.clr, ncomp = 3)
+ad.pca.bmc = pca(ad.bmc, ncomp = 3)
+ad.pca.combat = pca(ad.combat, ncomp = 3)
+ad.pca.limma = pca(ad.limma, ncomp = 3)
+ad.pca.percentile = pca(ad.percentile, ncomp = 3)
+ad.pca.svd = pca(ad.svd, ncomp = 3)
+ad.pca.ruv = pca(ad.ruvIII, ncomp = 3)
 ```
 
+We then plot these PCA sample plots with denisty plots per PC.
 
 ```{r,include=F,echo=T}
 ### sponge data
+sponge.pca.plot.before = Scatter_Density(data = sponge.pca.before$variates$X,batch = sponge.batch, trt = sponge.trt, expl.var = sponge.pca.before$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Before batch correction (Sponge)',title.cex = 1,legend.title.cex = 0.6)
 
-plot.pca.before.sponge = Scatter_Density(data = pca.sponge.before$variates$X,batch = sponge.batch, trt = sponge.trt, expl.var = pca.sponge.before$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Before batch correction (Sponge)')
+sponge.pca.plot.bmc = Scatter_Density(data = sponge.pca.bmc$variates$X,batch = sponge.batch, trt = sponge.trt, expl.var = sponge.pca.bmc$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with BMC (Sponge)',title.cex = 1,legend.title.cex = 0.6)
 
-plot.pca.bmc.sponge = Scatter_Density(data = pca.sponge.bmc$variates$X,batch = sponge.batch, trt = sponge.trt, expl.var = pca.sponge.bmc$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with BMC (Sponge)')
+sponge.pca.plot.combat = Scatter_Density(data = sponge.pca.combat$variates$X,batch = sponge.batch, trt = sponge.trt, expl.var = sponge.pca.combat$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with ComBat (Sponge)',title.cex = 1,legend.title.cex = 0.6)
 
-plot.pca.combat.sponge = Scatter_Density(data = pca.sponge.combat$variates$X,batch = sponge.batch, trt = sponge.trt, expl.var = pca.sponge.combat$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with ComBat (Sponge)')
+sponge.pca.plot.limma = Scatter_Density(data = sponge.pca.limma$variates$X,batch = sponge.batch, trt = sponge.trt, expl.var = sponge.pca.limma$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with rBE (Sponge)',title.cex = 1,legend.title.cex = 0.6)
 
-plot.pca.limma.sponge = Scatter_Density(data = pca.sponge.limma$variates$X,batch = sponge.batch, trt = sponge.trt, expl.var = pca.sponge.limma$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with rBE (Sponge)')
+sponge.pca.plot.percentile = Scatter_Density(data = sponge.pca.percentile$variates$X,batch = sponge.batch, trt = sponge.trt,expl.var = sponge.pca.percentile$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with PN (Sponge)',title.cex = 1,legend.title.cex = 0.6)
 
-plot.pca.percentile.sponge = Scatter_Density(data = pca.sponge.percentile$variates$X,batch = sponge.batch, trt = sponge.trt,expl.var = pca.sponge.percentile$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with PN (Sponge)')
-
-plot.pca.svd.sponge = Scatter_Density(data = pca.sponge.svd$variates$X,batch = sponge.batch, trt = sponge.trt,expl.var = pca.sponge.svd$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with SVD (Sponge)')
+sponge.pca.plot.svd = Scatter_Density(data = sponge.pca.svd$variates$X,batch = sponge.batch, trt = sponge.trt,expl.var = sponge.pca.svd$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Batch correction with SVD (Sponge)',title.cex = 1,legend.title.cex = 0.6)
 
 ```
 
 ```{r,fig.width=9,fig.height=5}
-grid.arrange(plot.pca.before.sponge, plot.pca.bmc.sponge, plot.pca.combat.sponge,plot.pca.limma.sponge,ncol=2)
-grid.arrange(plot.pca.before.sponge, plot.pca.percentile.sponge,plot.pca.svd.sponge,ncol=2)
+grid.arrange(sponge.pca.plot.before, sponge.pca.plot.bmc, sponge.pca.plot.combat,sponge.pca.plot.limma,ncol=2)
+grid.arrange(sponge.pca.plot.before, sponge.pca.plot.percentile,sponge.pca.plot.svd,ncol=2)
 ```
+
+SVD performed the worse, compared to BMC, removeBatchEffect and percentile normalisation, as it did not remove batch effects but removed tissue variation instead.
 
 ```{r, include=F,echo=T}
 # ad data
-plot.pca.before.ad = Scatter_Density(data = pca.ad.before$variates$X, batch = ad.batch, trt = ad.trt, expl.var = pca.ad.before$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Before batch correction (AD)')
+ad.pca.plot.before = Scatter_Density(data = ad.pca.before$variates$X, batch = ad.batch, trt = ad.trt, expl.var = ad.pca.before$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Before batch correction (AD)',title.cex = 1,legend.cex = 0.4,legend.title.cex = 0.6)
 
-plot.pca.bmc.ad = Scatter_Density(data = pca.ad.bmc$variates$X, batch = ad.batch, trt = ad.trt, expl.var = pca.ad.bmc$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with BMC (AD)')
+ad.pca.plot.bmc = Scatter_Density(data = ad.pca.bmc$variates$X, batch = ad.batch, trt = ad.trt, expl.var = ad.pca.bmc$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with BMC (AD)',title.cex = 1,legend.cex = 0.4,legend.title.cex = 0.6)
 
-plot.pca.combat.ad = Scatter_Density(data = pca.ad.combat$variates$X, batch = ad.batch, trt = ad.trt, expl.var = pca.ad.combat$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with ComBat (AD)')
+ad.pca.plot.combat = Scatter_Density(data = ad.pca.combat$variates$X, batch = ad.batch, trt = ad.trt, expl.var = ad.pca.combat$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with ComBat (AD)',title.cex = 1,legend.cex = 0.4,legend.title.cex = 0.6)
 
-plot.pca.limma.ad = Scatter_Density(data = pca.ad.limma$variates$X, batch = ad.batch, trt = ad.trt, expl.var = pca.ad.limma$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with rBE (AD)')
+ad.pca.plot.limma = Scatter_Density(data = ad.pca.limma$variates$X, batch = ad.batch, trt = ad.trt, expl.var = ad.pca.limma$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with rBE (AD)',title.cex = 1,legend.cex = 0.4,legend.title.cex = 0.6)
 
 
-plot.pca.percentile.ad = Scatter_Density(data = pca.ad.percentile$variates$X,batch = ad.batch, trt = ad.trt, expl.var = pca.ad.percentile$explained_variance,xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with PN (AD)')
+ad.pca.plot.percentile = Scatter_Density(data = ad.pca.percentile$variates$X,batch = ad.batch, trt = ad.trt, expl.var = ad.pca.percentile$explained_variance,xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with PN (AD)',title.cex = 1,legend.cex = 0.4,legend.title.cex = 0.6)
 
-plot.pca.svd.ad = Scatter_Density(data = pca.ad.svd$variates$X,batch = ad.batch, trt = ad.trt, expl.var = pca.ad.svd$explained_variance,xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with SVD (AD)')
+ad.pca.plot.svd = Scatter_Density(data = ad.pca.svd$variates$X,batch = ad.batch, trt = ad.trt, expl.var = ad.pca.svd$explained_variance,xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with SVD (AD)',title.cex = 1,legend.cex = 0.4,legend.title.cex = 0.6)
 
-plot.pca.ruv.ad = Scatter_Density(data = pca.ad.ruv$variates$X,batch = ad.batch, trt = ad.trt, expl.var = pca.ad.ruv$explained_variance,xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with RUVIII (AD)')
+ad.pca.plot.ruv = Scatter_Density(data = ad.pca.ruv$variates$X,batch = ad.batch, trt = ad.trt, expl.var = ad.pca.ruv$explained_variance,xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with RUVIII (AD)',title.cex = 1,legend.cex = 0.4,legend.title.cex = 0.6)
 
 ```
 
 ```{r,fig.width=9,fig.height=5}
-grid.arrange(plot.pca.before.ad, plot.pca.bmc.ad, plot.pca.combat.ad,plot.pca.limma.ad,ncol=2)
-grid.arrange(plot.pca.before.ad, plot.pca.percentile.ad,plot.pca.svd.ad,plot.pca.ruv.ad,ncol=2)
+grid.arrange(ad.pca.plot.before, ad.pca.plot.bmc, ad.pca.plot.combat,ad.pca.plot.limma,ncol=2)
+grid.arrange(ad.pca.plot.before, ad.pca.plot.percentile,ad.pca.plot.svd,ad.pca.plot.ruv,ncol=2)
 
 ```
+
+BMC, removeBatchEffect, percentile normalisation and RUVIII removed the batch effects, and maintained the treatment effects. SVD did not removed the batch effect but decreased the treatment effects.
 
 ### Density plot and box plot
 
@@ -83,92 +88,92 @@ grid.arrange(plot.pca.before.ad, plot.pca.percentile.ad,plot.pca.svd.ad,plot.pca
 ###############
 ## sponge data
 sponge.before.df = data.frame(value = sponge.tss.clr[,9], batch = sponge.batch)
-sponge.before.boxplot <- box_plot_fun(data = sponge.before.df,x=sponge.before.df$batch,
+sponge.boxplot.before <- box_plot_fun(data = sponge.before.df,x=sponge.before.df$batch,
              y=sponge.before.df$value,title = 'OTU9 - before (Sponge)',
              batch.legend.title = 'Gel (batch)')
 
 sponge.bmc.df = data.frame(value = sponge.bmc[,9], batch = sponge.batch)
-sponge.bmc.boxplot <-box_plot_fun(data = sponge.bmc.df,x=sponge.bmc.df$batch,
+sponge.boxplot.bmc <-box_plot_fun(data = sponge.bmc.df,x=sponge.bmc.df$batch,
              y=sponge.bmc.df$value,title = 'OTU9 - BMC (Sponge)',
              batch.legend.title = 'Gel (batch)')
 
 
 sponge.combat.df = data.frame(value = sponge.combat[,9], batch = sponge.batch)
-sponge.combat.boxplot <-box_plot_fun(data = sponge.combat.df,x=sponge.combat.df$batch,
+sponge.boxplot.combat <-box_plot_fun(data = sponge.combat.df,x=sponge.combat.df$batch,
              y=sponge.combat.df$value,title = 'OTU9 - ComBat (Sponge)',
              batch.legend.title = 'Gel (batch)')
 
 
 sponge.limma.df = data.frame(value = sponge.limma[,9], batch = sponge.batch)
-sponge.limma.boxplot <-box_plot_fun(data = sponge.limma.df,x=sponge.limma.df$batch,
+sponge.boxplot.limma <-box_plot_fun(data = sponge.limma.df,x=sponge.limma.df$batch,
              y=sponge.limma.df$value,title = 'OTU9 - rBE(Sponge)',
              batch.legend.title = 'Gel (batch)')
 
 sponge.percentile.df = data.frame(value = sponge.percentile[,9], batch = sponge.batch)
-sponge.percentile.boxplot <-box_plot_fun(data = sponge.percentile.df,x=sponge.percentile.df$batch,
+sponge.boxplot.percentile <-box_plot_fun(data = sponge.percentile.df,x=sponge.percentile.df$batch,
              y=sponge.percentile.df$value,title = 'OTU9 - PN (Sponge)',
              batch.legend.title = 'Gel (batch)')
 
 sponge.svd.df = data.frame(value = sponge.svd[,9], batch = sponge.batch)
-sponge.svd.boxplot <-box_plot_fun(data = sponge.svd.df,x=sponge.svd.df$batch,
+sponge.boxplot.svd <-box_plot_fun(data = sponge.svd.df,x=sponge.svd.df$batch,
              y=sponge.svd.df$value,title = 'OTU9 - SVD (Sponge)',
              batch.legend.title = 'Gel (batch)')
 ```
 
 ```{r}
-grid.arrange(sponge.before.boxplot, sponge.bmc.boxplot, sponge.combat.boxplot, sponge.limma.boxplot,ncol=2)
-grid.arrange(sponge.before.boxplot, sponge.percentile.boxplot,sponge.svd.boxplot,ncol=2)
+grid.arrange(sponge.boxplot.before, sponge.boxplot.bmc, sponge.boxplot.combat, sponge.boxplot.limma,ncol=2)
+grid.arrange(sponge.boxplot.before, sponge.boxplot.percentile,sponge.boxplot.svd,ncol=2)
 ```
 
 ```{r}
 ## density plot
 # before
-plot.sponge.before <- ggplot(sponge.before.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - before (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+sponge.dens.before <- ggplot(sponge.before.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - before (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 # BMC
-plot.sponge.bmc <- ggplot(sponge.bmc.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - BMC (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+sponge.dens.bmc <- ggplot(sponge.bmc.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - BMC (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 
 # ComBat
-plot.sponge.combat <- ggplot(sponge.combat.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - ComBat (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+sponge.dens.combat <- ggplot(sponge.combat.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - ComBat (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 
 # removeBatchEffect 
-plot.sponge.limma <- ggplot(sponge.limma.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - rBE (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+sponge.dens.limma <- ggplot(sponge.limma.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - rBE (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 
 # percentile normal
-plot.sponge.percentile <- ggplot(sponge.percentile.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - PN (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+sponge.dens.percentile <- ggplot(sponge.percentile.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - PN (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 
 # SVD
-plot.sponge.svd <- ggplot(sponge.svd.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - SVD (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+sponge.dens.svd <- ggplot(sponge.svd.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 - SVD (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 ```
 
 
 ```{r}
-grid.arrange(plot.sponge.before, plot.sponge.bmc, plot.sponge.combat,plot.sponge.limma,ncol=2)
-grid.arrange(plot.sponge.before, plot.sponge.percentile, plot.sponge.svd,ncol=2)
+grid.arrange(sponge.dens.before, sponge.dens.bmc, sponge.dens.combat,sponge.dens.limma,ncol=2)
+grid.arrange(sponge.dens.before, sponge.dens.percentile, sponge.dens.svd,ncol=2)
 
 
 ######### p-values
-linearm.sponge.before = lm(sponge.tss.clr[,9]~ sponge.trt + sponge.batch)
-summary(linearm.sponge.before)
+sponge.lm.before = lm(sponge.tss.clr[,9]~ sponge.trt + sponge.batch)
+summary(sponge.lm.before)
 
-linearm.sponge.bmc = lm(sponge.bmc[,9]~ sponge.trt + sponge.batch)
-summary(linearm.sponge.bmc)
+sponge.lm.bmc = lm(sponge.bmc[,9]~ sponge.trt + sponge.batch)
+summary(sponge.lm.bmc)
 
-linearm.sponge.combat = lm(sponge.combat[,9]~ sponge.trt + sponge.batch)
-summary(linearm.sponge.combat)
+sponge.lm.combat = lm(sponge.combat[,9]~ sponge.trt + sponge.batch)
+summary(sponge.lm.combat)
 
-linearm.sponge.limma = lm(sponge.limma[,9]~ sponge.trt + sponge.batch)
-summary(linearm.sponge.limma)
+sponge.lm.limma = lm(sponge.limma[,9]~ sponge.trt + sponge.batch)
+summary(sponge.lm.limma)
 
-linearm.sponge.percentile = lm(sponge.percentile[,9]~ sponge.trt + sponge.batch)
-summary(linearm.sponge.percentile)
+sponge.lm.percentile = lm(sponge.percentile[,9]~ sponge.trt + sponge.batch)
+summary(sponge.lm.percentile)
 
-linearm.sponge.svd = lm(sponge.svd[,9]~ sponge.trt + sponge.batch)
-summary(linearm.sponge.svd)
+sponge.lm.svd = lm(sponge.svd[,9]~ sponge.trt + sponge.batch)
+summary(sponge.lm.svd)
 
 ```
 
@@ -180,7 +185,7 @@ summary(linearm.sponge.svd)
 # boxplot
 ad.before.df = data.frame(value = ad.tss.clr[,1], batch = ad.batch)
 
-ad.before.boxplot <- box_plot_fun(data = ad.before.df,x=ad.before.df$batch,
+ad.boxplot.before <- box_plot_fun(data = ad.before.df,x=ad.before.df$batch,
              y=ad.before.df$value,title = 'OTU12 - before (AD)',
              batch.legend.title = 'Date (batch)',
              x.angle = 45, x.hjust = 1)
@@ -188,7 +193,7 @@ ad.before.boxplot <- box_plot_fun(data = ad.before.df,x=ad.before.df$batch,
 
 ad.bmc.df = data.frame(value = ad.bmc[,1], batch = ad.batch)
 
-ad.bmc.boxplot <- box_plot_fun(data = ad.bmc.df,x=ad.bmc.df$batch,
+ad.boxplot.bmc <- box_plot_fun(data = ad.bmc.df,x=ad.bmc.df$batch,
              y=ad.bmc.df$value,title = 'OTU12 - BMC (AD)',
              batch.legend.title = 'Date (batch)',
              x.angle = 45, x.hjust = 1)
@@ -196,14 +201,14 @@ ad.bmc.boxplot <- box_plot_fun(data = ad.bmc.df,x=ad.bmc.df$batch,
 
 ad.combat.df = data.frame(value = ad.combat[,1], batch = ad.batch)
 
-ad.combat.boxplot <- box_plot_fun(data = ad.combat.df,x=ad.combat.df$batch,
+ad.boxplot.combat <- box_plot_fun(data = ad.combat.df,x=ad.combat.df$batch,
              y=ad.combat.df$value,title = 'OTU12 - ComBat (AD)',
              batch.legend.title = 'Date (batch)',
              x.angle = 45, x.hjust = 1)
 
 ad.limma.df = data.frame(value = ad.limma[,1], batch = ad.batch)
 
-ad.limma.boxplot <- box_plot_fun(data = ad.limma.df,x=ad.limma.df$batch,
+ad.boxplot.limma <- box_plot_fun(data = ad.limma.df,x=ad.limma.df$batch,
              y=ad.limma.df$value,title = 'OTU12 - rBE (AD)',
              batch.legend.title = 'Date (batch)',
              x.angle = 45, x.hjust = 1)
@@ -211,21 +216,21 @@ ad.limma.boxplot <- box_plot_fun(data = ad.limma.df,x=ad.limma.df$batch,
 
 ad.percentile.df = data.frame(value = ad.percentile[,1], batch = ad.batch)
 
-ad.percentile.boxplot <- box_plot_fun(data = ad.percentile.df,x=ad.percentile.df$batch,
+ad.boxplot.percentile <- box_plot_fun(data = ad.percentile.df,x=ad.percentile.df$batch,
              y=ad.percentile.df$value,title = 'OTU12 - PN (AD)',
              batch.legend.title = 'Date (batch)',
              x.angle = 45, x.hjust = 1)
 
 ad.svd.df = data.frame(value = ad.svd[,1], batch = ad.batch)
 
-ad.svd.boxplot <- box_plot_fun(data = ad.svd.df,x=ad.svd.df$batch,
+ad.boxplot.svd <- box_plot_fun(data = ad.svd.df,x=ad.svd.df$batch,
              y=ad.svd.df$value,title = 'OTU12 - SVD (AD)',
              batch.legend.title = 'Date (batch)',
              x.angle = 45, x.hjust = 1)
 
-ad.ruv.df = data.frame(value = ad.ruv[,1], batch = ad.batch)
+ad.ruv.df = data.frame(value = ad.ruvIII[,1], batch = ad.batch)
 
-ad.ruv.boxplot <- box_plot_fun(data = ad.ruv.df,x=ad.ruv.df$batch,
+ad.boxplot.ruv <- box_plot_fun(data = ad.ruv.df,x=ad.ruv.df$batch,
              y=ad.ruv.df$value,title = 'OTU12 - RUVIII (AD)',
              batch.legend.title = 'Date (batch)',
              x.angle = 45, x.hjust = 1)
@@ -233,74 +238,74 @@ ad.ruv.boxplot <- box_plot_fun(data = ad.ruv.df,x=ad.ruv.df$batch,
 ```
 
 ```{r}
-grid.arrange(ad.before.boxplot, ad.bmc.boxplot, ad.combat.boxplot, ad.limma.boxplot,ncol=2)
-grid.arrange(ad.before.boxplot, ad.percentile.boxplot,ad.svd.boxplot,ad.ruv.boxplot,ncol=2)
+grid.arrange(ad.boxplot.before, ad.boxplot.bmc, ad.boxplot.combat, ad.boxplot.limma,ncol=2)
+grid.arrange(ad.boxplot.before, ad.boxplot.percentile,ad.boxplot.svd,ad.boxplot.ruv,ncol=2)
 ```
 
 
 ```{r}
 # density plot
 # before
-plot.ad.before = ggplot(ad.before.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - before (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ad.dens.before = ggplot(ad.before.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - before (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 # BMC
-plot.ad.bmc = ggplot(ad.bmc.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - BMC (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ad.dens.bmc = ggplot(ad.bmc.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - BMC (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 
 # ComBat
-plot.ad.combat = ggplot(ad.combat.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - ComBat (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ad.dens.combat = ggplot(ad.combat.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - ComBat (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 
 # removeBatchEffect
-plot.ad.limma = ggplot(ad.limma.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - rBE (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ad.dens.limma = ggplot(ad.limma.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - rBE (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 
 # percentile norm
-plot.ad.percentile = ggplot(ad.percentile.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - PN (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ad.dens.percentile = ggplot(ad.percentile.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - PN (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 
 # SVD
-plot.ad.svd = ggplot(ad.svd.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - SVD (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ad.dens.svd = ggplot(ad.svd.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - SVD (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 
 # RUVIII
-plot.ad.ruv = ggplot(ad.ruv.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - RUVIII (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ad.dens.ruv = ggplot(ad.ruv.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 - RUVIII (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
 
 ```
 
 ```{r}
-grid.arrange(plot.ad.before, plot.ad.bmc, plot.ad.combat,plot.ad.limma,ncol=2)
-grid.arrange(plot.ad.before, plot.ad.percentile, plot.ad.svd,plot.ad.ruv, ncol=2)
+grid.arrange(ad.dens.before, ad.dens.bmc, ad.dens.combat,ad.dens.limma,ncol=2)
+grid.arrange(ad.dens.before, ad.dens.percentile, ad.dens.svd,ad.dens.ruv, ncol=2)
 
 #p-values
-linearm.ad.before = lm(ad.tss.clr[,1]~ ad.trt + ad.batch)
-anova(linearm.ad.before)
-summary(linearm.ad.before)
+ad.lm.before = lm(ad.tss.clr[,1]~ ad.trt + ad.batch)
+anova(ad.lm.before)
+#summary(ad.lm.before)
 
-linearm.ad.bmc = lm(ad.bmc[,1]~ ad.trt + ad.batch)
-anova(linearm.ad.bmc)
-summary(linearm.ad.bmc)
+ad.lm.bmc = lm(ad.bmc[,1]~ ad.trt + ad.batch)
+anova(ad.lm.bmc)
+#summary(ad.lm.bmc)
 
-linearm.ad.combat = lm(ad.combat[,1]~ ad.trt + ad.batch)
-anova(linearm.ad.combat)
-summary(linearm.ad.combat)
+ad.lm.combat = lm(ad.combat[,1]~ ad.trt + ad.batch)
+anova(ad.lm.combat)
+#summary(ad.lm.combat)
 
-linearm.ad.limma = lm(ad.limma[,1]~ ad.trt + ad.batch)
-anova(linearm.ad.limma)
-summary(linearm.ad.limma)
+ad.lm.limma = lm(ad.limma[,1]~ ad.trt + ad.batch)
+anova(ad.lm.limma)
+#summary(ad.lm.limma)
 
-linearm.ad.percentile = lm(ad.percentile[,1]~ ad.trt + ad.batch)
-anova(linearm.ad.percentile)
-summary(linearm.ad.percentile)
+ad.lm.percentile = lm(ad.percentile[,1]~ ad.trt + ad.batch)
+anova(ad.lm.percentile)
+#summary(ad.lm.percentile)
 
-linearm.ad.svd = lm(ad.svd[,1]~ ad.trt + ad.batch)
-anova(linearm.ad.svd)
-summary(linearm.ad.svd)
+ad.lm.svd = lm(ad.svd[,1]~ ad.trt + ad.batch)
+anova(ad.lm.svd)
+#summary(ad.lm.svd)
 
 
-linearm.ad.ruv = lm(ad.ruv[,1]~ ad.trt + ad.batch)
-anova(linearm.ad.ruv)
-summary(linearm.ad.ruv)
+ad.lm.ruv = lm(ad.ruvIII[,1]~ ad.trt + ad.batch)
+anova(ad.lm.ruv)
+#summary(ad.lm.ruv)
 ```
 
 ### RLE plots
@@ -340,7 +345,7 @@ RleMicroRna2(object = t(sponge.bmc_c), batch = sponge.batch_c,maintitle = 'Spong
 
 RleMicroRna2(object = t(sponge.combat_c),batch = sponge.batch_c,maintitle = 'Sponge: ComBat (choanosome)',title.cex = 1)
 
-  RleMicroRna2(object = t(sponge.limma_c),batch = sponge.batch_c,maintitle = 'Sponge: rBE (choanosome)',title.cex = 1)
+RleMicroRna2(object = t(sponge.limma_c),batch = sponge.batch_c,maintitle = 'Sponge: rBE (choanosome)',title.cex = 1)
 
 RleMicroRna2(object = t(sponge.percentile_c),batch = sponge.batch_c,maintitle = 'Sponge: PN (choanosome)',title.cex = 1)
 
@@ -349,6 +354,7 @@ RleMicroRna2(object = t(sponge.svd_c),batch = sponge.batch_c,maintitle = 'Sponge
 par(mfrow = c(1,1))
 ```
 
+The batch effect before correction is not obvious as all medians of samples are close to zero, but gel2 has a greater interquartile range (IQR) than the other samples. Percentile normalisation increased batch effects, as the samples after correction are deviated from zero and the IQR is increased. Among other methods, the IQR of all the box plots (samples) from different batches is consistent after ComBat correction.
 
 ```{r}
 par(mfrow = c(2,3), mai=c(0.4,0.6,0.3,0.1))
@@ -367,6 +373,8 @@ RleMicroRna2(object = t(sponge.svd_e),batch = sponge.batch_e,maintitle = 'Sponge
 
 par(mfrow = c(1,1))
 ```
+
+Batch effect is not easily detected, but percentile normalisation increased batch variation.
 
 ```{r}
 ################
@@ -394,8 +402,8 @@ ad.svd_05 = ad.svd[ad.trt == '0-0.5',]
 ad.svd_2 = ad.svd[ad.trt == '1-2',]
 
 ###### RUVIII
-ad.ruv_05 = ad.ruv[ad.trt == '0-0.5',]
-ad.ruv_2 = ad.ruv[ad.trt == '1-2',]
+ad.ruv_05 = ad.ruvIII[ad.trt == '0-0.5',]
+ad.ruv_2 = ad.ruvIII[ad.trt == '1-2',]
 
 ```
 
@@ -420,6 +428,8 @@ RleMicroRna2(object = t(ad.ruv_05),batch = ad.batch_05,maintitle = 'AD: RUVIII (
 par(mfrow = c(1,1))
 ```
 
+Batch effect is not easily detected, but percentile normalisation increased batch variation.
+
 ```{r}
 par(mfrow=c(2,2), mai=c(0.35,0.8,0.3,0.1))
 
@@ -440,6 +450,8 @@ RleMicroRna2(object = t(ad.ruv_2),batch = ad.batch_2,maintitle = 'AD: RUVIII (1-
 par(mfrow = c(1,1))
 ```
 
+Batch effect is not easily detected, but percentile normalisation increased batch variation.
+
 ### Heatmap
 
 ```{r}
@@ -448,8 +460,8 @@ par(mfrow = c(1,1))
 sponge.tss.clr.scale = scale(sponge.tss.clr,center = T, scale = T) # scale on OTUs
 sponge.tss.clr.scale = scale(t(sponge.tss.clr.scale), center = T, scale = T) # scale on samples
 
-anno_col.sponge = data.frame(Batch = sponge.batch, Tissue = sponge.trt)
-anno_metabo_colors.sponge = list(Batch = c('1'="#388ECC",'2'="#F68B33"),Tissue = c(C="#F0E442",E="#D55E00"))
+sponge.anno_col = data.frame(Batch = sponge.batch, Tissue = sponge.trt)
+sponge.anno_metabo_colors = list(Batch = c('1'="#388ECC",'2'="#F68B33"),Tissue = c(C="#F0E442",E="#D55E00"))
 
 
 pheatmap(sponge.tss.clr.scale, 
@@ -461,10 +473,12 @@ pheatmap(sponge.tss.clr.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.sponge,
-         annotation_colors=anno_metabo_colors.sponge,
+         annotation_col = sponge.anno_col,
+         annotation_colors = sponge.anno_metabo_colors,
          border_color = 'NA',
          main = 'Sponge data - before')
+
+
 
 # BMC 
 sponge.bmc.scale = scale(sponge.bmc,center = T, scale = T) # scale on OTUs
@@ -479,8 +493,8 @@ pheatmap(sponge.bmc.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.sponge,
-         annotation_colors=anno_metabo_colors.sponge,
+         annotation_col = sponge.anno_col,
+         annotation_colors=sponge.anno_metabo_colors,
          border_color = 'NA',
          main = 'Sponge data - BMC')
 
@@ -498,8 +512,8 @@ pheatmap(sponge.combat.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.sponge,
-         annotation_colors=anno_metabo_colors.sponge,
+         annotation_col = sponge.anno_col,
+         annotation_colors=sponge.anno_metabo_colors,
          border_color = 'NA',
          main = 'Sponge data - ComBat')
 
@@ -516,8 +530,8 @@ pheatmap(sponge.limma.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.sponge,
-         annotation_colors=anno_metabo_colors.sponge,
+         annotation_col = sponge.anno_col,
+         annotation_colors= sponge.anno_metabo_colors,
          border_color = 'NA',
          main = 'Sponge data - removeBatchEffect')
 
@@ -534,8 +548,8 @@ pheatmap(sponge.percentile.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.sponge,
-         annotation_colors=anno_metabo_colors.sponge,
+         annotation_col = sponge.anno_col,
+         annotation_colors = sponge.anno_metabo_colors,
          border_color = 'NA',
          main = 'Sponge data - percentile norm')
 
@@ -553,8 +567,8 @@ pheatmap(sponge.svd.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.sponge,
-         annotation_colors=anno_metabo_colors.sponge,
+         annotation_col = sponge.anno_col,
+         annotation_colors = sponge.anno_metabo_colors,
          border_color = 'NA',
          main = 'Sponge data - SVD')
 
@@ -564,8 +578,8 @@ pheatmap(sponge.svd.scale,
 ad.tss.clr.scale = scale(ad.tss.clr,center = T, scale = T) # scale on OTUs
 ad.tss.clr.scale = scale(t(ad.tss.clr.scale), center = T, scale = T) # scale on samples
 
-anno_col.ad = data.frame(Batch = ad.batch, Treatment = ad.trt)
-anno_metabo_colors.ad = list(Batch = c('09/04/2015'="#388ECC",'14/04/2016'="#F68B33",'01/07/2016'="#C2C2C2",'14/11/2016'="#009E73",'21/09/2017'="#CC79A7"), Treatment = c("0-0.5" = "#0072B2", "1-2" = "#999999"))
+ad.anno_col = data.frame(Batch = ad.batch, Treatment = ad.trt)
+ad.anno_metabo_colors = list(Batch = c('09/04/2015'="#388ECC",'14/04/2016'="#F68B33",'01/07/2016'="#C2C2C2",'14/11/2016'="#009E73",'21/09/2017'="#CC79A7"), Treatment = c("0-0.5" = "#0072B2", "1-2" = "#999999"))
 
 
 pheatmap(ad.tss.clr.scale, 
@@ -577,10 +591,10 @@ pheatmap(ad.tss.clr.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.ad,
-         annotation_colors=anno_metabo_colors.ad,
+         annotation_col = ad.anno_col,
+         annotation_colors = ad.anno_metabo_colors,
          border_color = 'NA',
-         main = 'AD data - Scaled')
+         main = 'AD data - before')
 
 # BMC
 ad.bmc.scale = scale(ad.bmc,center = T, scale = T) # scale on OTUs
@@ -595,8 +609,8 @@ pheatmap(ad.bmc.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.ad,
-         annotation_colors=anno_metabo_colors.ad,
+         annotation_col = ad.anno_col,
+         annotation_colors = ad.anno_metabo_colors,
          border_color = 'NA',
          main = 'AD data - BMC')
 
@@ -613,8 +627,8 @@ pheatmap(ad.combat.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.ad,
-         annotation_colors=anno_metabo_colors.ad,
+         annotation_col = ad.anno_col,
+         annotation_colors = ad.anno_metabo_colors,
          border_color = 'NA',
          main = 'AD data - ComBat')
 
@@ -631,8 +645,8 @@ pheatmap(ad.limma.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.ad,
-         annotation_colors=anno_metabo_colors.ad,
+         annotation_col = ad.anno_col,
+         annotation_colors = ad.anno_metabo_colors,
          border_color = 'NA',
          main = 'AD data - removeBatchEffect')
 
@@ -649,8 +663,8 @@ pheatmap(ad.percentile.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.ad,
-         annotation_colors=anno_metabo_colors.ad,
+         annotation_col = ad.anno_col,
+         annotation_colors = ad.anno_metabo_colors,
          border_color = 'NA',
          main = 'AD data - percentile norm')
 
@@ -667,14 +681,14 @@ pheatmap(ad.svd.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.ad,
-         annotation_colors=anno_metabo_colors.ad,
+         annotation_col = ad.anno_col,
+         annotation_colors = ad.anno_metabo_colors,
          border_color = 'NA',
          main = 'AD data - SVD')
 
 
 # RUVIII
-ad.ruv.scale = scale(ad.ruv,center = T, scale = T) # scale on OTUs
+ad.ruv.scale = scale(ad.ruvIII,center = T, scale = T) # scale on OTUs
 ad.ruv.scale = scale(t(ad.ruv.scale), center = T, scale = T) # scale on samples
 
 pheatmap(ad.ruv.scale, 
@@ -686,8 +700,8 @@ pheatmap(ad.ruv.scale,
          clustering_distance_rows = "euclidean",
          clustering_method = "ward.D",
          treeheight_row = 30,
-         annotation_col = anno_col.ad,
-         annotation_colors=anno_metabo_colors.ad,
+         annotation_col = ad.anno_col,
+         annotation_colors = ad.anno_metabo_colors,
          border_color = 'NA',
          main = 'AD data - RUVIII')
 
@@ -695,71 +709,176 @@ pheatmap(ad.ruv.scale,
 
 ## Variance calculation
 
+### Linear model per variable
+
+```{r, warning=F, message=F}
+## Sponge data
+form.sponge <- ~ sponge.trt + sponge.batch
+info.sponge = as.data.frame(cbind(rownames(sponge.tss.clr),sponge.trt,sponge.batch))
+rownames(info.sponge) = rownames(sponge.tss.clr)
+
+# before
+varPart.sponge.before <- fitExtractVarPartModel(t(sponge.tss.clr), form.sponge, info.sponge)
+
+# BMC
+varPart.sponge.bmc <- fitExtractVarPartModel(t(sponge.bmc), form.sponge, info.sponge)
+
+# combat
+varPart.sponge.combat <- fitExtractVarPartModel(t(sponge.combat), form.sponge, info.sponge)
+
+# removeBatchEffect
+varPart.sponge.limma <- fitExtractVarPartModel(t(sponge.limma), form.sponge, info.sponge)
+
+# percentile normalisation
+varPart.sponge.percentile <- fitExtractVarPartModel(t(sponge.percentile), form.sponge, info.sponge)
+
+# svd
+varPart.sponge.svd <- fitExtractVarPartModel(t(sponge.svd), form.sponge, info.sponge)
+
+
+################
+#merge them
+variance.sponge =  rbind(cbind(variance = varPart.sponge.before$sponge.batch,Type = rep('Batch',24), method = rep('Before',24)),
+                             cbind(variance = varPart.sponge.before$sponge.trt,Type = rep('Tissue',24), method = rep('Before',24)),
+                             cbind(variance = varPart.sponge.bmc$sponge.batch,Type = rep('Batch',24), method = rep('BMC',24)),
+                             cbind(variance = varPart.sponge.bmc$sponge.trt,Type = rep('Tissue',24), method = rep('BMC',24)),
+                             cbind(variance = varPart.sponge.combat$sponge.batch,Type = rep('Batch',24), method = rep('ComBat',24)),
+                             cbind(variance = varPart.sponge.combat$sponge.trt,Type = rep('Tissue',24), method = rep('ComBat',24)),
+                             cbind(variance = varPart.sponge.limma$sponge.batch,Type = rep('Batch',24), method = rep('rBE',24)),
+                             cbind(variance = varPart.sponge.limma$sponge.trt,Type = rep('Tissue',24), method = rep('rBE',24)),
+                             cbind(variance = varPart.sponge.percentile$sponge.batch,Type = rep('Batch',24), method = rep('PN',24)),
+                             cbind(variance = varPart.sponge.percentile$sponge.trt,Type = rep('Tissue',24), method = rep('PN',24)),
+                             cbind(variance = varPart.sponge.svd$sponge.batch,Type = rep('Batch',24), method = rep('SVD',24)),
+                             cbind(variance = varPart.sponge.svd$sponge.trt,Type = rep('Tissue',24), method = rep('SVD',24)))
+
+variance.sponge = as.data.frame(variance.sponge)
+variance.sponge$Type = factor(variance.sponge$Type,levels = unique(variance.sponge$Type))
+variance.sponge$method = factor(variance.sponge$method,levels = unique(variance.sponge$method))
+variance.sponge$variance = as.numeric(as.character(variance.sponge$variance))
+
+ggplot(variance.sponge, aes(x=Type, y=variance,fill=Type)) + geom_boxplot() + facet_grid(cols = vars(method)) + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1), strip.text = element_text(size=12),panel.grid = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15),legend.title = element_text(size=15),legend.text = element_text(size=12)) + labs(x = "Type", y = "Proportion Variance",name='Type') + ylim(0,1)
+
+##########
+# AD data
+form.ad <- ~ ad.trt + ad.batch
+info.ad = as.data.frame(cbind(rownames(ad.tss.clr),ad.trt,ad.batch))
+rownames(info.ad) = rownames(ad.tss.clr)
+
+# before
+varPart.ad.before <- fitExtractVarPartModel(t(ad.tss.clr), form.ad, info.ad)
+
+# BMC
+varPart.ad.bmc <- fitExtractVarPartModel(t(ad.bmc), form.ad, info.ad)
+
+# combat
+varPart.ad.combat <- fitExtractVarPartModel(t(ad.combat), form.ad, info.ad)
+
+# removeBatchEffect
+varPart.ad.limma <- fitExtractVarPartModel(t(ad.limma), form.ad, info.ad)
+
+# percentile normalisation
+varPart.ad.percentile <- fitExtractVarPartModel(t(ad.percentile), form.ad, info.ad)
+
+# svd
+varPart.ad.svd <- fitExtractVarPartModel(t(ad.svd), form.ad, info.ad)
+
+# ruv
+varPart.ad.ruv <- fitExtractVarPartModel(t(ad.ruvIII), form.ad, info.ad)
+
+
+################
+#merge them
+variance.ad =  rbind(cbind(variance = varPart.ad.before$ad.batch,Type = rep('Batch',231), method = rep('Before',231)),
+                             cbind(variance = varPart.ad.before$ad.trt,Type = rep('Treatment',231), method = rep('Before',231)),
+                             cbind(variance = varPart.ad.bmc$ad.batch,Type = rep('Batch',231), method = rep('BMC',231)),
+                             cbind(variance = varPart.ad.bmc$ad.trt,Type = rep('Treatment',231), method = rep('BMC',231)),
+                             cbind(variance = varPart.ad.combat$ad.batch,Type = rep('Batch',231), method = rep('ComBat',231)),
+                             cbind(variance = varPart.ad.combat$ad.trt,Type = rep('Treatment',231), method = rep('ComBat',231)),
+                             cbind(variance = varPart.ad.limma$ad.batch,Type = rep('Batch',231), method = rep('rBE',231)),
+                             cbind(variance = varPart.ad.limma$ad.trt,Type = rep('Treatment',231), method = rep('rBE',231)),
+                             cbind(variance = varPart.ad.percentile$ad.batch,Type = rep('Batch',231), method = rep('PN',231)),
+                             cbind(variance = varPart.ad.percentile$ad.trt,Type = rep('Treatment',231), method = rep('PN',231)),
+                             cbind(variance = varPart.ad.svd$ad.batch,Type = rep('Batch',231), method = rep('SVD',231)),
+                             cbind(variance = varPart.ad.svd$ad.trt,Type = rep('Treatment',231), method = rep('SVD',231)), cbind(variance = varPart.ad.ruv$ad.batch,Type = rep('Batch',231), method = rep('RUVIII',231)),
+                             cbind(variance = varPart.ad.ruv$ad.trt,Type = rep('Treatment',231), method = rep('RUVIII',231)))
+
+variance.ad = as.data.frame(variance.ad)
+variance.ad$Type = factor(variance.ad$Type,levels = unique(variance.ad$Type))
+variance.ad$method = factor(variance.ad$method,levels = unique(variance.ad$method))
+variance.ad$variance = as.numeric(as.character(variance.ad$variance))
+
+ggplot(variance.ad, aes(x=Type, y=variance,fill=Type)) + geom_boxplot() + facet_grid(cols = vars(method)) + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1), strip.text = element_text(size=11),panel.grid = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15),legend.title = element_text(size=15),legend.text = element_text(size=12)) + labs(x = "Type", y = "Proportion Variance",name='Type') + scale_fill_hue(l=40) + ylim(0,1)
+
+```
+
+
 ### RDA
+
+The multivariate method pRDA can be applied to calculate the variance of batch and treatment effects for all variables at once.
 
 ```{r,warning=F}
 # Sponge data
-data.design.sponge = numeric()
-data.design.sponge$group = sponge.trt
-data.design.sponge$batch = sponge.batch
+sponge.data.design = numeric()
+sponge.data.design$group = sponge.trt
+sponge.data.design$batch = sponge.batch
 
 # before
 # conditioning on a batch effect
-rda.sponge.before1 = rda(sponge.tss.clr ~ group + Condition(batch), data = data.design.sponge)
-rda.sponge.before2 = rda(sponge.tss.clr ~ batch + Condition(group), data = data.design.sponge)
+sponge.rda.before1 = rda(sponge.tss.clr ~ group + Condition(batch), data = sponge.data.design)
+sponge.rda.before2 = rda(sponge.tss.clr ~ batch + Condition(group), data = sponge.data.design)
 
 # amount of variance
-rda.prop.bat.sponge.before = rda.sponge.before1$pCCA$tot.chi*100/rda.sponge.before1$tot.chi
-rda.prop.trt.sponge.before = rda.sponge.before2$pCCA$tot.chi*100/rda.sponge.before1$tot.chi
+sponge.rda.bat_prop.before = sponge.rda.before1$pCCA$tot.chi*100/sponge.rda.before1$tot.chi
+sponge.rda.trt_prop.before = sponge.rda.before2$pCCA$tot.chi*100/sponge.rda.before2$tot.chi
 
 # BMC
 # conditioning on a batch effect
-rda.sponge.bmc1 = rda(sponge.bmc ~ group + Condition(batch), data = data.design.sponge)
-rda.sponge.bmc2 = rda(sponge.bmc ~ batch + Condition(group), data = data.design.sponge)
+sponge.rda.bmc1 = rda(sponge.bmc ~ group + Condition(batch), data = sponge.data.design)
+sponge.rda.bmc2 = rda(sponge.bmc ~ batch + Condition(group), data = sponge.data.design)
 
 # amount of variance
-rda.prop.bat.sponge.bmc = rda.sponge.bmc1$pCCA$tot.chi*100/rda.sponge.bmc1$tot.chi
-rda.prop.trt.sponge.bmc = rda.sponge.bmc2$pCCA$tot.chi*100/rda.sponge.bmc2$tot.chi
+sponge.rda.bat_prop.bmc = sponge.rda.bmc1$pCCA$tot.chi*100/sponge.rda.bmc1$tot.chi
+sponge.rda.trt_prop.bmc = sponge.rda.bmc2$pCCA$tot.chi*100/sponge.rda.bmc2$tot.chi
 
 
 # combat
 # conditioning on a batch effect
-rda.sponge.combat1 = rda(sponge.combat ~ group + Condition(batch), data = data.design.sponge)
-rda.sponge.combat2 = rda(sponge.combat ~ batch + Condition(group), data = data.design.sponge)
+sponge.rda.combat1 = rda(sponge.combat ~ group + Condition(batch), data = sponge.data.design)
+sponge.rda.combat2 = rda(sponge.combat ~ batch + Condition(group), data = sponge.data.design)
 
 # amount of variance
-rda.prop.bat.sponge.combat = rda.sponge.combat1$pCCA$tot.chi*100/rda.sponge.combat1$tot.chi
-rda.prop.trt.sponge.combat = rda.sponge.combat2$pCCA$tot.chi*100/rda.sponge.combat2$tot.chi
+sponge.rda.bat_prop.combat = sponge.rda.combat1$pCCA$tot.chi*100/sponge.rda.combat1$tot.chi
+sponge.rda.trt_prop.combat = sponge.rda.combat2$pCCA$tot.chi*100/sponge.rda.combat2$tot.chi
 
 
 # limma
 # conditioning on a batch effect
-rda.sponge.limma1 = rda(sponge.limma ~ group + Condition(batch), data = data.design.sponge)
-rda.sponge.limma2 = rda(sponge.limma ~ batch + Condition(group), data = data.design.sponge)
+sponge.rda.limma1 = rda(sponge.limma ~ group + Condition(batch), data = sponge.data.design)
+sponge.rda.limma2 = rda(sponge.limma ~ batch + Condition(group), data = sponge.data.design)
 
 # amount of variance
-rda.prop.bat.sponge.limma = rda.sponge.limma1$pCCA$tot.chi*100/rda.sponge.limma1$tot.chi
-rda.prop.trt.sponge.limma = rda.sponge.limma2$pCCA$tot.chi*100/rda.sponge.limma2$tot.chi
+sponge.rda.bat_prop.limma = sponge.rda.limma1$pCCA$tot.chi*100/sponge.rda.limma1$tot.chi
+sponge.rda.trt_prop.limma = sponge.rda.limma2$pCCA$tot.chi*100/sponge.rda.limma2$tot.chi
 
 
 # percentile
 # conditioning on a batch effect
-rda.sponge.percentile1 = rda(sponge.percentile ~ group + Condition(batch), data = data.design.sponge)
-rda.sponge.percentile2 = rda(sponge.percentile ~ batch + Condition(group), data = data.design.sponge)
+sponge.rda.percentile1 = rda(sponge.percentile ~ group + Condition(batch), data = sponge.data.design)
+sponge.rda.percentile2 = rda(sponge.percentile ~ batch + Condition(group), data = sponge.data.design)
 
 # amount of variance
-rda.prop.bat.sponge.percentile = rda.sponge.percentile1$pCCA$tot.chi*100/rda.sponge.percentile1$tot.chi
-rda.prop.trt.sponge.percentile = rda.sponge.percentile2$pCCA$tot.chi*100/rda.sponge.percentile2$tot.chi
+sponge.rda.bat_prop.percentile = sponge.rda.percentile1$pCCA$tot.chi*100/sponge.rda.percentile1$tot.chi
+sponge.rda.trt_prop.percentile = sponge.rda.percentile2$pCCA$tot.chi*100/sponge.rda.percentile2$tot.chi
 
 
 # SVD
 # conditioning on a batch effect
-rda.sponge.svd1 = rda(sponge.svd ~ group + Condition(batch), data = data.design.sponge)
-rda.sponge.svd2 = rda(sponge.svd ~ batch + Condition(group), data = data.design.sponge)
+sponge.rda.svd1 = rda(sponge.svd ~ group + Condition(batch), data = sponge.data.design)
+sponge.rda.svd2 = rda(sponge.svd ~ batch + Condition(group), data = sponge.data.design)
 
 # amount of variance
-rda.prop.bat.sponge.svd = rda.sponge.svd1$pCCA$tot.chi*100/rda.sponge.svd1$tot.chi
-rda.prop.trt.sponge.svd = rda.sponge.svd2$pCCA$tot.chi*100/rda.sponge.svd2$tot.chi
+sponge.rda.bat_prop.svd = sponge.rda.svd1$pCCA$tot.chi*100/sponge.rda.svd1$tot.chi
+sponge.rda.trt_prop.svd = sponge.rda.svd2$pCCA$tot.chi*100/sponge.rda.svd2$tot.chi
 
 
 ```
@@ -767,21 +886,24 @@ rda.prop.trt.sponge.svd = rda.sponge.svd2$pCCA$tot.chi*100/rda.sponge.svd2$tot.c
 
 ```{r}
 # proportion
-rda.prop.sponge.before = c(rda.prop.bat.sponge.before,rda.prop.trt.sponge.before)
-rda.prop.sponge.bmc = c(rda.prop.bat.sponge.bmc,rda.prop.trt.sponge.bmc)
-rda.prop.sponge.combat = c(rda.prop.bat.sponge.combat,rda.prop.trt.sponge.combat)
-rda.prop.sponge.limma = c(rda.prop.bat.sponge.limma,rda.prop.trt.sponge.limma)
-rda.prop.sponge.percentile = c(rda.prop.bat.sponge.percentile,rda.prop.trt.sponge.percentile)
-rda.prop.sponge.svd= c(rda.prop.bat.sponge.svd,rda.prop.trt.sponge.svd)
+sponge.rda.prop.before = c(sponge.rda.bat_prop.before,sponge.rda.trt_prop.before)
+sponge.rda.prop.bmc = c(sponge.rda.bat_prop.bmc,sponge.rda.trt_prop.bmc)
+sponge.rda.prop.combat = c(sponge.rda.bat_prop.combat,sponge.rda.trt_prop.combat)
+sponge.rda.prop.limma = c(sponge.rda.bat_prop.limma,sponge.rda.trt_prop.limma)
+sponge.rda.prop.percentile = c(sponge.rda.bat_prop.percentile,sponge.rda.trt_prop.percentile)
+sponge.rda.prop.svd= c(sponge.rda.bat_prop.svd,sponge.rda.trt_prop.svd)
 
-rda.prop.sponge.val = c(rda.prop.sponge.before,rda.prop.sponge.bmc,rda.prop.sponge.combat,rda.prop.sponge.limma,rda.prop.sponge.percentile,rda.prop.sponge.svd)
-rda.prop.sponge = data.frame(prop = rda.prop.sponge.val, prop.r = round(rda.prop.sponge.val,2), Method = rep(c('Before','BMC','ComBat','rBE','PN','SVD'),each=2),Type = rep(c('Batch','Tissue'),6))
+sponge.rda.prop.val = c(sponge.rda.prop.before,sponge.rda.prop.bmc,sponge.rda.prop.combat,sponge.rda.prop.limma,sponge.rda.prop.percentile,sponge.rda.prop.svd)
+sponge.rda.prop = data.frame(prop = sponge.rda.prop.val, prop.r = round(sponge.rda.prop.val,2), Method = rep(c('Before','BMC','ComBat','rBE','PN','SVD'),each=2),Type = rep(c('Batch','Tissue'),6))
 
-rda.prop.sponge$Method =  factor(rda.prop.sponge$Method, levels = unique(rda.prop.sponge$Method))
+sponge.rda.prop$Method =  factor(sponge.rda.prop$Method, levels = unique(sponge.rda.prop$Method))
 
-ggplot(data = rda.prop.sponge, aes(x=Method,y=prop,fill = Type)) + geom_bar(stat="identity",position = 'dodge', colour = 'black') + geom_text(data=rda.prop.sponge, aes(Method, prop+2.5, label=prop.r), position = position_dodge(width=0.9), size=3) + theme_bw() + labs(y = "Variance explained (%)") + theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15),legend.title = element_text(size=15),legend.text = element_text(size=12)) + ylim(0,100)
+ggplot(data = sponge.rda.prop, aes(x=Method,y=prop,fill = Type)) + geom_bar(stat="identity",position = 'dodge', colour = 'black') + geom_text(data=sponge.rda.prop, aes(Method, prop+2.5, label=prop.r), position = position_dodge(width=0.9), size=3) + theme_bw() + labs(y = "Variance explained (%)") + theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15),legend.title = element_text(size=15),legend.text = element_text(size=12)) + ylim(0,100)
 
 ```
+
+pRDA shows that BMC, ComBat and removeBatchEffect were more efficient at removing batch variation while preserving treatment variation. This result is in agreement with the proportional variance calculated using a linear model in the previous section `linear model per variable'. ComBat removed relatively less batch variation compared with the other two methods, which implies that the batch effect is not purely systematic. The low efficiency of percentile normalisation is more obvious in the variance calculated with pRDA. It did not remove enough batch variation, nor preserve enough treatment variation both in sponge data.
+
 
 ```{r,warning=F}
 # AD data
@@ -850,8 +972,8 @@ rda.prop.trt.ad.svd = rda.ad.svd2$pCCA$tot.chi*100/rda.ad.svd2$tot.chi
 
 # RUVIII
 # conditioning on a batch effect
-rda.ad.ruv1 = rda(ad.ruv ~ group + Condition(batch), data = data.design.ad)
-rda.ad.ruv2 = rda(ad.ruv ~ batch + Condition(group), data = data.design.ad)
+rda.ad.ruv1 = rda(ad.ruvIII ~ group + Condition(batch), data = data.design.ad)
+rda.ad.ruv2 = rda(ad.ruvIII ~ batch + Condition(group), data = data.design.ad)
 
 # amount of variance
 rda.prop.bat.ad.ruv = rda.ad.ruv1$pCCA$tot.chi*100/rda.ad.ruv1$tot.chi
@@ -939,7 +1061,7 @@ PVCA.score.ad[6,] = values.svd
 
 # RUVIII
 
-eset.X.ruv <- new("ExpressionSet", exprs = t(ad.ruv), phenoData = pdata)
+eset.X.ruv <- new("ExpressionSet", exprs = t(ad.ruvIII), phenoData = pdata)
 pvcaObj.ruv <- pvcaBatchAssess(eset.X.ruv, c('Batch','Treatment'), 0.6)
 values.ruv = pvcaObj.ruv$dat
 PVCA.score.ad[7,] = values.ruv
@@ -960,109 +1082,6 @@ ggplot(data = pvca.prop.ad, aes(x=Method,y=prop,fill = Type)) + geom_bar(stat="i
 ```
 
 
-### Variance partition per variable
-
-```{r, warning=F, message=F}
-## Sponge data
-form.sponge <- ~ sponge.trt + sponge.batch
-info.sponge = as.data.frame(cbind(rownames(sponge.tss.clr),sponge.trt,sponge.batch))
-rownames(info.sponge) = rownames(sponge.tss.clr)
-
-# before
-varPart.sponge.before <- fitExtractVarPartModel(t(sponge.tss.clr), form.sponge, info.sponge)
-
-# BMC
-varPart.sponge.bmc <- fitExtractVarPartModel(t(sponge.bmc), form.sponge, info.sponge)
-
-# combat
-varPart.sponge.combat <- fitExtractVarPartModel(t(sponge.combat), form.sponge, info.sponge)
-
-# removeBatchEffect
-varPart.sponge.limma <- fitExtractVarPartModel(t(sponge.limma), form.sponge, info.sponge)
-
-# percentile normalisation
-varPart.sponge.percentile <- fitExtractVarPartModel(t(sponge.percentile), form.sponge, info.sponge)
-
-# svd
-varPart.sponge.svd <- fitExtractVarPartModel(t(sponge.svd), form.sponge, info.sponge)
-
-
-################
-#merge them
-variance.sponge =  rbind(cbind(variance = varPart.sponge.before$sponge.batch,Type = rep('Batch',24), method = rep('Before',24)),
-                             cbind(variance = varPart.sponge.before$sponge.trt,Type = rep('Tissue',24), method = rep('Before',24)),
-                             cbind(variance = varPart.sponge.bmc$sponge.batch,Type = rep('Batch',24), method = rep('BMC',24)),
-                             cbind(variance = varPart.sponge.bmc$sponge.trt,Type = rep('Tissue',24), method = rep('BMC',24)),
-                             cbind(variance = varPart.sponge.combat$sponge.batch,Type = rep('Batch',24), method = rep('ComBat',24)),
-                             cbind(variance = varPart.sponge.combat$sponge.trt,Type = rep('Tissue',24), method = rep('ComBat',24)),
-                             cbind(variance = varPart.sponge.limma$sponge.batch,Type = rep('Batch',24), method = rep('rBE',24)),
-                             cbind(variance = varPart.sponge.limma$sponge.trt,Type = rep('Tissue',24), method = rep('rBE',24)),
-                             cbind(variance = varPart.sponge.percentile$sponge.batch,Type = rep('Batch',24), method = rep('PN',24)),
-                             cbind(variance = varPart.sponge.percentile$sponge.trt,Type = rep('Tissue',24), method = rep('PN',24)),
-                             cbind(variance = varPart.sponge.svd$sponge.batch,Type = rep('Batch',24), method = rep('SVD',24)),
-                             cbind(variance = varPart.sponge.svd$sponge.trt,Type = rep('Tissue',24), method = rep('SVD',24)))
-
-variance.sponge = as.data.frame(variance.sponge)
-variance.sponge$Type = factor(variance.sponge$Type,levels = unique(variance.sponge$Type))
-variance.sponge$method = factor(variance.sponge$method,levels = unique(variance.sponge$method))
-variance.sponge$variance = as.numeric(as.character(variance.sponge$variance))
-
-ggplot(variance.sponge, aes(x=Type, y=variance,fill=Type)) + geom_boxplot() + facet_grid(cols = vars(method)) + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1), strip.text = element_text(size=12),panel.grid = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15),legend.title = element_text(size=15),legend.text = element_text(size=12)) + labs(x = "Type", y = "Proportion Variance",name='Type') + ylim(0,1)
-
-##########
-# AD data
-form.ad <- ~ ad.trt + ad.batch
-info.ad = as.data.frame(cbind(rownames(ad.tss.clr),ad.trt,ad.batch))
-rownames(info.ad) = rownames(ad.tss.clr)
-
-# before
-varPart.ad.before <- fitExtractVarPartModel(t(ad.tss.clr), form.ad, info.ad)
-
-# BMC
-varPart.ad.bmc <- fitExtractVarPartModel(t(ad.bmc), form.ad, info.ad)
-
-# combat
-varPart.ad.combat <- fitExtractVarPartModel(t(ad.combat), form.ad, info.ad)
-
-# removeBatchEffect
-varPart.ad.limma <- fitExtractVarPartModel(t(ad.limma), form.ad, info.ad)
-
-# percentile normalisation
-varPart.ad.percentile <- fitExtractVarPartModel(t(ad.percentile), form.ad, info.ad)
-
-# svd
-varPart.ad.svd <- fitExtractVarPartModel(t(ad.svd), form.ad, info.ad)
-
-# ruv
-varPart.ad.ruv <- fitExtractVarPartModel(t(ad.ruv), form.ad, info.ad)
-
-
-################
-#merge them
-variance.ad =  rbind(cbind(variance = varPart.ad.before$ad.batch,Type = rep('Batch',231), method = rep('Before',231)),
-                             cbind(variance = varPart.ad.before$ad.trt,Type = rep('Treatment',231), method = rep('Before',231)),
-                             cbind(variance = varPart.ad.bmc$ad.batch,Type = rep('Batch',231), method = rep('BMC',231)),
-                             cbind(variance = varPart.ad.bmc$ad.trt,Type = rep('Treatment',231), method = rep('BMC',231)),
-                             cbind(variance = varPart.ad.combat$ad.batch,Type = rep('Batch',231), method = rep('ComBat',231)),
-                             cbind(variance = varPart.ad.combat$ad.trt,Type = rep('Treatment',231), method = rep('ComBat',231)),
-                             cbind(variance = varPart.ad.limma$ad.batch,Type = rep('Batch',231), method = rep('rBE',231)),
-                             cbind(variance = varPart.ad.limma$ad.trt,Type = rep('Treatment',231), method = rep('rBE',231)),
-                             cbind(variance = varPart.ad.percentile$ad.batch,Type = rep('Batch',231), method = rep('PN',231)),
-                             cbind(variance = varPart.ad.percentile$ad.trt,Type = rep('Treatment',231), method = rep('PN',231)),
-                             cbind(variance = varPart.ad.svd$ad.batch,Type = rep('Batch',231), method = rep('SVD',231)),
-                             cbind(variance = varPart.ad.svd$ad.trt,Type = rep('Treatment',231), method = rep('SVD',231)), cbind(variance = varPart.ad.ruv$ad.batch,Type = rep('Batch',231), method = rep('RUVIII',231)),
-                             cbind(variance = varPart.ad.ruv$ad.trt,Type = rep('Treatment',231), method = rep('RUVIII',231)))
-
-variance.ad = as.data.frame(variance.ad)
-variance.ad$Type = factor(variance.ad$Type,levels = unique(variance.ad$Type))
-variance.ad$method = factor(variance.ad$method,levels = unique(variance.ad$method))
-variance.ad$variance = as.numeric(as.character(variance.ad$variance))
-
-ggplot(variance.ad, aes(x=Type, y=variance,fill=Type)) + geom_boxplot() + facet_grid(cols = vars(method)) + theme_bw() + theme(axis.text.x = element_text(angle = 60, hjust = 1), strip.text = element_text(size=11),panel.grid = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15),legend.title = element_text(size=15),legend.text = element_text(size=12)) + labs(x = "Type", y = "Proportion Variance",name='Type') + scale_fill_hue(l=40) + ylim(0,1)
-
-```
-
-
 
 ### Silhouette coefficient
 
@@ -1070,12 +1089,12 @@ ggplot(variance.ad, aes(x=Type, y=variance,fill=Type)) + geom_boxplot() + facet_
 ###################
 # Sponge data
 
-silh.sponge.before = calc.sil(pca.sponge.before$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
-silh.sponge.bmc = calc.sil(pca.sponge.bmc$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
-silh.sponge.combat = calc.sil(pca.sponge.combat$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
-silh.sponge.limma = calc.sil(pca.sponge.limma$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
-silh.sponge.percentile = calc.sil(pca.sponge.percentile$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
-silh.sponge.svd = calc.sil(pca.sponge.svd$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
+silh.sponge.before = calc.sil(sponge.pca.before$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
+silh.sponge.bmc = calc.sil(sponge.pca.bmc$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
+silh.sponge.combat = calc.sil(sponge.pca.combat$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
+silh.sponge.limma = calc.sil(sponge.pca.limma$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
+silh.sponge.percentile = calc.sil(sponge.pca.percentile$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
+silh.sponge.svd = calc.sil(sponge.pca.svd$variates$X,y1 = sponge.batch, y2= sponge.trt, name.y1 = 'Batch',name.y2 = 'Tissue')
 
 
 data.plot.sponge = rbind(silh.sponge.before, silh.sponge.bmc, silh.sponge.combat, silh.sponge.limma, silh.sponge.percentile, silh.sponge.svd)
@@ -1096,13 +1115,13 @@ ggplot(data.plot.sponge, aes(x=Type, y=silh.coeff, color = Cluster, shape = Type
 
 ############
 # AD data
-silh.ad.before = calc.sil(pca.ad.before$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
-silh.ad.bmc = calc.sil(pca.ad.bmc$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
-silh.ad.combat = calc.sil(pca.ad.combat$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
-silh.ad.limma = calc.sil(pca.ad.limma$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
-silh.ad.percentile = calc.sil(pca.ad.percentile$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
-silh.ad.svd = calc.sil(pca.ad.svd$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
-silh.ad.ruv = calc.sil(pca.ad.ruv$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
+silh.ad.before = calc.sil(ad.pca.before$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
+silh.ad.bmc = calc.sil(ad.pca.bmc$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
+silh.ad.combat = calc.sil(ad.pca.combat$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
+silh.ad.limma = calc.sil(ad.pca.limma$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
+silh.ad.percentile = calc.sil(ad.pca.percentile$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
+silh.ad.svd = calc.sil(ad.pca.svd$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
+silh.ad.ruv = calc.sil(ad.pca.ruv$variates$X,y1 = ad.batch, y2= ad.trt, name.y1 = 'Batch',name.y2 = 'Treatment')
 
 
 data.plot.ad = rbind(silh.ad.before, silh.ad.bmc, silh.ad.combat, silh.ad.limma, silh.ad.percentile, silh.ad.svd,silh.ad.ruv)

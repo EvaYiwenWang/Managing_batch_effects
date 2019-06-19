@@ -114,14 +114,13 @@
 "0","values.svd = pvcaObj.svd$dat"
 "0","PVCA.score.ad[6,] = values.svd"
 "0","# RUVIII"
-"0","eset.X.ruv <- new(""ExpressionSet"", exprs = t(ad.ruv), phenoData = pdata)"
+"0","eset.X.ruv <- new(""ExpressionSet"", exprs = t(ad.ruvIII), phenoData = pdata)"
 "0","pvcaObj.ruv <- pvcaBatchAssess(eset.X.ruv, c('Batch','Treatment'), 0.6)"
 "2","singular fit
 "
 "2","singular fit
 "
-"2","singular fit
-"
+"2","Model failed to converge with max|grad| = 0.00283015 (tol = 0.002, component 1)"
 "2","singular fit
 "
 "0","values.ruv = pvcaObj.ruv$dat"

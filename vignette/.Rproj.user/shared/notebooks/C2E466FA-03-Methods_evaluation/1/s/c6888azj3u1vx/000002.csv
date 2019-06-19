@@ -17,5 +17,5 @@
 "0","ad.svd_05 = ad.svd[ad.trt == '0-0.5',]"
 "0","ad.svd_2 = ad.svd[ad.trt == '1-2',]"
 "0","###### RUVIII"
-"0","ad.ruv_05 = ad.ruv[ad.trt == '0-0.5',]"
-"0","ad.ruv_2 = ad.ruv[ad.trt == '1-2',]"
+"0","ad.ruv_05 = ad.ruvIII[ad.trt == '0-0.5',]"
+"0","ad.ruv_2 = ad.ruvIII[ad.trt == '1-2',]"

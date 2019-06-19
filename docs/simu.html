@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang">
 
 
-<meta name="date" content="2019-06-18">
+<meta name="date" content="2019-06-19">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -147,9 +147,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.1.4" data-path="eval.html"><a href="eval.html#heatmap-1"><i class="fa fa-check"></i><b>4.1.4</b> Heatmap</a></li>
 </ul></li>
 <li class="chapter" data-level="4.2" data-path="eval.html"><a href="eval.html#variance-calculation"><i class="fa fa-check"></i><b>4.2</b> Variance calculation</a><ul>
-<li class="chapter" data-level="4.2.1" data-path="eval.html"><a href="eval.html#rda"><i class="fa fa-check"></i><b>4.2.1</b> RDA</a></li>
-<li class="chapter" data-level="4.2.2" data-path="eval.html"><a href="eval.html#pvca"><i class="fa fa-check"></i><b>4.2.2</b> PVCA</a></li>
-<li class="chapter" data-level="4.2.3" data-path="eval.html"><a href="eval.html#variance-partition-per-variable"><i class="fa fa-check"></i><b>4.2.3</b> Variance partition per variable</a></li>
+<li class="chapter" data-level="4.2.1" data-path="eval.html"><a href="eval.html#linear-model-per-variable"><i class="fa fa-check"></i><b>4.2.1</b> Linear model per variable</a></li>
+<li class="chapter" data-level="4.2.2" data-path="eval.html"><a href="eval.html#rda"><i class="fa fa-check"></i><b>4.2.2</b> RDA</a></li>
+<li class="chapter" data-level="4.2.3" data-path="eval.html"><a href="eval.html#pvca"><i class="fa fa-check"></i><b>4.2.3</b> PVCA</a></li>
 <li class="chapter" data-level="4.2.4" data-path="eval.html"><a href="eval.html#silhouette-coefficient"><i class="fa fa-check"></i><b>4.2.4</b> Silhouette coefficient</a></li>
 </ul></li>
 </ul></li>
@@ -228,7 +228,7 @@ w.cof =<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(w.cof)
 <span class="kw">qqline</span>(w.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
 </div>
 <div id="mean05unequal-variance" class="section level2">
 <h2><span class="header-section-number">5.2</span> Mean=0&amp;5,unequal variance</h2>
@@ -277,7 +277,7 @@ w.cof2 =<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(w.cof2)
 <span class="kw">qqline</span>(w.cof2, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
 </div>
 <div id="sponge-data" class="section level2">
 <h2><span class="header-section-number">5.3</span> Sponge data</h2>
@@ -294,7 +294,7 @@ w.cof2 =<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(sponge.b.cof)
 <span class="kw">qqline</span>(sponge.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-70-1.png" width="672" /></p>
 </div>
 <div id="ad-data" class="section level2">
 <h2><span class="header-section-number">5.4</span> AD data</h2>
@@ -312,7 +312,7 @@ ad.batch.relevel =<span class="st"> </span><span class="kw">relevel</span>(ad.ba
 <span class="kw">qqnorm</span>(ad.b.cof)
 <span class="kw">qqline</span>(ad.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-70-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
 
 </div>
 </div>

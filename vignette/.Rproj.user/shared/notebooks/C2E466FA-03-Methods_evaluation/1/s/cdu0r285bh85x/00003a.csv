@@ -1,2 +1,0 @@
-"0","par(mfrow=c(2,2), mai=c(0.5,0.8,0.3,0.1))"
-"0","RleMicroRna2(object = t(ad.before_05),batch = ad.batch_05,maintitle = 'AD: before (0-0.5 g/L)',legend.cex = 0.4, cex.xaxis = 0.5)"

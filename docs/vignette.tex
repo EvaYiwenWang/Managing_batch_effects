@@ -125,7 +125,7 @@
   \postauthor{\par}
       \predate{\centering\large\emph}
   \postdate{\par}
-    \date{2019-06-18}
+    \date{2019-06-19}
 
 \usepackage{booktabs}
 \usepackage{amsthm}
@@ -985,7 +985,7 @@ variables:
 \end{Shaded}
 
 \begin{verbatim}
-## Number of significant surrogate variables is:  1 
+## Number of significant surrogate variables is:  3 
 ## Iteration (out of 5 ):1  2  3  4  5
 \end{verbatim}
 
@@ -1068,24 +1068,49 @@ difference captured by these controls.
 
 Since our three datasets do not have negative control variables, we use
 a linear model (or linear mixed model) to identify OTUs less likely to
-be affected by treatment effects as negative controls.
+be affected by treatment effects as negative controls to fit the
+assumptions. The P-values of treatment effects calculated in section
+`Linear model and linear mixed model' are therefore used here.
+
+\textbf{Note:} it is not a optimal way to obtain negative control
+variables like what we did. Negative control variables should be known
+and designed before the experiment. The reason we obtained controls
+using this way is just to fit the assumption and demonstrate hwo to use
+RUV series.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# sponge data}
 \NormalTok{sponge.nc =}\StringTok{ }\NormalTok{sponge.trt_q }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
+
+\CommentTok{# AD data}
+\NormalTok{ad.nc =}\StringTok{ }\NormalTok{ad.trt_q }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
+
+\CommentTok{# HD data}
+\NormalTok{hd.nc =}\StringTok{ }\NormalTok{hd.trt_p }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
+\end{Highlighting}
+\end{Shaded}
+
+We then apply the \emph{RUV2} function. This function needs to specify
+the number of unwanted factors (components of negative controls). We
+therefore specify k = 3, but the number is very subjective and can be
+changed to any number. After that, we extract the P-values of treatment
+effects considering unwanted batch effects and then Q-values after FDR
+adjustment.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# sponge data}
 \NormalTok{sponge.ruv2 <-}\StringTok{ }\KeywordTok{RUV2}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ sponge.tss.clr, }\DataTypeTok{X =}\NormalTok{ sponge.trt, }\DataTypeTok{ctl =}\NormalTok{ sponge.nc, }\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\CommentTok{# k is subjective}
 \NormalTok{sponge.ruv2.trt_p <-}\StringTok{ }\NormalTok{sponge.ruv2}\OperatorTok{$}\NormalTok{p}
 \NormalTok{sponge.ruv2.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.ruv2.trt_p,}\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 
 \CommentTok{# AD data}
-\NormalTok{ad.nc =}\StringTok{ }\NormalTok{ad.trt_q }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
 \NormalTok{ad.ruv2 <-}\StringTok{ }\KeywordTok{RUV2}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ ad.tss.clr, }\DataTypeTok{X =}\NormalTok{ ad.trt, }\DataTypeTok{ctl =}\NormalTok{ ad.nc, }\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\CommentTok{# k is subjective}
 \NormalTok{ad.ruv2.trt_p <-}\StringTok{ }\NormalTok{ad.ruv2}\OperatorTok{$}\NormalTok{p}
 \NormalTok{ad.ruv2.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.ruv2.trt_p,}\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 
 \CommentTok{# HD data}
-\NormalTok{hd.nc =}\StringTok{ }\NormalTok{hd.trt_p }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
 \NormalTok{hd.ruv2 <-}\StringTok{ }\KeywordTok{RUV2}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ hd.tss.clr, }\DataTypeTok{X =}\NormalTok{ hd.trt, }\DataTypeTok{ctl =}\NormalTok{ hd.nc, }\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\CommentTok{# k is subjective}
 \NormalTok{hd.ruv2.trt_p <-}\StringTok{ }\NormalTok{hd.ruv2}\OperatorTok{$}\NormalTok{p}
 \NormalTok{hd.ruv2.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.ruv2.trt_p,}\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
@@ -1093,6 +1118,17 @@ be affected by treatment effects as negative controls.
 \end{Shaded}
 
 \subsection{RUV4}\label{ruv4}
+
+RUV4 is an updated version of RUV2 that uses negative control variables
+and the residual matrix that has no treatment effect to estimate
+unwanted batch effects.
+
+\emph{RUV4} also needs to specify the number of unwanted factors as
+\emph{RUV2}, and here we use a function called \emph{getK} to estimate
+this number. This function is only for \emph{RUV4} and the estimated k
+is not always suitable. If the estimated k is 0, k can be forced to 1
+and still to account for unwanted variation captured from negative
+controls.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1127,6 +1163,10 @@ effects}\label{correcting-for-batch-effects}
 
 \subsection{BMC (batch mean centering)}\label{bmc-batch-mean-centering}
 
+We centers data within a batch across all variables. As a result, each
+batch mean is standardised to zero. The disadvantages of BMC are it is
+univariate and not optimal for non-Gaussian distributed microbiome data.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Sponge data}
@@ -1148,6 +1188,12 @@ effects}\label{correcting-for-batch-effects}
 \end{Shaded}
 
 \subsection{ComBat}\label{combat}
+
+ComBat works on known and systematic batch effects. If the treatment
+information is known, the option \emph{mod} can be fitted with a full
+model having treatment informationn to efficiently maintain enough
+treatment variation, like what we do here on sponge and AD data. The
+\emph{mod} can also be NULL if the treatment information is unknown.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1214,6 +1260,16 @@ effects}\label{correcting-for-batch-effects}
 
 \subsection{removeBatchEffect}\label{removebatcheffect}
 
+\emph{removeBatchEffect} is a function implemented in the LIMMA package
+that fits a linear model for each variable given a series of conditions
+as explanatory variables, including the batch effect and treatment
+effect. Contrary to a standard linear or linear mixed models (see
+section `linear model and linear mixed model') that simultaneously
+estimate treatment and batch effects, \emph{removeBatchEffect} subtracts
+the batch effect from the original data, resulting in a residual matrix
+that contains any and only treatment effect. The option \emph{design} is
+the same as option \emph{mod} in ComBat.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Sponge data}
@@ -1226,8 +1282,14 @@ effects}\label{correcting-for-batch-effects}
 
 \subsection{FAbatch}\label{fabatch}
 
-FAbatch is unable to converge on both sponge data and AD data. This may
-influence the effect of batch correction.
+FAbatch is a combination of location-scale adjustment and factor
+analysis. We fit \emph{y} with the treatment information and
+\emph{batch} with batch information. Since this method only accepts
+numeric variables, the levels of variables are changed to be numeric
+(e.g. `1', `2' and so on). However, FAbatch is unable to converge on
+both sponge data and AD data. This may influence the effect of batch
+correction. We therefore do not compare the results from FAbatch with
+those from other methods.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1243,6 +1305,14 @@ influence the effect of batch correction.
 
 \subsection{percentile normalisation}\label{percentile-normalisation}
 
+Percentile normalisation (PN) is developed for microbiome data
+integration. For each batch, it transforms the relative abundance of
+control samples to their own percentiles while converting the relative
+abundance of case samples into the percentiles of their corresponding
+control distribution. The method thus only applies to case-control
+studies, and may lose a large amount of information as it uses
+percentiles rather than the original values.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{sponge.percentile =}\StringTok{ }\KeywordTok{percentile_norm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.tss, }\DataTypeTok{batch =}\NormalTok{ sponge.batch, }\DataTypeTok{trt =}\NormalTok{ sponge.trt)}
@@ -1254,38 +1324,36 @@ influence the effect of batch correction.
 
 \subsection{SVD-based method}\label{svd-based-method}
 
+We center and scale the data before SVD. After SVD, we deflate the first
+component, which has the highest variation and is assumed to related to
+batch effects.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{#################}
 \CommentTok{# sponge data}
 \NormalTok{sponge.sd =}\StringTok{ }\KeywordTok{apply}\NormalTok{(sponge.tss.clr,}\DecValTok{2}\NormalTok{,sd)}
 \NormalTok{sponge.mean =}\StringTok{ }\KeywordTok{apply}\NormalTok{(sponge.tss.clr,}\DecValTok{2}\NormalTok{,mean)}
-\NormalTok{X.sponge =}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.tss.clr,}\DataTypeTok{center =}\NormalTok{ T,}\DataTypeTok{scale =}\NormalTok{ T)}
+\NormalTok{sponge.X =}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.tss.clr,}\DataTypeTok{center =}\NormalTok{ T,}\DataTypeTok{scale =}\NormalTok{ T)}
 
-\NormalTok{m.sponge =}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(X.sponge)}
-\NormalTok{m.svd.sponge =}\StringTok{ }\KeywordTok{svd}\NormalTok{(m.sponge)}
-\KeywordTok{barplot}\NormalTok{(m.svd.sponge}\OperatorTok{$}\NormalTok{d)}
-\end{Highlighting}
-\end{Shaded}
+\NormalTok{sponge.m =}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(sponge.X)}
+\NormalTok{sponge.m.svd =}\StringTok{ }\KeywordTok{svd}\NormalTok{(sponge.m)}
+\CommentTok{#barplot(sponge.m.svd$d)}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-37-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{a1.sponge =}\StringTok{ }\NormalTok{m.svd.sponge}\OperatorTok{$}\NormalTok{u[,}\DecValTok{1}\NormalTok{]}
-\NormalTok{b1.sponge =}\StringTok{ }\NormalTok{m.svd.sponge}\OperatorTok{$}\NormalTok{v[,}\DecValTok{1}\NormalTok{]}
+\NormalTok{sponge.a1 =}\StringTok{ }\NormalTok{sponge.m.svd}\OperatorTok{$}\NormalTok{u[,}\DecValTok{1}\NormalTok{]}
+\NormalTok{sponge.b1 =}\StringTok{ }\NormalTok{sponge.m.svd}\OperatorTok{$}\NormalTok{v[,}\DecValTok{1}\NormalTok{]}
 
 \CommentTok{# component 1}
-\NormalTok{t1.sponge =}\StringTok{ }\NormalTok{X.sponge }\OperatorTok{%*%}\StringTok{ }\NormalTok{a1.sponge }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(a1.sponge)))}
-\NormalTok{c1.sponge =}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(X.sponge, t1.sponge) }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(t1.sponge))}
-\NormalTok{defl.matrix_svd1.sponge  =}\StringTok{ }\NormalTok{X.sponge }\OperatorTok{-}\StringTok{ }\NormalTok{t1.sponge }\OperatorTok{%*%}\StringTok{ }\KeywordTok{t}\NormalTok{(c1.sponge)}
+\NormalTok{sponge.t1 =}\StringTok{ }\NormalTok{sponge.X }\OperatorTok{%*%}\StringTok{ }\NormalTok{sponge.a1 }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(sponge.a1)))}
+\NormalTok{sponge.c1 =}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(sponge.X, sponge.t1) }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(sponge.t1))}
+\NormalTok{sponge.svd.defl.matrix1  =}\StringTok{ }\NormalTok{sponge.X }\OperatorTok{-}\StringTok{ }\NormalTok{sponge.t1 }\OperatorTok{%*%}\StringTok{ }\KeywordTok{t}\NormalTok{(sponge.c1)}
 
-\CommentTok{# #}
-\NormalTok{sponge.svd =}\StringTok{ }\NormalTok{defl.matrix_svd1.sponge}
+\NormalTok{## add back mean and variance}
+\NormalTok{sponge.svd =}\StringTok{ }\NormalTok{sponge.svd.defl.matrix1}
 \NormalTok{sponge.svd[}\DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(sponge.svd),}\DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(sponge.svd)] =}\StringTok{ }\OtherTok{NA}
-\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(defl.matrix_svd1.sponge))\{}
-  \ControlFlowTok{for}\NormalTok{(j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(defl.matrix_svd1.sponge))\{}
-\NormalTok{    sponge.svd[j,i] =}\StringTok{ }\NormalTok{defl.matrix_svd1.sponge[j,i]}\OperatorTok{*}\NormalTok{sponge.sd[i] }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.mean[i]}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(sponge.svd.defl.matrix1))\{}
+  \ControlFlowTok{for}\NormalTok{(j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(sponge.svd.defl.matrix1))\{}
+\NormalTok{    sponge.svd[j,i] =}\StringTok{ }\NormalTok{sponge.svd.defl.matrix1[j,i]}\OperatorTok{*}\NormalTok{sponge.sd[i] }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.mean[i]}
 \NormalTok{  \}}
 \NormalTok{\}}
 
@@ -1293,32 +1361,32 @@ influence the effect of batch correction.
 \CommentTok{# ad data}
 \NormalTok{ad.sd =}\StringTok{ }\KeywordTok{apply}\NormalTok{(ad.tss.clr,}\DecValTok{2}\NormalTok{,sd)}
 \NormalTok{ad.mean =}\StringTok{ }\KeywordTok{apply}\NormalTok{(ad.tss.clr,}\DecValTok{2}\NormalTok{,mean)}
-\NormalTok{X.ad =}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.tss.clr,}\DataTypeTok{center =}\NormalTok{ T,}\DataTypeTok{scale =}\NormalTok{ T)}
+\NormalTok{ad.X =}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.tss.clr,}\DataTypeTok{center =}\NormalTok{ T,}\DataTypeTok{scale =}\NormalTok{ T)}
 
-\NormalTok{m.ad =}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(X.ad)}
-\NormalTok{m.svd.ad =}\StringTok{ }\KeywordTok{svd}\NormalTok{(m.ad)}
-\KeywordTok{barplot}\NormalTok{(m.svd.ad}\OperatorTok{$}\NormalTok{d)}
+\NormalTok{ad.m =}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(ad.X)}
+\NormalTok{ad.m.svd =}\StringTok{ }\KeywordTok{svd}\NormalTok{(ad.m)}
+\KeywordTok{barplot}\NormalTok{(ad.m.svd}\OperatorTok{$}\NormalTok{d)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-37-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-38-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{a1.ad =}\StringTok{ }\NormalTok{m.svd.ad}\OperatorTok{$}\NormalTok{u[,}\DecValTok{1}\NormalTok{]}
-\NormalTok{b1.ad =}\StringTok{ }\NormalTok{m.svd.ad}\OperatorTok{$}\NormalTok{v[,}\DecValTok{1}\NormalTok{]}
+\NormalTok{ad.a1 =}\StringTok{ }\NormalTok{ad.m.svd}\OperatorTok{$}\NormalTok{u[,}\DecValTok{1}\NormalTok{]}
+\NormalTok{ad.b1 =}\StringTok{ }\NormalTok{ad.m.svd}\OperatorTok{$}\NormalTok{v[,}\DecValTok{1}\NormalTok{]}
 
 \CommentTok{# component 1}
-\NormalTok{t1.ad =}\StringTok{ }\NormalTok{X.ad }\OperatorTok{%*%}\StringTok{ }\NormalTok{a1.ad }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(a1.ad)))}
-\NormalTok{c1.ad =}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(X.ad, t1.ad) }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(t1.ad))}
-\NormalTok{defl.matrix_svd1.ad  =}\StringTok{ }\NormalTok{X.ad }\OperatorTok{-}\StringTok{ }\NormalTok{t1.ad }\OperatorTok{%*%}\StringTok{ }\KeywordTok{t}\NormalTok{(c1.ad)}
+\NormalTok{ad.t1 =}\StringTok{ }\NormalTok{ad.X }\OperatorTok{%*%}\StringTok{ }\NormalTok{ad.a1 }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(ad.a1)))}
+\NormalTok{ad.c1 =}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(ad.X, ad.t1) }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(ad.t1))}
+\NormalTok{ad.svd.defl.matrix1  =}\StringTok{ }\NormalTok{ad.X }\OperatorTok{-}\StringTok{ }\NormalTok{ad.t1 }\OperatorTok{%*%}\StringTok{ }\KeywordTok{t}\NormalTok{(ad.c1)}
 
 \CommentTok{# #}
-\NormalTok{ad.svd =}\StringTok{ }\NormalTok{defl.matrix_svd1.ad}
+\NormalTok{ad.svd =}\StringTok{ }\NormalTok{ad.svd.defl.matrix1}
 \NormalTok{ad.svd[}\DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(ad.svd),}\DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(ad.svd)] =}\StringTok{ }\OtherTok{NA}
-\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(defl.matrix_svd1.ad))\{}
-  \ControlFlowTok{for}\NormalTok{(j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(defl.matrix_svd1.ad))\{}
-\NormalTok{    ad.svd[j,i] =}\StringTok{ }\NormalTok{defl.matrix_svd1.ad[j,i]}\OperatorTok{*}\NormalTok{ad.sd[i] }\OperatorTok{+}\StringTok{ }\NormalTok{ad.mean[i]}
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(ad.svd.defl.matrix1))\{}
+  \ControlFlowTok{for}\NormalTok{(j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(ad.svd.defl.matrix1))\{}
+\NormalTok{    ad.svd[j,i] =}\StringTok{ }\NormalTok{ad.svd.defl.matrix1[j,i]}\OperatorTok{*}\NormalTok{ad.sd[i] }\OperatorTok{+}\StringTok{ }\NormalTok{ad.mean[i]}
 \NormalTok{  \}}
 \NormalTok{\}}
 \end{Highlighting}
@@ -1326,39 +1394,28 @@ influence the effect of batch correction.
 
 \subsection{RUVIII}\label{ruviii}
 
-RUVIII needs technical sample replicates and negative control variables.
-As only AD data have sample replicates, RUVIII is only applied on AD
-data. We use linear model to find variables with less probability of
-treatment effects, and these variables are treated as negative control
-variables to fit the assumptions of RUVIII.
+RUVIII needs not only negative control variables as RUV2 and RUV4, but
+also technical sample replicates. As only AD data have sample
+replicates, RUVIII is only applied on AD data.
+
+In contrast to RUV2 and RUV4, RUVIII is a multivariate method that
+accounts for the dependency between microbial variables, but it is
+currently limited to the correction of technical and computational
+sources of batch effects.
+
+\textbf{Note:} RUVIII requires the number of negative control variables
+to be larger than the sample size in order to fully use the sample
+information.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{#####################}
 \CommentTok{# ad data only}
-\NormalTok{replicates.ad =}\StringTok{ }\NormalTok{ad.metadata}\OperatorTok{$}\NormalTok{sample_name.data.extraction}
-\NormalTok{replicates.ad.matrix =}\StringTok{ }\KeywordTok{replicate.matrix}\NormalTok{(replicates.ad)}
+\NormalTok{ad.replicates =}\StringTok{ }\NormalTok{ad.metadata}\OperatorTok{$}\NormalTok{sample_name.data.extraction}
+\NormalTok{ad.replicates.matrix =}\StringTok{ }\KeywordTok{replicate.matrix}\NormalTok{(ad.replicates)}
 
-\NormalTok{p.ad =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DataTypeTok{nrow =} \DecValTok{2}\NormalTok{, }\DataTypeTok{ncol =} \KeywordTok{ncol}\NormalTok{(ad.tss.clr))}
-\KeywordTok{rownames}\NormalTok{(p.ad) =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'ad.trt'}\NormalTok{,}\StringTok{'ad.batch'}\NormalTok{)}
-\KeywordTok{colnames}\NormalTok{(p.ad) =}\StringTok{ }\KeywordTok{colnames}\NormalTok{(ad.tss.clr)}
-\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(ad.tss.clr))\{}
-\NormalTok{  res =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.tss.clr[,i] }\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
-\NormalTok{  summ.res =}\StringTok{ }\KeywordTok{summary}\NormalTok{(res)}
-\NormalTok{  anova.res =}\StringTok{ }\KeywordTok{anova}\NormalTok{(res)}
-\NormalTok{  p.ad[}\DecValTok{1}\NormalTok{,i] =}\StringTok{ }\NormalTok{anova.res}\OperatorTok{$}\StringTok{`}\DataTypeTok{Pr(>F)}\StringTok{`}\NormalTok{[}\DecValTok{1}\NormalTok{]}
-\NormalTok{  p.ad[}\DecValTok{2}\NormalTok{,i] =}\StringTok{ }\NormalTok{anova.res}\OperatorTok{$}\StringTok{`}\DataTypeTok{Pr(>F)}\StringTok{`}\NormalTok{[}\DecValTok{2}\NormalTok{]}
-\NormalTok{\}}
-
-\NormalTok{p.adj.ad =}\StringTok{ }\KeywordTok{apply}\NormalTok{(p.ad,}\DecValTok{1}\NormalTok{,p.adjust,}\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
-\NormalTok{p.adj.ad1 =}\StringTok{ }\KeywordTok{sort}\NormalTok{(p.adj.ad[,}\DecValTok{1}\NormalTok{],}\DataTypeTok{decreasing =}\NormalTok{ T)}
-\NormalTok{nc.otu1 =}\StringTok{ }\KeywordTok{names}\NormalTok{(p.adj.ad1[}\DecValTok{1}\OperatorTok{:}\DecValTok{75}\NormalTok{]) }\CommentTok{#negative control genes need be equal or more than samples}
-\NormalTok{nc1 =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\OtherTok{FALSE}\NormalTok{, }\KeywordTok{ncol}\NormalTok{(ad.tss.clr))}
-\KeywordTok{names}\NormalTok{(nc1) =}\StringTok{ }\KeywordTok{colnames}\NormalTok{(ad.tss.clr)}
-\NormalTok{nc1[nc.otu1] =}\StringTok{ }\OtherTok{TRUE}
-
-\NormalTok{ad.ruv <-}\StringTok{ }\KeywordTok{RUVIII}\NormalTok{(}\DataTypeTok{Y=}\NormalTok{ad.tss.clr,}\DataTypeTok{M =}\NormalTok{ replicates.ad.matrix, }\DataTypeTok{ctl =}\NormalTok{ nc1)}
-\KeywordTok{rownames}\NormalTok{(ad.ruv) =}\StringTok{ }\KeywordTok{rownames}\NormalTok{(ad.tss.clr)}
+\NormalTok{ad.ruvIII <-}\StringTok{ }\KeywordTok{RUVIII}\NormalTok{(}\DataTypeTok{Y=}\NormalTok{ad.tss.clr,}\DataTypeTok{M =}\NormalTok{ ad.replicates.matrix, }\DataTypeTok{ctl =}\NormalTok{ ad.nc)}
+\KeywordTok{rownames}\NormalTok{(ad.ruvIII) =}\StringTok{ }\KeywordTok{rownames}\NormalTok{(ad.tss.clr)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1369,58 +1426,71 @@ variables to fit the assumptions of RUVIII.
 \subsection{Principal component analysis (PCA) with density plot per
 component}\label{principal-component-analysis-pca-with-density-plot-per-component-1}
 
+We apply PCA on both sponge and AD data before and after correction with
+different methods.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# sponge data}
-\NormalTok{pca.sponge.before =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.tss.clr, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.sponge.bmc =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.bmc, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.sponge.combat =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.combat, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.sponge.limma =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.limma, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.sponge.percentile =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.percentile, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.sponge.svd =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.svd, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{sponge.pca.before =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.tss.clr, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{sponge.pca.bmc =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.bmc, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{sponge.pca.combat =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.combat, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{sponge.pca.limma =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.limma, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{sponge.pca.percentile =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.percentile, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{sponge.pca.svd =}\StringTok{ }\KeywordTok{pca}\NormalTok{(sponge.svd, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
 
 \CommentTok{# ad data}
-\NormalTok{pca.ad.before =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.tss.clr, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.ad.bmc =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.bmc, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.ad.combat =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.combat, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.ad.limma =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.limma, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.ad.percentile =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.percentile, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.ad.svd =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.svd, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
-\NormalTok{pca.ad.ruv =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.ruv, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{ad.pca.before =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.tss.clr, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{ad.pca.bmc =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.bmc, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{ad.pca.combat =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.combat, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{ad.pca.limma =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.limma, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{ad.pca.percentile =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.percentile, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{ad.pca.svd =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.svd, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
+\NormalTok{ad.pca.ruv =}\StringTok{ }\KeywordTok{pca}\NormalTok{(ad.ruvIII, }\DataTypeTok{ncomp =} \DecValTok{3}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+We then plot these PCA sample plots with denisty plots per PC.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(plot.pca.before.sponge, plot.pca.bmc.sponge, plot.pca.combat.sponge,plot.pca.limma.sponge,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(sponge.pca.plot.before, sponge.pca.plot.bmc, sponge.pca.plot.combat,sponge.pca.plot.limma,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-41-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-42-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(plot.pca.before.sponge, plot.pca.percentile.sponge,plot.pca.svd.sponge,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(sponge.pca.plot.before, sponge.pca.plot.percentile,sponge.pca.plot.svd,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-41-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-42-2.pdf}
+
+SVD performed the worse, compared to BMC, removeBatchEffect and
+percentile normalisation, as it did not remove batch effects but removed
+tissue variation instead.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(plot.pca.before.ad, plot.pca.bmc.ad, plot.pca.combat.ad,plot.pca.limma.ad,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(ad.pca.plot.before, ad.pca.plot.bmc, ad.pca.plot.combat,ad.pca.plot.limma,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-43-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-44-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(plot.pca.before.ad, plot.pca.percentile.ad,plot.pca.svd.ad,plot.pca.ruv.ad,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(ad.pca.plot.before, ad.pca.plot.percentile,ad.pca.plot.svd,ad.pca.plot.ruv,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-43-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-44-2.pdf}
+
+BMC, removeBatchEffect, percentile normalisation and RUVIII removed the
+batch effects, and maintained the treatment effects. SVD did not removed
+the batch effect but decreased the treatment effects.
 
 \subsection{Density plot and box
 plot}\label{density-plot-and-box-plot-1}
@@ -1430,34 +1500,34 @@ plot}\label{density-plot-and-box-plot-1}
 \NormalTok{###############}
 \NormalTok{## sponge data}
 \NormalTok{sponge.before.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ sponge.tss.clr[,}\DecValTok{9}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ sponge.batch)}
-\NormalTok{sponge.before.boxplot <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.before.df,}\DataTypeTok{x=}\NormalTok{sponge.before.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{sponge.boxplot.before <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.before.df,}\DataTypeTok{x=}\NormalTok{sponge.before.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{sponge.before.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU9 - before (Sponge)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Gel (batch)'}\NormalTok{)}
 
 \NormalTok{sponge.bmc.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ sponge.bmc[,}\DecValTok{9}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ sponge.batch)}
-\NormalTok{sponge.bmc.boxplot <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.bmc.df,}\DataTypeTok{x=}\NormalTok{sponge.bmc.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{sponge.boxplot.bmc <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.bmc.df,}\DataTypeTok{x=}\NormalTok{sponge.bmc.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{sponge.bmc.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU9 - BMC (Sponge)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Gel (batch)'}\NormalTok{)}
 
 
 \NormalTok{sponge.combat.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ sponge.combat[,}\DecValTok{9}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ sponge.batch)}
-\NormalTok{sponge.combat.boxplot <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.combat.df,}\DataTypeTok{x=}\NormalTok{sponge.combat.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{sponge.boxplot.combat <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.combat.df,}\DataTypeTok{x=}\NormalTok{sponge.combat.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{sponge.combat.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU9 - ComBat (Sponge)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Gel (batch)'}\NormalTok{)}
 
 
 \NormalTok{sponge.limma.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ sponge.limma[,}\DecValTok{9}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ sponge.batch)}
-\NormalTok{sponge.limma.boxplot <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.limma.df,}\DataTypeTok{x=}\NormalTok{sponge.limma.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{sponge.boxplot.limma <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.limma.df,}\DataTypeTok{x=}\NormalTok{sponge.limma.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{sponge.limma.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU9 - rBE(Sponge)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Gel (batch)'}\NormalTok{)}
 
 \NormalTok{sponge.percentile.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ sponge.percentile[,}\DecValTok{9}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ sponge.batch)}
-\NormalTok{sponge.percentile.boxplot <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.percentile.df,}\DataTypeTok{x=}\NormalTok{sponge.percentile.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{sponge.boxplot.percentile <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.percentile.df,}\DataTypeTok{x=}\NormalTok{sponge.percentile.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{sponge.percentile.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU9 - PN (Sponge)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Gel (batch)'}\NormalTok{)}
 
 \NormalTok{sponge.svd.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ sponge.svd[,}\DecValTok{9}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ sponge.batch)}
-\NormalTok{sponge.svd.boxplot <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.svd.df,}\DataTypeTok{x=}\NormalTok{sponge.svd.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{sponge.boxplot.svd <-}\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.svd.df,}\DataTypeTok{x=}\NormalTok{sponge.svd.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{sponge.svd.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU9 - SVD (Sponge)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Gel (batch)'}\NormalTok{)}
 \end{Highlighting}
@@ -1465,68 +1535,68 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(sponge.before.boxplot, sponge.bmc.boxplot, sponge.combat.boxplot, sponge.limma.boxplot,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(sponge.boxplot.before, sponge.boxplot.bmc, sponge.boxplot.combat, sponge.boxplot.limma,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-45-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-46-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(sponge.before.boxplot, sponge.percentile.boxplot,sponge.svd.boxplot,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(sponge.boxplot.before, sponge.boxplot.percentile,sponge.boxplot.svd,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-45-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-46-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{## density plot}
 \CommentTok{# before}
-\NormalTok{plot.sponge.before <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.before.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - before (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{sponge.dens.before <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.before.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - before (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 \CommentTok{# BMC}
-\NormalTok{plot.sponge.bmc <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.bmc.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - BMC (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{sponge.dens.bmc <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.bmc.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - BMC (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 
 \CommentTok{# ComBat}
-\NormalTok{plot.sponge.combat <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.combat.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - ComBat (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{sponge.dens.combat <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.combat.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - ComBat (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 
 \CommentTok{# removeBatchEffect }
-\NormalTok{plot.sponge.limma <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.limma.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - rBE (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{sponge.dens.limma <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.limma.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - rBE (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 
 \CommentTok{# percentile normal}
-\NormalTok{plot.sponge.percentile <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.percentile.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - PN (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{sponge.dens.percentile <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.percentile.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - PN (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 
 \CommentTok{# SVD}
-\NormalTok{plot.sponge.svd <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.svd.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - SVD (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{sponge.dens.svd <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.svd.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU9 - SVD (Sponge)'}\NormalTok{,}\DataTypeTok{x=}\StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Gel (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(plot.sponge.before, plot.sponge.bmc, plot.sponge.combat,plot.sponge.limma,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(sponge.dens.before, sponge.dens.bmc, sponge.dens.combat,sponge.dens.limma,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-47-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-48-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(plot.sponge.before, plot.sponge.percentile, plot.sponge.svd,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(sponge.dens.before, sponge.dens.percentile, sponge.dens.svd,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-47-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-48-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{######### p-values}
-\NormalTok{linearm.sponge.before =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.tss.clr[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
-\KeywordTok{summary}\NormalTok{(linearm.sponge.before)}
+\NormalTok{sponge.lm.before =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.tss.clr[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
+\KeywordTok{summary}\NormalTok{(sponge.lm.before)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1554,8 +1624,8 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{linearm.sponge.bmc =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.bmc[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
-\KeywordTok{summary}\NormalTok{(linearm.sponge.bmc)}
+\NormalTok{sponge.lm.bmc =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.bmc[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
+\KeywordTok{summary}\NormalTok{(sponge.lm.bmc)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1581,8 +1651,8 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{linearm.sponge.combat =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.combat[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
-\KeywordTok{summary}\NormalTok{(linearm.sponge.combat)}
+\NormalTok{sponge.lm.combat =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.combat[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
+\KeywordTok{summary}\NormalTok{(sponge.lm.combat)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1610,8 +1680,8 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{linearm.sponge.limma =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.limma[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
-\KeywordTok{summary}\NormalTok{(linearm.sponge.limma)}
+\NormalTok{sponge.lm.limma =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.limma[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
+\KeywordTok{summary}\NormalTok{(sponge.lm.limma)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1639,8 +1709,8 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{linearm.sponge.percentile =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.percentile[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
-\KeywordTok{summary}\NormalTok{(linearm.sponge.percentile)}
+\NormalTok{sponge.lm.percentile =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.percentile[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
+\KeywordTok{summary}\NormalTok{(sponge.lm.percentile)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1668,8 +1738,8 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{linearm.sponge.svd =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.svd[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
-\KeywordTok{summary}\NormalTok{(linearm.sponge.svd)}
+\NormalTok{sponge.lm.svd =}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.svd[,}\DecValTok{9}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
+\KeywordTok{summary}\NormalTok{(sponge.lm.svd)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1703,7 +1773,7 @@ plot}\label{density-plot-and-box-plot-1}
 \CommentTok{# boxplot}
 \NormalTok{ad.before.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ ad.tss.clr[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ ad.batch)}
 
-\NormalTok{ad.before.boxplot <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.before.df,}\DataTypeTok{x=}\NormalTok{ad.before.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{ad.boxplot.before <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.before.df,}\DataTypeTok{x=}\NormalTok{ad.before.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{ad.before.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU12 - before (AD)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Date (batch)'}\NormalTok{,}
              \DataTypeTok{x.angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{x.hjust =} \DecValTok{1}\NormalTok{)}
@@ -1711,7 +1781,7 @@ plot}\label{density-plot-and-box-plot-1}
 
 \NormalTok{ad.bmc.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ ad.bmc[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ ad.batch)}
 
-\NormalTok{ad.bmc.boxplot <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.bmc.df,}\DataTypeTok{x=}\NormalTok{ad.bmc.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{ad.boxplot.bmc <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.bmc.df,}\DataTypeTok{x=}\NormalTok{ad.bmc.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{ad.bmc.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU12 - BMC (AD)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Date (batch)'}\NormalTok{,}
              \DataTypeTok{x.angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{x.hjust =} \DecValTok{1}\NormalTok{)}
@@ -1719,14 +1789,14 @@ plot}\label{density-plot-and-box-plot-1}
 
 \NormalTok{ad.combat.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ ad.combat[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ ad.batch)}
 
-\NormalTok{ad.combat.boxplot <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.combat.df,}\DataTypeTok{x=}\NormalTok{ad.combat.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{ad.boxplot.combat <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.combat.df,}\DataTypeTok{x=}\NormalTok{ad.combat.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{ad.combat.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU12 - ComBat (AD)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Date (batch)'}\NormalTok{,}
              \DataTypeTok{x.angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{x.hjust =} \DecValTok{1}\NormalTok{)}
 
 \NormalTok{ad.limma.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ ad.limma[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ ad.batch)}
 
-\NormalTok{ad.limma.boxplot <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.limma.df,}\DataTypeTok{x=}\NormalTok{ad.limma.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{ad.boxplot.limma <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.limma.df,}\DataTypeTok{x=}\NormalTok{ad.limma.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{ad.limma.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU12 - rBE (AD)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Date (batch)'}\NormalTok{,}
              \DataTypeTok{x.angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{x.hjust =} \DecValTok{1}\NormalTok{)}
@@ -1734,21 +1804,21 @@ plot}\label{density-plot-and-box-plot-1}
 
 \NormalTok{ad.percentile.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ ad.percentile[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ ad.batch)}
 
-\NormalTok{ad.percentile.boxplot <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.percentile.df,}\DataTypeTok{x=}\NormalTok{ad.percentile.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{ad.boxplot.percentile <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.percentile.df,}\DataTypeTok{x=}\NormalTok{ad.percentile.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{ad.percentile.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU12 - PN (AD)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Date (batch)'}\NormalTok{,}
              \DataTypeTok{x.angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{x.hjust =} \DecValTok{1}\NormalTok{)}
 
 \NormalTok{ad.svd.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ ad.svd[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ ad.batch)}
 
-\NormalTok{ad.svd.boxplot <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.svd.df,}\DataTypeTok{x=}\NormalTok{ad.svd.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{ad.boxplot.svd <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.svd.df,}\DataTypeTok{x=}\NormalTok{ad.svd.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{ad.svd.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU12 - SVD (AD)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Date (batch)'}\NormalTok{,}
              \DataTypeTok{x.angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{x.hjust =} \DecValTok{1}\NormalTok{)}
 
-\NormalTok{ad.ruv.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ ad.ruv[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ ad.batch)}
+\NormalTok{ad.ruv.df =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{value =}\NormalTok{ ad.ruvIII[,}\DecValTok{1}\NormalTok{], }\DataTypeTok{batch =}\NormalTok{ ad.batch)}
 
-\NormalTok{ad.ruv.boxplot <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.ruv.df,}\DataTypeTok{x=}\NormalTok{ad.ruv.df}\OperatorTok{$}\NormalTok{batch,}
+\NormalTok{ad.boxplot.ruv <-}\StringTok{ }\KeywordTok{box_plot_fun}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.ruv.df,}\DataTypeTok{x=}\NormalTok{ad.ruv.df}\OperatorTok{$}\NormalTok{batch,}
              \DataTypeTok{y=}\NormalTok{ad.ruv.df}\OperatorTok{$}\NormalTok{value,}\DataTypeTok{title =} \StringTok{'OTU12 - RUVIII (AD)'}\NormalTok{,}
              \DataTypeTok{batch.legend.title =} \StringTok{'Date (batch)'}\NormalTok{,}
              \DataTypeTok{x.angle =} \DecValTok{45}\NormalTok{, }\DataTypeTok{x.hjust =} \DecValTok{1}\NormalTok{)}
@@ -1757,72 +1827,72 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(ad.before.boxplot, ad.bmc.boxplot, ad.combat.boxplot, ad.limma.boxplot,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(ad.boxplot.before, ad.boxplot.bmc, ad.boxplot.combat, ad.boxplot.limma,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-49-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-50-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(ad.before.boxplot, ad.percentile.boxplot,ad.svd.boxplot,ad.ruv.boxplot,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(ad.boxplot.before, ad.boxplot.percentile,ad.boxplot.svd,ad.boxplot.ruv,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-49-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-50-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# density plot}
 \CommentTok{# before}
-\NormalTok{plot.ad.before =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.before.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - before (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{ad.dens.before =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.before.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - before (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 \CommentTok{# BMC}
-\NormalTok{plot.ad.bmc =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.bmc.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - BMC (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{ad.dens.bmc =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.bmc.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - BMC (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 
 \CommentTok{# ComBat}
-\NormalTok{plot.ad.combat =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.combat.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - ComBat (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{ad.dens.combat =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.combat.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - ComBat (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 
 \CommentTok{# removeBatchEffect}
-\NormalTok{plot.ad.limma =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.limma.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - rBE (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{ad.dens.limma =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.limma.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - rBE (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 
 \CommentTok{# percentile norm}
-\NormalTok{plot.ad.percentile =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.percentile.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - PN (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{ad.dens.percentile =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.percentile.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - PN (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 
 \CommentTok{# SVD}
-\NormalTok{plot.ad.svd =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.svd.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - SVD (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{ad.dens.svd =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.svd.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - SVD (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 
 
 \CommentTok{# RUVIII}
-\NormalTok{plot.ad.ruv =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.ruv.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - RUVIII (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
+\NormalTok{ad.dens.ruv =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(ad.ruv.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values=}\KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{title =} \StringTok{'OTU12 - RUVIII (AD)'}\NormalTok{,}\DataTypeTok{x =} \StringTok{'Value'}\NormalTok{,}\DataTypeTok{fill =} \StringTok{'Date (batch)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{plot.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{hjust=}\FloatTok{0.5}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{())}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(plot.ad.before, plot.ad.bmc, plot.ad.combat,plot.ad.limma,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(ad.dens.before, ad.dens.bmc, ad.dens.combat,ad.dens.limma,}\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-51-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-52-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{grid.arrange}\NormalTok{(plot.ad.before, plot.ad.percentile, plot.ad.svd,plot.ad.ruv, }\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
+\KeywordTok{grid.arrange}\NormalTok{(ad.dens.before, ad.dens.percentile, ad.dens.svd,ad.dens.ruv, }\DataTypeTok{ncol=}\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-51-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-52-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{#p-values}
-\NormalTok{linearm.ad.before =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.tss.clr[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
-\KeywordTok{anova}\NormalTok{(linearm.ad.before)}
+\NormalTok{ad.lm.before =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.tss.clr[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
+\KeywordTok{anova}\NormalTok{(ad.lm.before)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1840,39 +1910,10 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{summary}\NormalTok{(linearm.ad.before)}
-\end{Highlighting}
-\end{Shaded}
+\CommentTok{#summary(ad.lm.before)}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = ad.tss.clr[, 1] ~ ad.trt + ad.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.09885 -0.39613 -0.00381  0.36645  1.98185 
-## 
-## Coefficients:
-##                     Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)         2.311213   0.247768   9.328 7.57e-14 ***
-## ad.trt1-2           0.203619   0.171183   1.189  0.23833    
-## ad.batch14/04/2016 -0.828100   0.287918  -2.876  0.00535 ** 
-## ad.batch01/07/2016  0.007239   0.273672   0.026  0.97897    
-## ad.batch14/11/2016  0.062689   0.282978   0.222  0.82533    
-## ad.batch21/09/2017  1.361132   0.306373   4.443 3.30e-05 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.6864 on 69 degrees of freedom
-## Multiple R-squared:  0.5138, Adjusted R-squared:  0.4786 
-## F-statistic: 14.58 on 5 and 69 DF,  p-value: 9.665e-10
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{linearm.ad.bmc =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.bmc[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
-\KeywordTok{anova}\NormalTok{(linearm.ad.bmc)}
+\NormalTok{ad.lm.bmc =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.bmc[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
+\KeywordTok{anova}\NormalTok{(ad.lm.bmc)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1888,37 +1929,10 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{summary}\NormalTok{(linearm.ad.bmc)}
-\end{Highlighting}
-\end{Shaded}
+\CommentTok{#summary(ad.lm.bmc)}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = ad.bmc[, 1] ~ ad.trt + ad.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.09885 -0.39613 -0.00381  0.36645  1.98185 
-## 
-## Coefficients:
-##                     Estimate Std. Error t value Pr(>|t|)
-## (Intercept)        -0.113122   0.247768  -0.457    0.649
-## ad.trt1-2           0.203619   0.171183   1.189    0.238
-## ad.batch14/04/2016 -0.039593   0.287918  -0.138    0.891
-## ad.batch01/07/2016 -0.012928   0.273672  -0.047    0.962
-## ad.batch14/11/2016  0.005323   0.282978   0.019    0.985
-## ad.batch21/09/2017 -0.056561   0.306373  -0.185    0.854
-## 
-## Residual standard error: 0.6864 on 69 degrees of freedom
-## Multiple R-squared:  0.02009,    Adjusted R-squared:  -0.05091 
-## F-statistic: 0.283 on 5 and 69 DF,  p-value: 0.9209
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{linearm.ad.combat =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.combat[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
-\KeywordTok{anova}\NormalTok{(linearm.ad.combat)}
+\NormalTok{ad.lm.combat =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.combat[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
+\KeywordTok{anova}\NormalTok{(ad.lm.combat)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1934,39 +1948,10 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{summary}\NormalTok{(linearm.ad.combat)}
-\end{Highlighting}
-\end{Shaded}
+\CommentTok{#summary(ad.lm.combat)}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = ad.combat[, 1] ~ ad.trt + ad.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.72209 -0.38700 -0.00346  0.34754  1.79333 
-## 
-## Coefficients:
-##                    Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)         2.46834    0.22668  10.889   <2e-16 ***
-## ad.trt1-2           0.20995    0.15661   1.341    0.184    
-## ad.batch14/04/2016 -0.19520    0.26341  -0.741    0.461    
-## ad.batch01/07/2016 -0.12986    0.25038  -0.519    0.606    
-## ad.batch14/11/2016 -0.09816    0.25889  -0.379    0.706    
-## ad.batch21/09/2017 -0.08901    0.28030  -0.318    0.752    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.6279 on 69 degrees of freedom
-## Multiple R-squared:  0.03225,    Adjusted R-squared:  -0.03787 
-## F-statistic: 0.4599 on 5 and 69 DF,  p-value: 0.8047
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{linearm.ad.limma =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.limma[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
-\KeywordTok{anova}\NormalTok{(linearm.ad.limma)}
+\NormalTok{ad.lm.limma =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.limma[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
+\KeywordTok{anova}\NormalTok{(ad.lm.limma)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1982,39 +1967,10 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{summary}\NormalTok{(linearm.ad.limma)}
-\end{Highlighting}
-\end{Shaded}
+\CommentTok{#summary(ad.lm.limma)}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = ad.limma[, 1] ~ ad.trt + ad.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.09885 -0.39613 -0.00381  0.36645  1.98185 
-## 
-## Coefficients:
-##                     Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)        2.432e+00  2.478e-01   9.815    1e-14 ***
-## ad.trt1-2          2.036e-01  1.712e-01   1.189    0.238    
-## ad.batch14/04/2016 2.561e-15  2.879e-01   0.000    1.000    
-## ad.batch01/07/2016 1.175e-15  2.737e-01   0.000    1.000    
-## ad.batch14/11/2016 1.116e-15  2.830e-01   0.000    1.000    
-## ad.batch21/09/2017 2.973e-16  3.064e-01   0.000    1.000    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.6864 on 69 degrees of freedom
-## Multiple R-squared:  0.02121,    Adjusted R-squared:  -0.04972 
-## F-statistic: 0.299 on 5 and 69 DF,  p-value: 0.9118
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{linearm.ad.percentile =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.percentile[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
-\KeywordTok{anova}\NormalTok{(linearm.ad.percentile)}
+\NormalTok{ad.lm.percentile =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.percentile[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
+\KeywordTok{anova}\NormalTok{(ad.lm.percentile)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2032,39 +1988,10 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{summary}\NormalTok{(linearm.ad.percentile)}
-\end{Highlighting}
-\end{Shaded}
+\CommentTok{#summary(ad.lm.percentile)}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = ad.percentile[, 1] ~ ad.trt + ad.batch)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -0.5560 -0.3126  0.1613  0.2029  0.6226 
-## 
-## Coefficients:
-##                    Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)         0.43006    0.12503   3.440 0.000992 ***
-## ad.trt1-2           0.12590    0.08638   1.457 0.149528    
-## ad.batch14/04/2016  0.24115    0.14529   1.660 0.101497    
-## ad.batch01/07/2016 -0.11514    0.13810  -0.834 0.407312    
-## ad.batch14/11/2016  0.15770    0.14279   1.104 0.273254    
-## ad.batch21/09/2017  0.25670    0.15460   1.660 0.101375    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.3464 on 69 degrees of freedom
-## Multiple R-squared:  0.2078, Adjusted R-squared:  0.1504 
-## F-statistic: 3.619 on 5 and 69 DF,  p-value: 0.005766
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{linearm.ad.svd =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.svd[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
-\KeywordTok{anova}\NormalTok{(linearm.ad.svd)}
+\NormalTok{ad.lm.svd =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.svd[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
+\KeywordTok{anova}\NormalTok{(ad.lm.svd)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2082,84 +2009,31 @@ plot}\label{density-plot-and-box-plot-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{summary}\NormalTok{(linearm.ad.svd)}
-\end{Highlighting}
-\end{Shaded}
+\CommentTok{#summary(ad.lm.svd)}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = ad.svd[, 1] ~ ad.trt + ad.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -2.18899 -0.39114  0.00684  0.40400  1.98037 
-## 
-## Coefficients:
-##                    Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)         2.45910    0.24432  10.065 3.57e-15 ***
-## ad.trt1-2           0.05243    0.16880   0.311 0.757055    
-## ad.batch14/04/2016 -0.97834    0.28391  -3.446 0.000973 ***
-## ad.batch01/07/2016  0.02012    0.26987   0.075 0.940779    
-## ad.batch14/11/2016  0.05321    0.27904   0.191 0.849320    
-## ad.batch21/09/2017  1.24541    0.30211   4.122 0.000103 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.6768 on 69 degrees of freedom
-## Multiple R-squared:  0.5192, Adjusted R-squared:  0.4844 
-## F-statistic:  14.9 on 5 and 69 DF,  p-value: 6.658e-10
-\end{verbatim}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{linearm.ad.ruv =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.ruv[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
-\KeywordTok{anova}\NormalTok{(linearm.ad.ruv)}
+\NormalTok{ad.lm.ruv =}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.ruvIII[,}\DecValTok{1}\NormalTok{]}\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
+\KeywordTok{anova}\NormalTok{(ad.lm.ruv)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
 ## Analysis of Variance Table
 ## 
-## Response: ad.ruv[, 1]
+## Response: ad.ruvIII[, 1]
 ##           Df  Sum Sq Mean Sq F value  Pr(>F)  
-## ad.trt     1  1.7759 1.77595  4.4258 0.03905 *
-## ad.batch   4  1.3555 0.33888  0.8445 0.50179  
-## Residuals 69 27.6877 0.40127                  
+## ad.trt     1  2.1333 2.13330  5.4144 0.02291 *
+## ad.batch   4  2.0222 0.50554  1.2831 0.28512  
+## Residuals 69 27.1862 0.39400                  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{summary}\NormalTok{(linearm.ad.ruv)}
+\CommentTok{#summary(ad.lm.ruv)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = ad.ruv[, 1] ~ ad.trt + ad.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.69231 -0.31474 -0.06617  0.22934  2.04171 
-## 
-## Coefficients:
-##                    Estimate Std. Error t value Pr(>|t|)   
-## (Intercept)          0.7435     0.2287   3.251  0.00178 **
-## ad.trt1-2            0.2599     0.1580   1.645  0.10455   
-## ad.batch14/04/2016   0.3266     0.2657   1.229  0.22318   
-## ad.batch01/07/2016   0.1115     0.2526   0.441  0.66027   
-## ad.batch14/11/2016   0.1022     0.2612   0.391  0.69666   
-## ad.batch21/09/2017   0.4022     0.2828   1.422  0.15942   
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.6335 on 69 degrees of freedom
-## Multiple R-squared:  0.1016, Adjusted R-squared:  0.03651 
-## F-statistic: 1.561 on 5 and 69 DF,  p-value: 0.1828
-\end{verbatim}
 
 \subsection{RLE plots}\label{rle-plots-1}
 
@@ -2200,7 +2074,7 @@ plot}\label{density-plot-and-box-plot-1}
 
 \KeywordTok{RleMicroRna2}\NormalTok{(}\DataTypeTok{object =} \KeywordTok{t}\NormalTok{(sponge.combat_c),}\DataTypeTok{batch =}\NormalTok{ sponge.batch_c,}\DataTypeTok{maintitle =} \StringTok{'Sponge: ComBat (choanosome)'}\NormalTok{,}\DataTypeTok{title.cex =} \DecValTok{1}\NormalTok{)}
 
-  \KeywordTok{RleMicroRna2}\NormalTok{(}\DataTypeTok{object =} \KeywordTok{t}\NormalTok{(sponge.limma_c),}\DataTypeTok{batch =}\NormalTok{ sponge.batch_c,}\DataTypeTok{maintitle =} \StringTok{'Sponge: rBE (choanosome)'}\NormalTok{,}\DataTypeTok{title.cex =} \DecValTok{1}\NormalTok{)}
+\KeywordTok{RleMicroRna2}\NormalTok{(}\DataTypeTok{object =} \KeywordTok{t}\NormalTok{(sponge.limma_c),}\DataTypeTok{batch =}\NormalTok{ sponge.batch_c,}\DataTypeTok{maintitle =} \StringTok{'Sponge: rBE (choanosome)'}\NormalTok{,}\DataTypeTok{title.cex =} \DecValTok{1}\NormalTok{)}
 
 \KeywordTok{RleMicroRna2}\NormalTok{(}\DataTypeTok{object =} \KeywordTok{t}\NormalTok{(sponge.percentile_c),}\DataTypeTok{batch =}\NormalTok{ sponge.batch_c,}\DataTypeTok{maintitle =} \StringTok{'Sponge: PN (choanosome)'}\NormalTok{,}\DataTypeTok{title.cex =} \DecValTok{1}\NormalTok{)}
 
@@ -2208,13 +2082,20 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-53-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
+
+The batch effect before correction is not obvious as all medians of
+samples are close to zero, but gel2 has a greater interquartile range
+(IQR) than the other samples. Percentile normalisation increased batch
+effects, as the samples after correction are deviated from zero and the
+IQR is increased. Among other methods, the IQR of all the box plots
+(samples) from different batches is consistent after ComBat correction.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2234,13 +2115,16 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-54-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-55-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
+
+Batch effect is not easily detected, but percentile normalisation
+increased batch variation.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2269,8 +2153,8 @@ plot}\label{density-plot-and-box-plot-1}
 \NormalTok{ad.svd_}\DecValTok{2}\NormalTok{ =}\StringTok{ }\NormalTok{ad.svd[ad.trt }\OperatorTok{==}\StringTok{ '1-2'}\NormalTok{,]}
 
 \NormalTok{###### RUVIII}
-\NormalTok{ad.ruv_}\DecValTok{05}\NormalTok{ =}\StringTok{ }\NormalTok{ad.ruv[ad.trt }\OperatorTok{==}\StringTok{ '0-0.5'}\NormalTok{,]}
-\NormalTok{ad.ruv_}\DecValTok{2}\NormalTok{ =}\StringTok{ }\NormalTok{ad.ruv[ad.trt }\OperatorTok{==}\StringTok{ '1-2'}\NormalTok{,]}
+\NormalTok{ad.ruv_}\DecValTok{05}\NormalTok{ =}\StringTok{ }\NormalTok{ad.ruvIII[ad.trt }\OperatorTok{==}\StringTok{ '0-0.5'}\NormalTok{,]}
+\NormalTok{ad.ruv_}\DecValTok{2}\NormalTok{ =}\StringTok{ }\NormalTok{ad.ruvIII[ad.trt }\OperatorTok{==}\StringTok{ '1-2'}\NormalTok{,]}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2288,7 +2172,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-56-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-57-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2302,7 +2186,10 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-56-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-57-2.pdf}
+
+Batch effect is not easily detected, but percentile normalisation
+increased batch variation.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2318,7 +2205,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-57-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2332,7 +2219,10 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-57-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-2.pdf}
+
+Batch effect is not easily detected, but percentile normalisation
+increased batch variation.
 
 \subsection{Heatmap}\label{heatmap-1}
 
@@ -2343,8 +2233,8 @@ plot}\label{density-plot-and-box-plot-1}
 \NormalTok{sponge.tss.clr.scale =}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.tss.clr,}\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
 \NormalTok{sponge.tss.clr.scale =}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.tss.clr.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
 
-\NormalTok{anno_col.sponge =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{Batch =}\NormalTok{ sponge.batch, }\DataTypeTok{Tissue =}\NormalTok{ sponge.trt)}
-\NormalTok{anno_metabo_colors.sponge =}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{Batch =} \KeywordTok{c}\NormalTok{(}\StringTok{'1'}\NormalTok{=}\StringTok{"#388ECC"}\NormalTok{,}\StringTok{'2'}\NormalTok{=}\StringTok{"#F68B33"}\NormalTok{),}\DataTypeTok{Tissue =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{C=}\StringTok{"#F0E442"}\NormalTok{,}\DataTypeTok{E=}\StringTok{"#D55E00"}\NormalTok{))}
+\NormalTok{sponge.anno_col =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{Batch =}\NormalTok{ sponge.batch, }\DataTypeTok{Tissue =}\NormalTok{ sponge.trt)}
+\NormalTok{sponge.anno_metabo_colors =}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{Batch =} \KeywordTok{c}\NormalTok{(}\StringTok{'1'}\NormalTok{=}\StringTok{"#388ECC"}\NormalTok{,}\StringTok{'2'}\NormalTok{=}\StringTok{"#F68B33"}\NormalTok{),}\DataTypeTok{Tissue =} \KeywordTok{c}\NormalTok{(}\DataTypeTok{C=}\StringTok{"#F0E442"}\NormalTok{,}\DataTypeTok{E=}\StringTok{"#D55E00"}\NormalTok{))}
 
 
 \KeywordTok{pheatmap}\NormalTok{(sponge.tss.clr.scale, }
@@ -2356,14 +2246,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.sponge,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.sponge,}
+         \DataTypeTok{annotation_col =}\NormalTok{ sponge.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ sponge.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'Sponge data - before'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2380,14 +2270,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.sponge,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.sponge,}
+         \DataTypeTok{annotation_col =}\NormalTok{ sponge.anno_col,}
+         \DataTypeTok{annotation_colors=}\NormalTok{sponge.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'Sponge data - BMC'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-2.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2404,14 +2294,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.sponge,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.sponge,}
+         \DataTypeTok{annotation_col =}\NormalTok{ sponge.anno_col,}
+         \DataTypeTok{annotation_colors=}\NormalTok{sponge.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'Sponge data - ComBat'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-3.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-3.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2428,14 +2318,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.sponge,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.sponge,}
+         \DataTypeTok{annotation_col =}\NormalTok{ sponge.anno_col,}
+         \DataTypeTok{annotation_colors=}\NormalTok{ sponge.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'Sponge data - removeBatchEffect'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-4.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-4.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2452,14 +2342,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.sponge,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.sponge,}
+         \DataTypeTok{annotation_col =}\NormalTok{ sponge.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ sponge.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'Sponge data - percentile norm'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-5.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-5.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2476,14 +2366,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.sponge,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.sponge,}
+         \DataTypeTok{annotation_col =}\NormalTok{ sponge.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ sponge.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'Sponge data - SVD'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-6.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-6.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2493,8 +2383,8 @@ plot}\label{density-plot-and-box-plot-1}
 \NormalTok{ad.tss.clr.scale =}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.tss.clr,}\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
 \NormalTok{ad.tss.clr.scale =}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.tss.clr.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
 
-\NormalTok{anno_col.ad =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{Batch =}\NormalTok{ ad.batch, }\DataTypeTok{Treatment =}\NormalTok{ ad.trt)}
-\NormalTok{anno_metabo_colors.ad =}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{Batch =} \KeywordTok{c}\NormalTok{(}\StringTok{'09/04/2015'}\NormalTok{=}\StringTok{"#388ECC"}\NormalTok{,}\StringTok{'14/04/2016'}\NormalTok{=}\StringTok{"#F68B33"}\NormalTok{,}\StringTok{'01/07/2016'}\NormalTok{=}\StringTok{"#C2C2C2"}\NormalTok{,}\StringTok{'14/11/2016'}\NormalTok{=}\StringTok{"#009E73"}\NormalTok{,}\StringTok{'21/09/2017'}\NormalTok{=}\StringTok{"#CC79A7"}\NormalTok{), }\DataTypeTok{Treatment =} \KeywordTok{c}\NormalTok{(}\StringTok{"0-0.5"}\NormalTok{ =}\StringTok{ "#0072B2"}\NormalTok{, }\StringTok{"1-2"}\NormalTok{ =}\StringTok{ "#999999"}\NormalTok{))}
+\NormalTok{ad.anno_col =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{Batch =}\NormalTok{ ad.batch, }\DataTypeTok{Treatment =}\NormalTok{ ad.trt)}
+\NormalTok{ad.anno_metabo_colors =}\StringTok{ }\KeywordTok{list}\NormalTok{(}\DataTypeTok{Batch =} \KeywordTok{c}\NormalTok{(}\StringTok{'09/04/2015'}\NormalTok{=}\StringTok{"#388ECC"}\NormalTok{,}\StringTok{'14/04/2016'}\NormalTok{=}\StringTok{"#F68B33"}\NormalTok{,}\StringTok{'01/07/2016'}\NormalTok{=}\StringTok{"#C2C2C2"}\NormalTok{,}\StringTok{'14/11/2016'}\NormalTok{=}\StringTok{"#009E73"}\NormalTok{,}\StringTok{'21/09/2017'}\NormalTok{=}\StringTok{"#CC79A7"}\NormalTok{), }\DataTypeTok{Treatment =} \KeywordTok{c}\NormalTok{(}\StringTok{"0-0.5"}\NormalTok{ =}\StringTok{ "#0072B2"}\NormalTok{, }\StringTok{"1-2"}\NormalTok{ =}\StringTok{ "#999999"}\NormalTok{))}
 
 
 \KeywordTok{pheatmap}\NormalTok{(ad.tss.clr.scale, }
@@ -2506,14 +2396,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.ad,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.ad,}
+         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
-         \DataTypeTok{main =} \StringTok{'AD data - Scaled'}\NormalTok{)}
+         \DataTypeTok{main =} \StringTok{'AD data - before'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-7.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-7.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2530,14 +2420,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.ad,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.ad,}
+         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'AD data - BMC'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-8.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-8.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2554,14 +2444,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.ad,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.ad,}
+         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'AD data - ComBat'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-9.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-9.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2578,14 +2468,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.ad,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.ad,}
+         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'AD data - removeBatchEffect'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-10.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-10.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2602,14 +2492,14 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.ad,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.ad,}
+         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'AD data - percentile norm'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-11.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-11.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2626,19 +2516,19 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.ad,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.ad,}
+         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'AD data - SVD'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-12.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-12.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# RUVIII}
-\NormalTok{ad.ruv.scale =}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.ruv,}\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
+\NormalTok{ad.ruv.scale =}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.ruvIII,}\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
 \NormalTok{ad.ruv.scale =}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.ruv.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
 
 \KeywordTok{pheatmap}\NormalTok{(ad.ruv.scale, }
@@ -2650,106 +2540,230 @@ plot}\label{density-plot-and-box-plot-1}
          \DataTypeTok{clustering_distance_rows =} \StringTok{"euclidean"}\NormalTok{,}
          \DataTypeTok{clustering_method =} \StringTok{"ward.D"}\NormalTok{,}
          \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ anno_col.ad,}
-         \DataTypeTok{annotation_colors=}\NormalTok{anno_metabo_colors.ad,}
+         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'AD data - RUVIII'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-58-13.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-13.pdf}
 
 \section{Variance calculation}\label{variance-calculation}
 
+\subsection{Linear model per variable}\label{linear-model-per-variable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{## Sponge data}
+\NormalTok{form.sponge <-}\StringTok{ }\ErrorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch}
+\NormalTok{info.sponge =}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(sponge.tss.clr),sponge.trt,sponge.batch))}
+\KeywordTok{rownames}\NormalTok{(info.sponge) =}\StringTok{ }\KeywordTok{rownames}\NormalTok{(sponge.tss.clr)}
+
+\CommentTok{# before}
+\NormalTok{varPart.sponge.before <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.tss.clr), form.sponge, info.sponge)}
+
+\CommentTok{# BMC}
+\NormalTok{varPart.sponge.bmc <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.bmc), form.sponge, info.sponge)}
+
+\CommentTok{# combat}
+\NormalTok{varPart.sponge.combat <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.combat), form.sponge, info.sponge)}
+
+\CommentTok{# removeBatchEffect}
+\NormalTok{varPart.sponge.limma <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.limma), form.sponge, info.sponge)}
+
+\CommentTok{# percentile normalisation}
+\NormalTok{varPart.sponge.percentile <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.percentile), form.sponge, info.sponge)}
+
+\CommentTok{# svd}
+\NormalTok{varPart.sponge.svd <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.svd), form.sponge, info.sponge)}
+
+
+\NormalTok{################}
+\CommentTok{#merge them}
+\NormalTok{variance.sponge =}\StringTok{  }\KeywordTok{rbind}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.before}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.before}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.bmc}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.bmc}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.combat}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.combat}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.limma}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.limma}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.percentile}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.percentile}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.svd}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.svd}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{,}\DecValTok{24}\NormalTok{)))}
+
+\NormalTok{variance.sponge =}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(variance.sponge)}
+\NormalTok{variance.sponge}\OperatorTok{$}\NormalTok{Type =}\StringTok{ }\KeywordTok{factor}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{Type,}\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{Type))}
+\NormalTok{variance.sponge}\OperatorTok{$}\NormalTok{method =}\StringTok{ }\KeywordTok{factor}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{method,}\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{method))}
+\NormalTok{variance.sponge}\OperatorTok{$}\NormalTok{variance =}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{variance))}
+
+\KeywordTok{ggplot}\NormalTok{(variance.sponge, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Type, }\DataTypeTok{y=}\NormalTok{variance,}\DataTypeTok{fill=}\NormalTok{Type)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_boxplot}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{facet_grid}\NormalTok{(}\DataTypeTok{cols =} \KeywordTok{vars}\NormalTok{(method)) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{60}\NormalTok{, }\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{), }\DataTypeTok{strip.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{),}\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{(),}\DataTypeTok{axis.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{),}\DataTypeTok{axis.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Type"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"Proportion Variance"}\NormalTok{,}\DataTypeTok{name=}\StringTok{'Type'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-60-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{##########}
+\CommentTok{# AD data}
+\NormalTok{form.ad <-}\StringTok{ }\ErrorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch}
+\NormalTok{info.ad =}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(ad.tss.clr),ad.trt,ad.batch))}
+\KeywordTok{rownames}\NormalTok{(info.ad) =}\StringTok{ }\KeywordTok{rownames}\NormalTok{(ad.tss.clr)}
+
+\CommentTok{# before}
+\NormalTok{varPart.ad.before <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.tss.clr), form.ad, info.ad)}
+
+\CommentTok{# BMC}
+\NormalTok{varPart.ad.bmc <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.bmc), form.ad, info.ad)}
+
+\CommentTok{# combat}
+\NormalTok{varPart.ad.combat <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.combat), form.ad, info.ad)}
+
+\CommentTok{# removeBatchEffect}
+\NormalTok{varPart.ad.limma <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.limma), form.ad, info.ad)}
+
+\CommentTok{# percentile normalisation}
+\NormalTok{varPart.ad.percentile <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.percentile), form.ad, info.ad)}
+
+\CommentTok{# svd}
+\NormalTok{varPart.ad.svd <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.svd), form.ad, info.ad)}
+
+\CommentTok{# ruv}
+\NormalTok{varPart.ad.ruv <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.ruvIII), form.ad, info.ad)}
+
+
+\NormalTok{################}
+\CommentTok{#merge them}
+\NormalTok{variance.ad =}\StringTok{  }\KeywordTok{rbind}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.before}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.before}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.bmc}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.bmc}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.combat}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.combat}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.limma}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.limma}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.percentile}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.percentile}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.svd}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.svd}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{,}\DecValTok{231}\NormalTok{)), }\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.ruv}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'RUVIII'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
+                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.ruv}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'RUVIII'}\NormalTok{,}\DecValTok{231}\NormalTok{)))}
+
+\NormalTok{variance.ad =}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(variance.ad)}
+\NormalTok{variance.ad}\OperatorTok{$}\NormalTok{Type =}\StringTok{ }\KeywordTok{factor}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{Type,}\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{Type))}
+\NormalTok{variance.ad}\OperatorTok{$}\NormalTok{method =}\StringTok{ }\KeywordTok{factor}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{method,}\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{method))}
+\NormalTok{variance.ad}\OperatorTok{$}\NormalTok{variance =}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{variance))}
+
+\KeywordTok{ggplot}\NormalTok{(variance.ad, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Type, }\DataTypeTok{y=}\NormalTok{variance,}\DataTypeTok{fill=}\NormalTok{Type)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_boxplot}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{facet_grid}\NormalTok{(}\DataTypeTok{cols =} \KeywordTok{vars}\NormalTok{(method)) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{60}\NormalTok{, }\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{), }\DataTypeTok{strip.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{11}\NormalTok{),}\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{(),}\DataTypeTok{axis.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{),}\DataTypeTok{axis.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Type"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"Proportion Variance"}\NormalTok{,}\DataTypeTok{name=}\StringTok{'Type'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_hue}\NormalTok{(}\DataTypeTok{l=}\DecValTok{40}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-60-2.pdf}
+
 \subsection{RDA}\label{rda}
+
+The multivariate method pRDA can be applied to calculate the variance of
+batch and treatment effects for all variables at once.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Sponge data}
-\NormalTok{data.design.sponge =}\StringTok{ }\KeywordTok{numeric}\NormalTok{()}
-\NormalTok{data.design.sponge}\OperatorTok{$}\NormalTok{group =}\StringTok{ }\NormalTok{sponge.trt}
-\NormalTok{data.design.sponge}\OperatorTok{$}\NormalTok{batch =}\StringTok{ }\NormalTok{sponge.batch}
+\NormalTok{sponge.data.design =}\StringTok{ }\KeywordTok{numeric}\NormalTok{()}
+\NormalTok{sponge.data.design}\OperatorTok{$}\NormalTok{group =}\StringTok{ }\NormalTok{sponge.trt}
+\NormalTok{sponge.data.design}\OperatorTok{$}\NormalTok{batch =}\StringTok{ }\NormalTok{sponge.batch}
 
 \CommentTok{# before}
 \CommentTok{# conditioning on a batch effect}
-\NormalTok{rda.sponge.before1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.tss.clr }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
-\NormalTok{rda.sponge.before2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.tss.clr }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
+\NormalTok{sponge.rda.before1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.tss.clr }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
+\NormalTok{sponge.rda.before2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.tss.clr }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
 
 \CommentTok{# amount of variance}
-\NormalTok{rda.prop.bat.sponge.before =}\StringTok{ }\NormalTok{rda.sponge.before1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.before1}\OperatorTok{$}\NormalTok{tot.chi}
-\NormalTok{rda.prop.trt.sponge.before =}\StringTok{ }\NormalTok{rda.sponge.before2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.before1}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.bat_prop.before =}\StringTok{ }\NormalTok{sponge.rda.before1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.before1}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.trt_prop.before =}\StringTok{ }\NormalTok{sponge.rda.before2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.before2}\OperatorTok{$}\NormalTok{tot.chi}
 
 \CommentTok{# BMC}
 \CommentTok{# conditioning on a batch effect}
-\NormalTok{rda.sponge.bmc1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.bmc }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
-\NormalTok{rda.sponge.bmc2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.bmc }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
+\NormalTok{sponge.rda.bmc1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.bmc }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
+\NormalTok{sponge.rda.bmc2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.bmc }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
 
 \CommentTok{# amount of variance}
-\NormalTok{rda.prop.bat.sponge.bmc =}\StringTok{ }\NormalTok{rda.sponge.bmc1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.bmc1}\OperatorTok{$}\NormalTok{tot.chi}
-\NormalTok{rda.prop.trt.sponge.bmc =}\StringTok{ }\NormalTok{rda.sponge.bmc2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.bmc2}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.bat_prop.bmc =}\StringTok{ }\NormalTok{sponge.rda.bmc1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.bmc1}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.trt_prop.bmc =}\StringTok{ }\NormalTok{sponge.rda.bmc2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.bmc2}\OperatorTok{$}\NormalTok{tot.chi}
 
 
 \CommentTok{# combat}
 \CommentTok{# conditioning on a batch effect}
-\NormalTok{rda.sponge.combat1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.combat }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
-\NormalTok{rda.sponge.combat2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.combat }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
+\NormalTok{sponge.rda.combat1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.combat }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
+\NormalTok{sponge.rda.combat2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.combat }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
 
 \CommentTok{# amount of variance}
-\NormalTok{rda.prop.bat.sponge.combat =}\StringTok{ }\NormalTok{rda.sponge.combat1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.combat1}\OperatorTok{$}\NormalTok{tot.chi}
-\NormalTok{rda.prop.trt.sponge.combat =}\StringTok{ }\NormalTok{rda.sponge.combat2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.combat2}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.bat_prop.combat =}\StringTok{ }\NormalTok{sponge.rda.combat1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.combat1}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.trt_prop.combat =}\StringTok{ }\NormalTok{sponge.rda.combat2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.combat2}\OperatorTok{$}\NormalTok{tot.chi}
 
 
 \CommentTok{# limma}
 \CommentTok{# conditioning on a batch effect}
-\NormalTok{rda.sponge.limma1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.limma }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
-\NormalTok{rda.sponge.limma2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.limma }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
+\NormalTok{sponge.rda.limma1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.limma }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
+\NormalTok{sponge.rda.limma2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.limma }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
 
 \CommentTok{# amount of variance}
-\NormalTok{rda.prop.bat.sponge.limma =}\StringTok{ }\NormalTok{rda.sponge.limma1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.limma1}\OperatorTok{$}\NormalTok{tot.chi}
-\NormalTok{rda.prop.trt.sponge.limma =}\StringTok{ }\NormalTok{rda.sponge.limma2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.limma2}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.bat_prop.limma =}\StringTok{ }\NormalTok{sponge.rda.limma1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.limma1}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.trt_prop.limma =}\StringTok{ }\NormalTok{sponge.rda.limma2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.limma2}\OperatorTok{$}\NormalTok{tot.chi}
 
 
 \CommentTok{# percentile}
 \CommentTok{# conditioning on a batch effect}
-\NormalTok{rda.sponge.percentile1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.percentile }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
-\NormalTok{rda.sponge.percentile2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.percentile }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
+\NormalTok{sponge.rda.percentile1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.percentile }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
+\NormalTok{sponge.rda.percentile2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.percentile }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
 
 \CommentTok{# amount of variance}
-\NormalTok{rda.prop.bat.sponge.percentile =}\StringTok{ }\NormalTok{rda.sponge.percentile1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.percentile1}\OperatorTok{$}\NormalTok{tot.chi}
-\NormalTok{rda.prop.trt.sponge.percentile =}\StringTok{ }\NormalTok{rda.sponge.percentile2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.percentile2}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.bat_prop.percentile =}\StringTok{ }\NormalTok{sponge.rda.percentile1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.percentile1}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.trt_prop.percentile =}\StringTok{ }\NormalTok{sponge.rda.percentile2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.percentile2}\OperatorTok{$}\NormalTok{tot.chi}
 
 
 \CommentTok{# SVD}
 \CommentTok{# conditioning on a batch effect}
-\NormalTok{rda.sponge.svd1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.svd }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
-\NormalTok{rda.sponge.svd2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.svd }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ data.design.sponge)}
+\NormalTok{sponge.rda.svd1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.svd }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
+\NormalTok{sponge.rda.svd2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(sponge.svd }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ sponge.data.design)}
 
 \CommentTok{# amount of variance}
-\NormalTok{rda.prop.bat.sponge.svd =}\StringTok{ }\NormalTok{rda.sponge.svd1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.svd1}\OperatorTok{$}\NormalTok{tot.chi}
-\NormalTok{rda.prop.trt.sponge.svd =}\StringTok{ }\NormalTok{rda.sponge.svd2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.sponge.svd2}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.bat_prop.svd =}\StringTok{ }\NormalTok{sponge.rda.svd1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.svd1}\OperatorTok{$}\NormalTok{tot.chi}
+\NormalTok{sponge.rda.trt_prop.svd =}\StringTok{ }\NormalTok{sponge.rda.svd2}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{sponge.rda.svd2}\OperatorTok{$}\NormalTok{tot.chi}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# proportion}
-\NormalTok{rda.prop.sponge.before =}\StringTok{ }\KeywordTok{c}\NormalTok{(rda.prop.bat.sponge.before,rda.prop.trt.sponge.before)}
-\NormalTok{rda.prop.sponge.bmc =}\StringTok{ }\KeywordTok{c}\NormalTok{(rda.prop.bat.sponge.bmc,rda.prop.trt.sponge.bmc)}
-\NormalTok{rda.prop.sponge.combat =}\StringTok{ }\KeywordTok{c}\NormalTok{(rda.prop.bat.sponge.combat,rda.prop.trt.sponge.combat)}
-\NormalTok{rda.prop.sponge.limma =}\StringTok{ }\KeywordTok{c}\NormalTok{(rda.prop.bat.sponge.limma,rda.prop.trt.sponge.limma)}
-\NormalTok{rda.prop.sponge.percentile =}\StringTok{ }\KeywordTok{c}\NormalTok{(rda.prop.bat.sponge.percentile,rda.prop.trt.sponge.percentile)}
-\NormalTok{rda.prop.sponge.svd=}\StringTok{ }\KeywordTok{c}\NormalTok{(rda.prop.bat.sponge.svd,rda.prop.trt.sponge.svd)}
+\NormalTok{sponge.rda.prop.before =}\StringTok{ }\KeywordTok{c}\NormalTok{(sponge.rda.bat_prop.before,sponge.rda.trt_prop.before)}
+\NormalTok{sponge.rda.prop.bmc =}\StringTok{ }\KeywordTok{c}\NormalTok{(sponge.rda.bat_prop.bmc,sponge.rda.trt_prop.bmc)}
+\NormalTok{sponge.rda.prop.combat =}\StringTok{ }\KeywordTok{c}\NormalTok{(sponge.rda.bat_prop.combat,sponge.rda.trt_prop.combat)}
+\NormalTok{sponge.rda.prop.limma =}\StringTok{ }\KeywordTok{c}\NormalTok{(sponge.rda.bat_prop.limma,sponge.rda.trt_prop.limma)}
+\NormalTok{sponge.rda.prop.percentile =}\StringTok{ }\KeywordTok{c}\NormalTok{(sponge.rda.bat_prop.percentile,sponge.rda.trt_prop.percentile)}
+\NormalTok{sponge.rda.prop.svd=}\StringTok{ }\KeywordTok{c}\NormalTok{(sponge.rda.bat_prop.svd,sponge.rda.trt_prop.svd)}
 
-\NormalTok{rda.prop.sponge.val =}\StringTok{ }\KeywordTok{c}\NormalTok{(rda.prop.sponge.before,rda.prop.sponge.bmc,rda.prop.sponge.combat,rda.prop.sponge.limma,rda.prop.sponge.percentile,rda.prop.sponge.svd)}
-\NormalTok{rda.prop.sponge =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{prop =}\NormalTok{ rda.prop.sponge.val, }\DataTypeTok{prop.r =} \KeywordTok{round}\NormalTok{(rda.prop.sponge.val,}\DecValTok{2}\NormalTok{), }\DataTypeTok{Method =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\StringTok{'BMC'}\NormalTok{,}\StringTok{'ComBat'}\NormalTok{,}\StringTok{'rBE'}\NormalTok{,}\StringTok{'PN'}\NormalTok{,}\StringTok{'SVD'}\NormalTok{),}\DataTypeTok{each=}\DecValTok{2}\NormalTok{),}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\StringTok{'Tissue'}\NormalTok{),}\DecValTok{6}\NormalTok{))}
+\NormalTok{sponge.rda.prop.val =}\StringTok{ }\KeywordTok{c}\NormalTok{(sponge.rda.prop.before,sponge.rda.prop.bmc,sponge.rda.prop.combat,sponge.rda.prop.limma,sponge.rda.prop.percentile,sponge.rda.prop.svd)}
+\NormalTok{sponge.rda.prop =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{prop =}\NormalTok{ sponge.rda.prop.val, }\DataTypeTok{prop.r =} \KeywordTok{round}\NormalTok{(sponge.rda.prop.val,}\DecValTok{2}\NormalTok{), }\DataTypeTok{Method =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\StringTok{'BMC'}\NormalTok{,}\StringTok{'ComBat'}\NormalTok{,}\StringTok{'rBE'}\NormalTok{,}\StringTok{'PN'}\NormalTok{,}\StringTok{'SVD'}\NormalTok{),}\DataTypeTok{each=}\DecValTok{2}\NormalTok{),}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\StringTok{'Tissue'}\NormalTok{),}\DecValTok{6}\NormalTok{))}
 
-\NormalTok{rda.prop.sponge}\OperatorTok{$}\NormalTok{Method =}\StringTok{  }\KeywordTok{factor}\NormalTok{(rda.prop.sponge}\OperatorTok{$}\NormalTok{Method, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(rda.prop.sponge}\OperatorTok{$}\NormalTok{Method))}
+\NormalTok{sponge.rda.prop}\OperatorTok{$}\NormalTok{Method =}\StringTok{  }\KeywordTok{factor}\NormalTok{(sponge.rda.prop}\OperatorTok{$}\NormalTok{Method, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(sponge.rda.prop}\OperatorTok{$}\NormalTok{Method))}
 
-\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ rda.prop.sponge, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Method,}\DataTypeTok{y=}\NormalTok{prop,}\DataTypeTok{fill =}\NormalTok{ Type)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat=}\StringTok{"identity"}\NormalTok{,}\DataTypeTok{position =} \StringTok{'dodge'}\NormalTok{, }\DataTypeTok{colour =} \StringTok{'black'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_text}\NormalTok{(}\DataTypeTok{data=}\NormalTok{rda.prop.sponge, }\KeywordTok{aes}\NormalTok{(Method, prop}\OperatorTok{+}\FloatTok{2.5}\NormalTok{, }\DataTypeTok{label=}\NormalTok{prop.r), }\DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.9}\NormalTok{), }\DataTypeTok{size=}\DecValTok{3}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{y =} \StringTok{"Variance explained (%)"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{60}\NormalTok{, }\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{(),}\DataTypeTok{axis.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{),}\DataTypeTok{axis.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{100}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.rda.prop, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Method,}\DataTypeTok{y=}\NormalTok{prop,}\DataTypeTok{fill =}\NormalTok{ Type)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_bar}\NormalTok{(}\DataTypeTok{stat=}\StringTok{"identity"}\NormalTok{,}\DataTypeTok{position =} \StringTok{'dodge'}\NormalTok{, }\DataTypeTok{colour =} \StringTok{'black'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_text}\NormalTok{(}\DataTypeTok{data=}\NormalTok{sponge.rda.prop, }\KeywordTok{aes}\NormalTok{(Method, prop}\OperatorTok{+}\FloatTok{2.5}\NormalTok{, }\DataTypeTok{label=}\NormalTok{prop.r), }\DataTypeTok{position =} \KeywordTok{position_dodge}\NormalTok{(}\DataTypeTok{width=}\FloatTok{0.9}\NormalTok{), }\DataTypeTok{size=}\DecValTok{3}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{y =} \StringTok{"Variance explained (%)"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{60}\NormalTok{, }\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{(),}\DataTypeTok{axis.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{),}\DataTypeTok{axis.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{100}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-60-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-1.pdf}
+
+pRDA shows that BMC, ComBat and removeBatchEffect were more efficient at
+removing batch variation while preserving treatment variation. This
+result is in agreement with the proportional variance calculated using a
+linear model in the previous section `linear model per variable'. ComBat
+removed relatively less batch variation compared with the other two
+methods, which implies that the batch effect is not purely systematic.
+The low efficiency of percentile normalisation is more obvious in the
+variance calculated with pRDA. It did not remove enough batch variation,
+nor preserve enough treatment variation both in sponge data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2819,8 +2833,8 @@ plot}\label{density-plot-and-box-plot-1}
 
 \CommentTok{# RUVIII}
 \CommentTok{# conditioning on a batch effect}
-\NormalTok{rda.ad.ruv1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(ad.ruv }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ data.design.ad)}
-\NormalTok{rda.ad.ruv2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(ad.ruv }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ data.design.ad)}
+\NormalTok{rda.ad.ruv1 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(ad.ruvIII }\OperatorTok{~}\StringTok{ }\NormalTok{group }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(batch), }\DataTypeTok{data =}\NormalTok{ data.design.ad)}
+\NormalTok{rda.ad.ruv2 =}\StringTok{ }\KeywordTok{rda}\NormalTok{(ad.ruvIII }\OperatorTok{~}\StringTok{ }\NormalTok{batch }\OperatorTok{+}\StringTok{ }\KeywordTok{Condition}\NormalTok{(group), }\DataTypeTok{data =}\NormalTok{ data.design.ad)}
 
 \CommentTok{# amount of variance}
 \NormalTok{rda.prop.bat.ad.ruv =}\StringTok{ }\NormalTok{rda.ad.ruv1}\OperatorTok{$}\NormalTok{pCCA}\OperatorTok{$}\NormalTok{tot.chi}\OperatorTok{*}\DecValTok{100}\OperatorTok{/}\NormalTok{rda.ad.ruv1}\OperatorTok{$}\NormalTok{tot.chi}
@@ -2849,7 +2863,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-64-1.pdf}
 
 \subsection{PVCA}\label{pvca}
 
@@ -2912,7 +2926,7 @@ be applied on Sponge data.
 
 \CommentTok{# RUVIII}
 
-\NormalTok{eset.X.ruv <-}\StringTok{ }\KeywordTok{new}\NormalTok{(}\StringTok{"ExpressionSet"}\NormalTok{, }\DataTypeTok{exprs =} \KeywordTok{t}\NormalTok{(ad.ruv), }\DataTypeTok{phenoData =}\NormalTok{ pdata)}
+\NormalTok{eset.X.ruv <-}\StringTok{ }\KeywordTok{new}\NormalTok{(}\StringTok{"ExpressionSet"}\NormalTok{, }\DataTypeTok{exprs =} \KeywordTok{t}\NormalTok{(ad.ruvIII), }\DataTypeTok{phenoData =}\NormalTok{ pdata)}
 \NormalTok{pvcaObj.ruv <-}\StringTok{ }\KeywordTok{pvcaBatchAssess}\NormalTok{(eset.X.ruv, }\KeywordTok{c}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\StringTok{'Treatment'}\NormalTok{), }\FloatTok{0.6}\NormalTok{)}
 \NormalTok{values.ruv =}\StringTok{ }\NormalTok{pvcaObj.ruv}\OperatorTok{$}\NormalTok{dat}
 \NormalTok{PVCA.score.ad[}\DecValTok{7}\NormalTok{,] =}\StringTok{ }\NormalTok{values.ruv}
@@ -2933,119 +2947,7 @@ be applied on Sponge data.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-64-1.pdf}
-
-\subsection{Variance partition per
-variable}\label{variance-partition-per-variable}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{## Sponge data}
-\NormalTok{form.sponge <-}\StringTok{ }\ErrorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch}
-\NormalTok{info.sponge =}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(sponge.tss.clr),sponge.trt,sponge.batch))}
-\KeywordTok{rownames}\NormalTok{(info.sponge) =}\StringTok{ }\KeywordTok{rownames}\NormalTok{(sponge.tss.clr)}
-
-\CommentTok{# before}
-\NormalTok{varPart.sponge.before <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.tss.clr), form.sponge, info.sponge)}
-
-\CommentTok{# BMC}
-\NormalTok{varPart.sponge.bmc <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.bmc), form.sponge, info.sponge)}
-
-\CommentTok{# combat}
-\NormalTok{varPart.sponge.combat <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.combat), form.sponge, info.sponge)}
-
-\CommentTok{# removeBatchEffect}
-\NormalTok{varPart.sponge.limma <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.limma), form.sponge, info.sponge)}
-
-\CommentTok{# percentile normalisation}
-\NormalTok{varPart.sponge.percentile <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.percentile), form.sponge, info.sponge)}
-
-\CommentTok{# svd}
-\NormalTok{varPart.sponge.svd <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.svd), form.sponge, info.sponge)}
-
-
-\NormalTok{################}
-\CommentTok{#merge them}
-\NormalTok{variance.sponge =}\StringTok{  }\KeywordTok{rbind}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.before}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.before}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.bmc}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.bmc}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.combat}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.combat}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.limma}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.limma}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.percentile}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.percentile}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.svd}\OperatorTok{$}\NormalTok{sponge.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{,}\DecValTok{24}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.sponge.svd}\OperatorTok{$}\NormalTok{sponge.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{,}\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{,}\DecValTok{24}\NormalTok{)))}
-
-\NormalTok{variance.sponge =}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(variance.sponge)}
-\NormalTok{variance.sponge}\OperatorTok{$}\NormalTok{Type =}\StringTok{ }\KeywordTok{factor}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{Type,}\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{Type))}
-\NormalTok{variance.sponge}\OperatorTok{$}\NormalTok{method =}\StringTok{ }\KeywordTok{factor}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{method,}\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{method))}
-\NormalTok{variance.sponge}\OperatorTok{$}\NormalTok{variance =}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(variance.sponge}\OperatorTok{$}\NormalTok{variance))}
-
-\KeywordTok{ggplot}\NormalTok{(variance.sponge, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Type, }\DataTypeTok{y=}\NormalTok{variance,}\DataTypeTok{fill=}\NormalTok{Type)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_boxplot}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{facet_grid}\NormalTok{(}\DataTypeTok{cols =} \KeywordTok{vars}\NormalTok{(method)) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{60}\NormalTok{, }\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{), }\DataTypeTok{strip.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{),}\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{(),}\DataTypeTok{axis.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{),}\DataTypeTok{axis.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Type"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"Proportion Variance"}\NormalTok{,}\DataTypeTok{name=}\StringTok{'Type'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-65-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{##########}
-\CommentTok{# AD data}
-\NormalTok{form.ad <-}\StringTok{ }\ErrorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch}
-\NormalTok{info.ad =}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(ad.tss.clr),ad.trt,ad.batch))}
-\KeywordTok{rownames}\NormalTok{(info.ad) =}\StringTok{ }\KeywordTok{rownames}\NormalTok{(ad.tss.clr)}
-
-\CommentTok{# before}
-\NormalTok{varPart.ad.before <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.tss.clr), form.ad, info.ad)}
-
-\CommentTok{# BMC}
-\NormalTok{varPart.ad.bmc <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.bmc), form.ad, info.ad)}
-
-\CommentTok{# combat}
-\NormalTok{varPart.ad.combat <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.combat), form.ad, info.ad)}
-
-\CommentTok{# removeBatchEffect}
-\NormalTok{varPart.ad.limma <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.limma), form.ad, info.ad)}
-
-\CommentTok{# percentile normalisation}
-\NormalTok{varPart.ad.percentile <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.percentile), form.ad, info.ad)}
-
-\CommentTok{# svd}
-\NormalTok{varPart.ad.svd <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.svd), form.ad, info.ad)}
-
-\CommentTok{# ruv}
-\NormalTok{varPart.ad.ruv <-}\StringTok{ }\KeywordTok{fitExtractVarPartModel}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.ruv), form.ad, info.ad)}
-
-
-\NormalTok{################}
-\CommentTok{#merge them}
-\NormalTok{variance.ad =}\StringTok{  }\KeywordTok{rbind}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.before}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.before}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.bmc}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.bmc}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.combat}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.combat}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.limma}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.limma}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.percentile}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.percentile}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.svd}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.svd}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{,}\DecValTok{231}\NormalTok{)), }\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.ruv}\OperatorTok{$}\NormalTok{ad.batch,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'RUVIII'}\NormalTok{,}\DecValTok{231}\NormalTok{)),}
-                             \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ varPart.ad.ruv}\OperatorTok{$}\NormalTok{ad.trt,}\DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{,}\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'RUVIII'}\NormalTok{,}\DecValTok{231}\NormalTok{)))}
-
-\NormalTok{variance.ad =}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(variance.ad)}
-\NormalTok{variance.ad}\OperatorTok{$}\NormalTok{Type =}\StringTok{ }\KeywordTok{factor}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{Type,}\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{Type))}
-\NormalTok{variance.ad}\OperatorTok{$}\NormalTok{method =}\StringTok{ }\KeywordTok{factor}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{method,}\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{method))}
-\NormalTok{variance.ad}\OperatorTok{$}\NormalTok{variance =}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(variance.ad}\OperatorTok{$}\NormalTok{variance))}
-
-\KeywordTok{ggplot}\NormalTok{(variance.ad, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{Type, }\DataTypeTok{y=}\NormalTok{variance,}\DataTypeTok{fill=}\NormalTok{Type)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_boxplot}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{facet_grid}\NormalTok{(}\DataTypeTok{cols =} \KeywordTok{vars}\NormalTok{(method)) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{angle =} \DecValTok{60}\NormalTok{, }\DataTypeTok{hjust =} \DecValTok{1}\NormalTok{), }\DataTypeTok{strip.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{11}\NormalTok{),}\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{(),}\DataTypeTok{axis.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{),}\DataTypeTok{axis.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{15}\NormalTok{),}\DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size=}\DecValTok{12}\NormalTok{)) }\OperatorTok{+}\StringTok{ }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Type"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"Proportion Variance"}\NormalTok{,}\DataTypeTok{name=}\StringTok{'Type'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_hue}\NormalTok{(}\DataTypeTok{l=}\DecValTok{40}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-65-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-66-1.pdf}
 
 \subsection{Silhouette coefficient}\label{silhouette-coefficient}
 
@@ -3054,12 +2956,12 @@ variable}\label{variance-partition-per-variable}
 \NormalTok{###################}
 \CommentTok{# Sponge data}
 
-\NormalTok{silh.sponge.before =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.sponge.before}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
-\NormalTok{silh.sponge.bmc =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.sponge.bmc}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
-\NormalTok{silh.sponge.combat =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.sponge.combat}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
-\NormalTok{silh.sponge.limma =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.sponge.limma}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
-\NormalTok{silh.sponge.percentile =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.sponge.percentile}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
-\NormalTok{silh.sponge.svd =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.sponge.svd}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
+\NormalTok{silh.sponge.before =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(sponge.pca.before}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
+\NormalTok{silh.sponge.bmc =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(sponge.pca.bmc}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
+\NormalTok{silh.sponge.combat =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(sponge.pca.combat}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
+\NormalTok{silh.sponge.limma =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(sponge.pca.limma}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
+\NormalTok{silh.sponge.percentile =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(sponge.pca.percentile}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
+\NormalTok{silh.sponge.svd =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(sponge.pca.svd}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2=}\NormalTok{ sponge.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Tissue'}\NormalTok{)}
 
 
 \NormalTok{data.plot.sponge =}\StringTok{ }\KeywordTok{rbind}\NormalTok{(silh.sponge.before, silh.sponge.bmc, silh.sponge.combat, silh.sponge.limma, silh.sponge.percentile, silh.sponge.svd)}
@@ -3079,19 +2981,19 @@ variable}\label{variance-partition-per-variable}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-66-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-67-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{############}
 \CommentTok{# AD data}
-\NormalTok{silh.ad.before =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.ad.before}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
-\NormalTok{silh.ad.bmc =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.ad.bmc}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
-\NormalTok{silh.ad.combat =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.ad.combat}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
-\NormalTok{silh.ad.limma =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.ad.limma}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
-\NormalTok{silh.ad.percentile =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.ad.percentile}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
-\NormalTok{silh.ad.svd =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.ad.svd}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
-\NormalTok{silh.ad.ruv =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(pca.ad.ruv}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
+\NormalTok{silh.ad.before =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(ad.pca.before}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
+\NormalTok{silh.ad.bmc =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(ad.pca.bmc}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
+\NormalTok{silh.ad.combat =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(ad.pca.combat}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
+\NormalTok{silh.ad.limma =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(ad.pca.limma}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
+\NormalTok{silh.ad.percentile =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(ad.pca.percentile}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
+\NormalTok{silh.ad.svd =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(ad.pca.svd}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
+\NormalTok{silh.ad.ruv =}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(ad.pca.ruv}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X,}\DataTypeTok{y1 =}\NormalTok{ ad.batch, }\DataTypeTok{y2=}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{,}\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
 
 
 \NormalTok{data.plot.ad =}\StringTok{ }\KeywordTok{rbind}\NormalTok{(silh.ad.before, silh.ad.bmc, silh.ad.combat, silh.ad.limma, silh.ad.percentile, silh.ad.svd,silh.ad.ruv)}
@@ -3111,7 +3013,7 @@ variable}\label{variance-partition-per-variable}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-66-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-67-2.pdf}
 
 \chapter{Simulations of systematic and non-systematic batch
 effects}\label{simu}
@@ -3171,7 +3073,7 @@ effects}\label{simu}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-67-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-68-1.pdf}
 
 \section{Mean=0\&5,unequal variance}\label{mean05unequal-variance}
 
@@ -3231,7 +3133,7 @@ effects}\label{simu}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-68-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-69-1.pdf}
 
 \section{Sponge data}\label{sponge-data}
 
@@ -3253,7 +3155,7 @@ effects}\label{simu}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-69-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-70-1.pdf}
 
 \section{AD data}\label{ad-data}
 
@@ -3276,7 +3178,7 @@ effects}\label{simu}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-70-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-71-1.pdf}
 
 \bibliography{book.bib,packages.bib}
 

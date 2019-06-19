@@ -5,18 +5,18 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "2906755376",
+    "hash" : "2112009764",
     "id" : "A1F5D17",
-    "lastKnownWriteTime" : 1560784828,
-    "last_content_update" : 1560784828,
+    "lastKnownWriteTime" : 1560935068,
+    "last_content_update" : 1560935068681,
     "path" : "~/Documents/GitHub/vignette/vignette/03-Methods_evaluation.Rmd",
     "project_path" : "03-Methods_evaluation.Rmd",
     "properties" : {
         "chunk_output_type" : "inline",
-        "cursorPosition" : "1098,72",
+        "cursorPosition" : "1123,26",
         "docOutlineSize" : "131.78348211201768",
         "docOutlineVisible" : "1",
-        "scrollLine" : "0"
+        "scrollLine" : "1109"
     },
     "relative_order" : 3,
     "source_on_save" : false,

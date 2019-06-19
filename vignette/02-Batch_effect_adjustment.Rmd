@@ -104,31 +104,46 @@ RUV2 estimates and accounts for unknown batch effects. But it needs negative con
 
 In the real world, we design negative control variables that are not affected by treatment effects only, we are not sure but assume these controls are affected by batch effects. RUV2 can only account for the difference captured by these controls.
 
-Since our three datasets do not have negative control variables, we use a linear model (or linear mixed model) to identify OTUs less likely to be affected by treatment effects as negative controls. 
+Since our three datasets do not have negative control variables, we use a linear model (or linear mixed model) to identify OTUs less likely to be affected by treatment effects as negative controls to fit the assumptions. The P-values of treatment effects calculated in section 'Linear model and linear mixed model' are therefore used here.
+
+**Note:** it is not a optimal way to obtain negative control variables like what we did. Negative control variables should be known and designed before the experiment. The reason we obtained controls using this way is just to fit the assumption and demonstrate hwo to use RUV series.
+
+```{r}
+# sponge data
+sponge.nc = sponge.trt_q > 0.05
+
+# AD data
+ad.nc = ad.trt_q > 0.05
+
+# HD data
+hd.nc = hd.trt_p > 0.05
+```
+
+We then apply the *RUV2* function. This function needs to specify the number of unwanted factors (components of negative controls). We therefore specify k = 3, but the number is very subjective and can be changed to any number. After that, we extract the P-values of treatment effects considering unwanted batch effects and then Q-values after FDR adjustment.
 
 ```{r, warning=F, message=F,error=FALSE}
 # sponge data
-sponge.nc = sponge.trt_q > 0.05
 sponge.ruv2 <- RUV2(Y = sponge.tss.clr, X = sponge.trt, ctl = sponge.nc, k = 3) # k is subjective
 sponge.ruv2.trt_p <- sponge.ruv2$p
 sponge.ruv2.trt_q <- p.adjust(sponge.ruv2.trt_p,method="fdr")
 
 # AD data
-ad.nc = ad.trt_q > 0.05
 ad.ruv2 <- RUV2(Y = ad.tss.clr, X = ad.trt, ctl = ad.nc, k = 3) # k is subjective
 ad.ruv2.trt_p <- ad.ruv2$p
 ad.ruv2.trt_q <- p.adjust(ad.ruv2.trt_p,method="fdr")
 
 # HD data
-hd.nc = hd.trt_p > 0.05
 hd.ruv2 <- RUV2(Y = hd.tss.clr, X = hd.trt, ctl = hd.nc, k = 3) # k is subjective
 hd.ruv2.trt_p <- hd.ruv2$p
 hd.ruv2.trt_q <- p.adjust(hd.ruv2.trt_p,method="fdr")
-
 ```
 
 
 ### RUV4
+
+RUV4 is an updated version of RUV2 that uses negative control variables and the residual matrix that has no treatment effect to estimate unwanted batch effects.
+
+*RUV4* also needs to specify the number of unwanted factors as *RUV2*, and here we use a function called *getK* to estimate this number. This function is only for *RUV4* and the estimated k is not always suitable. If the estimated k is 0, k can be forced to 1 and still to account for unwanted variation captured from negative controls. 
 
 ```{r, message=F,warning=F,error=F}
 # sponge data
@@ -161,6 +176,8 @@ hd.ruv4.trt_q <- p.adjust(hd.ruv4.trt_p,method="fdr")
 
 ### BMC (batch mean centering)
 
+We centers data within a batch across all variables. As a result, each batch mean is standardised to zero. The disadvantages of BMC are it is univariate and not optimal for non-Gaussian distributed microbiome data.
+
 ```{r}
 # Sponge data
 sponge.b1 = scale(sponge.tss.clr[sponge.batch== 1,],center = TRUE, scale = FALSE)
@@ -181,6 +198,8 @@ ad.bmc = ad.bmc[rownames(ad.tss.clr),]
 
 ### ComBat
 
+ComBat works on known and systematic batch effects. If the treatment information is known, the option *mod* can be fitted with a full model having treatment informationn to efficiently maintain enough treatment variation, like what we do here on sponge and AD data. The *mod* can also be NULL if the treatment information is unknown. 
+
 ```{r}
 # Sponge data
 sponge.combat <- t(ComBat(t(sponge.tss.clr),batch=sponge.batch,mod = sponge.mod,par.prior=F,prior.plots = F))
@@ -193,6 +212,8 @@ ad.combat <- t(ComBat(t(ad.tss.clr),batch=ad.batch,mod = ad.mod, par.prior=F,pri
 
 ### removeBatchEffect
 
+*removeBatchEffect* is a function implemented in the LIMMA package that fits a linear model for each variable given a series of conditions as explanatory variables, including the batch effect and treatment effect. Contrary to a standard linear or linear mixed models (see section 'linear model and linear mixed model') that simultaneously estimate treatment and batch effects, *removeBatchEffect* subtracts the batch effect from the original data, resulting in a residual matrix that contains any and only treatment effect. The option *design* is the same as option *mod* in ComBat.
+
 ```{r}
 # Sponge data
 sponge.limma <- t(removeBatchEffect(t(sponge.tss.clr),batch = sponge.batch,design = sponge.mod))
@@ -203,7 +224,7 @@ ad.limma <- t(removeBatchEffect(t(ad.tss.clr),batch = ad.batch,design = ad.mod))
 
 ### FAbatch
 
-FAbatch is unable to converge on both sponge data and AD data. This may influence the effect of batch correction.
+FAbatch is a combination of location-scale adjustment and factor analysis. We fit *y* with the treatment information and *batch* with batch information. Since this method only accepts numeric variables, the levels of variables are changed to be numeric (e.g. '1', '2' and so on). However, FAbatch is unable to converge on both sponge data and AD data. This may influence the effect of batch correction. We therefore do not compare the results from FAbatch with those from other methods.
 
 ```{r, message=F,warning=F,error=F}
 # sponge data
@@ -218,6 +239,8 @@ ad.fabatch <- ad.fabatch.obj$xadj
 
 ### percentile normalisation
 
+Percentile normalisation (PN) is developed for microbiome data integration. For each batch, it transforms the relative abundance of control samples to their own percentiles while converting the relative abundance of case samples into the percentiles of their corresponding control distribution. The method thus only applies to case-control studies, and may lose a large amount of information as it uses percentiles rather than the original values.
+
 ```{r}
 sponge.percentile = percentile_norm(data = sponge.tss, batch = sponge.batch, trt = sponge.trt)
 
@@ -228,31 +251,33 @@ ad.percentile = percentile_norm(data = ad.tss, batch = ad.batch, trt = ad.trt)
 
 ### SVD-based method
 
+We center and scale the data before SVD. After SVD, we deflate the first component, which has the highest variation and is assumed to related to batch effects.
+
 ```{r}
 #################
 # sponge data
 sponge.sd = apply(sponge.tss.clr,2,sd)
 sponge.mean = apply(sponge.tss.clr,2,mean)
-X.sponge = scale(sponge.tss.clr,center = T,scale = T)
+sponge.X = scale(sponge.tss.clr,center = T,scale = T)
 
-m.sponge = crossprod(X.sponge)
-m.svd.sponge = svd(m.sponge)
-barplot(m.svd.sponge$d)
+sponge.m = crossprod(sponge.X)
+sponge.m.svd = svd(sponge.m)
+#barplot(sponge.m.svd$d)
 
-a1.sponge = m.svd.sponge$u[,1]
-b1.sponge = m.svd.sponge$v[,1]
+sponge.a1 = sponge.m.svd$u[,1]
+sponge.b1 = sponge.m.svd$v[,1]
 
 # component 1
-t1.sponge = X.sponge %*% a1.sponge / drop(sqrt(crossprod(a1.sponge)))
-c1.sponge = crossprod(X.sponge, t1.sponge) / drop(crossprod(t1.sponge))
-defl.matrix_svd1.sponge  = X.sponge - t1.sponge %*% t(c1.sponge)
+sponge.t1 = sponge.X %*% sponge.a1 / drop(sqrt(crossprod(sponge.a1)))
+sponge.c1 = crossprod(sponge.X, sponge.t1) / drop(crossprod(sponge.t1))
+sponge.svd.defl.matrix1  = sponge.X - sponge.t1 %*% t(sponge.c1)
 
-# #
-sponge.svd = defl.matrix_svd1.sponge
+## add back mean and variance
+sponge.svd = sponge.svd.defl.matrix1
 sponge.svd[1:nrow(sponge.svd),1:ncol(sponge.svd)] = NA
-for(i in 1:ncol(defl.matrix_svd1.sponge)){
-  for(j in 1:nrow(defl.matrix_svd1.sponge)){
-    sponge.svd[j,i] = defl.matrix_svd1.sponge[j,i]*sponge.sd[i] + sponge.mean[i]
+for(i in 1:ncol(sponge.svd.defl.matrix1)){
+  for(j in 1:nrow(sponge.svd.defl.matrix1)){
+    sponge.svd[j,i] = sponge.svd.defl.matrix1[j,i]*sponge.sd[i] + sponge.mean[i]
   }
 }
 
@@ -260,26 +285,26 @@ for(i in 1:ncol(defl.matrix_svd1.sponge)){
 # ad data
 ad.sd = apply(ad.tss.clr,2,sd)
 ad.mean = apply(ad.tss.clr,2,mean)
-X.ad = scale(ad.tss.clr,center = T,scale = T)
+ad.X = scale(ad.tss.clr,center = T,scale = T)
 
-m.ad = crossprod(X.ad)
-m.svd.ad = svd(m.ad)
-barplot(m.svd.ad$d)
+ad.m = crossprod(ad.X)
+ad.m.svd = svd(ad.m)
+barplot(ad.m.svd$d)
 
-a1.ad = m.svd.ad$u[,1]
-b1.ad = m.svd.ad$v[,1]
+ad.a1 = ad.m.svd$u[,1]
+ad.b1 = ad.m.svd$v[,1]
 
 # component 1
-t1.ad = X.ad %*% a1.ad / drop(sqrt(crossprod(a1.ad)))
-c1.ad = crossprod(X.ad, t1.ad) / drop(crossprod(t1.ad))
-defl.matrix_svd1.ad  = X.ad - t1.ad %*% t(c1.ad)
+ad.t1 = ad.X %*% ad.a1 / drop(sqrt(crossprod(ad.a1)))
+ad.c1 = crossprod(ad.X, ad.t1) / drop(crossprod(ad.t1))
+ad.svd.defl.matrix1  = ad.X - ad.t1 %*% t(ad.c1)
 
 # #
-ad.svd = defl.matrix_svd1.ad
+ad.svd = ad.svd.defl.matrix1
 ad.svd[1:nrow(ad.svd),1:ncol(ad.svd)] = NA
-for(i in 1:ncol(defl.matrix_svd1.ad)){
-  for(j in 1:nrow(defl.matrix_svd1.ad)){
-    ad.svd[j,i] = defl.matrix_svd1.ad[j,i]*ad.sd[i] + ad.mean[i]
+for(i in 1:ncol(ad.svd.defl.matrix1)){
+  for(j in 1:nrow(ad.svd.defl.matrix1)){
+    ad.svd[j,i] = ad.svd.defl.matrix1[j,i]*ad.sd[i] + ad.mean[i]
   }
 }
 
@@ -288,34 +313,19 @@ for(i in 1:ncol(defl.matrix_svd1.ad)){
 
 ### RUVIII
 
-RUVIII needs technical sample replicates and negative control variables. As only AD data have sample replicates, RUVIII is only applied on AD data. We use linear model to find variables with less probability of treatment effects, and these variables are treated as negative control variables to fit the assumptions of RUVIII.
+RUVIII needs not only negative control variables as RUV2 and RUV4, but also technical sample replicates. As only AD data have sample replicates, RUVIII is only applied on AD data. 
+
+In contrast to RUV2 and RUV4, RUVIII is a multivariate method that accounts for the dependency between microbial variables, but it is currently limited to the correction of technical and computational sources of batch effects. 
+
+**Note:** RUVIII requires the number of negative control variables to be larger than the sample size in order to fully use the sample information.
 
 ```{r}
 #####################
 # ad data only
-replicates.ad = ad.metadata$sample_name.data.extraction
-replicates.ad.matrix = replicate.matrix(replicates.ad)
+ad.replicates = ad.metadata$sample_name.data.extraction
+ad.replicates.matrix = replicate.matrix(ad.replicates)
 
-p.ad = matrix(NA,nrow = 2, ncol = ncol(ad.tss.clr))
-rownames(p.ad) = c('ad.trt','ad.batch')
-colnames(p.ad) = colnames(ad.tss.clr)
-for(i in 1:ncol(ad.tss.clr)){
-  res = lm(ad.tss.clr[,i] ~ ad.trt + ad.batch)
-  summ.res = summary(res)
-  anova.res = anova(res)
-  p.ad[1,i] = anova.res$`Pr(>F)`[1]
-  p.ad[2,i] = anova.res$`Pr(>F)`[2]
-}
-
-p.adj.ad = apply(p.ad,1,p.adjust,method = 'fdr')
-p.adj.ad1 = sort(p.adj.ad[,1],decreasing = T)
-nc.otu1 = names(p.adj.ad1[1:75]) #negative control genes need be equal or more than samples
-nc1 = rep(FALSE, ncol(ad.tss.clr))
-names(nc1) = colnames(ad.tss.clr)
-nc1[nc.otu1] = TRUE
-
-ad.ruv <- RUVIII(Y=ad.tss.clr,M = replicates.ad.matrix, ctl = nc1)
-rownames(ad.ruv) = rownames(ad.tss.clr)
-
+ad.ruvIII <- RUVIII(Y=ad.tss.clr,M = ad.replicates.matrix, ctl = ad.nc)
+rownames(ad.ruvIII) = rownames(ad.tss.clr)
 ```
 

@@ -5,16 +5,16 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "3957513666",
+    "hash" : "4151757098",
     "id" : "985DF3",
-    "lastKnownWriteTime" : 1560856947,
-    "last_content_update" : 1560856947720,
+    "lastKnownWriteTime" : 1560927941,
+    "last_content_update" : 1560927941478,
     "path" : "~/Documents/GitHub/vignette/vignette/02-Batch_effect_adjustment.Rmd",
     "project_path" : "02-Batch_effect_adjustment.Rmd",
     "properties" : {
-        "cursorPosition" : "108,39",
+        "cursorPosition" : "313,0",
         "docOutlineVisible" : "1",
-        "scrollLine" : "116"
+        "scrollLine" : "311"
     },
     "relative_order" : 4,
     "source_on_save" : false,
