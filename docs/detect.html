@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang">
 
 
-<meta name="date" content="2019-06-19">
+<meta name="date" content="2019-06-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -182,11 +182,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="detect" class="section level1">
 <h1><span class="header-section-number">Chapter 2</span> Batch effect detection</h1>
-<p>In this chapter, we apply qualitative methods to assess the presence of batch effects using visualisations.</p>
+<p>In this chapter, we apply qualitative methods and diagnostic plots to visually assess the presence of batch effects.</p>
 <div id="principal-component-analysis-pca-with-density-plot-per-component" class="section level2">
 <h2><span class="header-section-number">2.1</span> Principal component analysis (PCA) with density plot per component</h2>
-<p>We first start with a PCA sample plot with denisty plot per PC.</p>
 <p>PCA is an unsupervised method used to explore the data variance structure by reducing its dimensions to a few principal components (PC) that explain the greatest variation in the data. Density plots are a complementary way to visualise batch effects per PC through examining the distributions of all samples.</p>
+<p>First, we run a good old PCA on the data, to assess whether major sources of variation can be explained by batch effects: in cases where batch effects account for a large source of variation in the data, the scatter plot of the top PCs should highlight a separation of the samples due to different batches. Plotting density plots on each component helps to visualise whether it is the case: samples within a batch will show similar distributions, and samples across different batches will show different distributions, if there is a batch effect.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
 sponge.pca.before =<span class="st"> </span><span class="kw">pca</span>(sponge.tss.clr, <span class="dt">ncomp =</span> <span class="dv">3</span>)
 
@@ -195,32 +195,54 @@ ad.pca.before =<span class="st"> </span><span class="kw">pca</span>(ad.tss.clr, 
 
 <span class="co"># hd data</span>
 hd.pca.before =<span class="st"> </span><span class="kw">pca</span>(hd.tss.clr, <span class="dt">ncomp =</span> <span class="dv">3</span>)</code></pre></div>
-<p>The PCA sample plots detect batch effects easily.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Scatter_Density</span>(<span class="dt">data =</span> sponge.pca.before<span class="op">$</span>variates<span class="op">$</span>X, <span class="dt">batch =</span> sponge.batch, <span class="dt">trt =</span> sponge.trt, <span class="dt">expl.var =</span> sponge.pca.before<span class="op">$</span>explained_variance, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="fl">4.5</span>,<span class="dv">5</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>,<span class="dv">4</span>), <span class="dt">batch.legend.title =</span> <span class="st">&#39;Gel (batch)&#39;</span>, <span class="dt">trt.legend.title =</span> <span class="st">&#39;Tissue (trt)&#39;</span>, <span class="dt">title =</span> <span class="st">&#39;Before batch effect correction (Sponge)&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
+<span class="kw">Scatter_Density</span>(<span class="dt">data =</span> sponge.pca.before<span class="op">$</span>variates<span class="op">$</span>X, <span class="dt">batch =</span> sponge.batch, 
+                <span class="dt">trt =</span> sponge.trt, <span class="dt">expl.var =</span> sponge.pca.before<span class="op">$</span>explained_variance, 
+                <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="fl">4.5</span>,<span class="dv">5</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">3</span>,<span class="dv">4</span>), 
+                <span class="dt">batch.legend.title =</span> <span class="st">&#39;Gel (batch)&#39;</span>, 
+                <span class="dt">trt.legend.title =</span> <span class="st">&#39;Tissue (trt)&#39;</span>, 
+                <span class="dt">title =</span> <span class="st">&#39;Before batch effect correction (Sponge)&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<p>The first PC (explaining the largest source of variation) shows variation between samples from different tissues (the effect of interest), while the second PC (explaining the second largest source of variation) displays sample differences due to different batches, as also highlighted in the density plots per component. Therefore, PCA plots can inform not only of the presence of batch effects, but also which variation is the largest in the data. In this particular dataset, the effect of interest variation is larger than batch variation.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Scatter_Density</span>(<span class="dt">data =</span> ad.pca.before<span class="op">$</span>variates<span class="op">$</span>X, <span class="dt">batch =</span> ad.batch, <span class="dt">trt =</span> ad.trt, <span class="dt">expl.var =</span> ad.pca.before<span class="op">$</span>explained_variance, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">15</span>,<span class="dv">14</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">13</span>,<span class="dv">14</span>), <span class="dt">batch.legend.title =</span> <span class="st">&#39;Date (batch)&#39;</span>, <span class="dt">trt.legend.title =</span> <span class="st">&#39;Conc (trt)&#39;</span>, <span class="dt">title =</span> <span class="st">&#39;Before batch effect correction (AD)&#39;</span>)</code></pre></div>
+<p>In sponge data, the first PC (explaining the largest source of variation) shows variation between samples from different tissues (the effect of interest), while the second PC (explaining the second largest source of variation) displays sample differences due to different batches, as also highlighted in the density plots per component. Therefore, PCA plots can inform not only of the presence of batch effects, but also which variation is the largest in the data. In this particular dataset, the effect of interest variation is larger than batch variation.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
+<span class="kw">Scatter_Density</span>(<span class="dt">data =</span> ad.pca.before<span class="op">$</span>variates<span class="op">$</span>X, <span class="dt">batch =</span> ad.batch, 
+                <span class="dt">trt =</span> ad.trt, <span class="dt">expl.var =</span> ad.pca.before<span class="op">$</span>explained_variance, 
+                <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">15</span>,<span class="dv">14</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">13</span>,<span class="dv">14</span>), 
+                <span class="dt">batch.legend.title =</span> <span class="st">&#39;Date (batch)&#39;</span>, 
+                <span class="dt">trt.legend.title =</span> <span class="st">&#39;Conc (trt)&#39;</span>, 
+                <span class="dt">title =</span> <span class="st">&#39;Before batch effect correction (AD)&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<p>In AD data, we observe a separation of samples from batch 14/04/2016.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Scatter_Density</span>(<span class="dt">data =</span> hd.pca.before<span class="op">$</span>variates<span class="op">$</span>X, <span class="dt">batch =</span> hd.batch, <span class="dt">trt =</span> hd.trt, <span class="dt">expl.var =</span> hd.pca.before<span class="op">$</span>explained_variance, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">20</span>,<span class="dv">20</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">25</span>,<span class="dv">15</span>), <span class="dt">batch.legend.title =</span> <span class="st">&#39;Cage (batch)&#39;</span>, <span class="dt">trt.legend.title =</span> <span class="st">&#39;Genotype (trt)&#39;</span>, <span class="dt">title =</span> <span class="st">&#39;Before batch effect correction (HD)&#39;</span>)</code></pre></div>
+<p>In AD data, we observe a separation of samples from batch 14/04/2016. The batch variation is mostly explained by the second PC.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data</span>
+<span class="kw">Scatter_Density</span>(<span class="dt">data =</span> hd.pca.before<span class="op">$</span>variates<span class="op">$</span>X, <span class="dt">batch =</span> hd.batch, 
+                <span class="dt">trt =</span> hd.trt, <span class="dt">expl.var =</span> hd.pca.before<span class="op">$</span>explained_variance, 
+                <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">20</span>,<span class="dv">20</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">25</span>,<span class="dv">15</span>), 
+                <span class="dt">batch.legend.title =</span> <span class="st">&#39;Cage (batch)&#39;</span>, 
+                <span class="dt">trt.legend.title =</span> <span class="st">&#39;Genotype (trt)&#39;</span>, 
+                <span class="dt">title =</span> <span class="st">&#39;Before batch effect correction (HD)&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
-<p>In HD data, batch effect is due to different cages and obvious.</p>
+<p>In HD data, batch effect is due to different cages and obvious. The batch variation is both explained by the first and second PC.</p>
 </div>
 <div id="density-plot-and-box-plot" class="section level2">
 <h2><span class="header-section-number">2.2</span> Density plot and box plot</h2>
-<p>We also apply density plots and box plots on OTUs one at a time from each dataset to visualise batch effects. But only one OTU each dataset is selected as examples.</p>
-<p>For each variable (e.g. OTU), density plots and box plots can be generated separately across samples within each batch to observe whether batch effects serve as a major source of variation.</p>
+<p>For non systematic batch effects, it is useful to visualise a few OTUs individually. We apply density plots and box plots on OTUs, one at a time from each dataset to visualise batch effects. But only one OTU each dataset is selected as examples.</p>
+<p>We randomly select OTU9 in sponge data, and generate density plots and box plots separately across samples within each batch to observe whether batch effects serve as a major source of variation.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
 sponge.before.df =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">value =</span> sponge.tss.clr[,<span class="dv">9</span>], <span class="dt">batch =</span> sponge.batch)
 
-<span class="kw">box_plot_fun</span>(<span class="dt">data =</span> sponge.before.df,<span class="dt">x=</span>sponge.before.df<span class="op">$</span>batch,
-             <span class="dt">y=</span>sponge.before.df<span class="op">$</span>value,<span class="dt">title =</span> <span class="st">&#39;OTU9 (Sponge)&#39;</span>,
+<span class="kw">box_plot_fun</span>(<span class="dt">data =</span> sponge.before.df, <span class="dt">x =</span> sponge.before.df<span class="op">$</span>batch,
+             <span class="dt">y =</span> sponge.before.df<span class="op">$</span>value, <span class="dt">title =</span> <span class="st">&#39;OTU9 (Sponge)&#39;</span>,
              <span class="dt">batch.legend.title =</span> <span class="st">&#39;Gel (batch)&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(sponge.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU9 (Sponge)&#39;</span>,<span class="dt">x=</span><span class="st">&#39;Value&#39;</span>,<span class="dt">fill =</span> <span class="st">&#39;Gel (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust=</span><span class="fl">0.5</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(sponge.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU9 (Sponge)&#39;</span>, <span class="dt">x =</span> <span class="st">&#39;Value&#39;</span>, <span class="dt">fill =</span> <span class="st">&#39;Gel (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust =</span> <span class="fl">0.5</span>), 
+                     <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
 <p>For the abundance of OTU9, the samples within different batches are very distinct, indicating a strong batch effect in sponge data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.lm =<span class="st"> </span><span class="kw">lm</span>(sponge.tss.clr[,<span class="dv">9</span>]<span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
+<p>Assuming the data fit the distribution of the linear model (which is the case here after CLR transformation), we can also assess the effect of batch in a linear model on that particular OTU9:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.lm =<span class="st"> </span><span class="kw">lm</span>(sponge.tss.clr[,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
 <span class="kw">summary</span>(sponge.lm)</code></pre></div>
 <pre><code>## 
 ## Call:
@@ -241,20 +263,23 @@ sponge.before.df =<span class="st"> </span><span class="kw">data.frame</span>(<s
 ## Residual standard error: 0.489 on 29 degrees of freedom
 ## Multiple R-squared:  0.4236, Adjusted R-squared:  0.3839 
 ## F-statistic: 10.66 on 2 and 29 DF,  p-value: 0.0003391</code></pre>
-<p>The batch effect observed with density and box plots was further confirmed with a linear regression model with tissue and batch effects (P <span class="math inline">\(&lt;\)</span> 0.001 for the regression coefficient associated with the batch effect in a linear model).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##################
-<span class="co"># ad data</span>
+<p>The batch (gel) effect is statistically significant (P <span class="math inline">\(&lt;\)</span> 0.001), as indicated in the <strong>sponge.batch2</strong> row.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
 ad.before.df =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">value =</span> ad.tss.clr[,<span class="dv">1</span>], <span class="dt">batch =</span> ad.batch)
 
-<span class="kw">box_plot_fun</span>(<span class="dt">data =</span> ad.before.df,<span class="dt">x=</span>ad.before.df<span class="op">$</span>batch,
-             <span class="dt">y=</span>ad.before.df<span class="op">$</span>value,<span class="dt">title =</span> <span class="st">&#39;OTU12 (AD)&#39;</span>,
+<span class="kw">box_plot_fun</span>(<span class="dt">data =</span> ad.before.df,<span class="dt">x =</span> ad.before.df<span class="op">$</span>batch,
+             <span class="dt">y =</span> ad.before.df<span class="op">$</span>value, <span class="dt">title =</span> <span class="st">&#39;OTU12 (AD)&#39;</span>,
              <span class="dt">batch.legend.title =</span> <span class="st">&#39;Date (batch)&#39;</span>,
              <span class="dt">x.angle =</span> <span class="dv">45</span>, <span class="dt">x.hjust =</span> <span class="dv">1</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(ad.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU12 (AD)&#39;</span>,<span class="dt">x =</span> <span class="st">&#39;Value&#39;</span>,<span class="dt">fill =</span> <span class="st">&#39;Date (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust=</span><span class="fl">0.5</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(ad.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU12 (AD)&#39;</span>,<span class="dt">x =</span> <span class="st">&#39;Value&#39;</span>,<span class="dt">fill =</span> <span class="st">&#39;Date (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust =</span> <span class="fl">0.5</span>), 
+                     <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-13-2.png" width="672" /></p>
-<p>Batch effects in AD data are also visualised.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.lm =<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[,<span class="dv">1</span>]<span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
+<p>Batch effects in AD data are also easily visualised.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.lm =<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
 <span class="kw">anova</span>(ad.lm)</code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -265,7 +290,7 @@ ad.before.df =<span class="st"> </span><span class="kw">data.frame</span>(<span 
 ## Residuals 69 32.506  0.4711                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>The difference between batches is statistically significant (P &lt; 0.001, as tested with ANOVA). We can also obtain P values between each two batch categories.</p>
+<p>In AD data, the difference between batches (dates) is statistically significant (P &lt; 0.001, as tested with ANOVA). We can also obtain P values between each two batch categories.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(ad.lm)</code></pre></div>
 <pre><code>## 
 ## Call:
@@ -289,18 +314,21 @@ ad.before.df =<span class="st"> </span><span class="kw">data.frame</span>(<span 
 ## Residual standard error: 0.6864 on 69 degrees of freedom
 ## Multiple R-squared:  0.5138, Adjusted R-squared:  0.4786 
 ## F-statistic: 14.58 on 5 and 69 DF,  p-value: 9.665e-10</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##################
-<span class="co"># hd data</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data</span>
 hd.before.df =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">value =</span> hd.tss.clr[,<span class="dv">1</span>], <span class="dt">batch =</span> hd.batch)
 
-<span class="kw">box_plot_fun</span>(<span class="dt">data =</span> hd.before.df,<span class="dt">x=</span>hd.before.df<span class="op">$</span>batch,
-             <span class="dt">y=</span>hd.before.df<span class="op">$</span>value,<span class="dt">title =</span> <span class="st">&#39;OTU1 (HD)&#39;</span>,
+<span class="kw">box_plot_fun</span>(<span class="dt">data =</span> hd.before.df, <span class="dt">x =</span> hd.before.df<span class="op">$</span>batch,
+             <span class="dt">y =</span> hd.before.df<span class="op">$</span>value,<span class="dt">title =</span> <span class="st">&#39;OTU1 (HD)&#39;</span>,
              <span class="dt">batch.legend.title =</span> <span class="st">&#39;Cage (batch)&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(hd.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU1 (HD)&#39;</span>,<span class="dt">x =</span> <span class="st">&#39;Value&#39;</span>,<span class="dt">fill =</span> <span class="st">&#39;Cage (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust=</span><span class="fl">0.5</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(hd.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;OTU1 (HD)&#39;</span>,<span class="dt">x =</span> <span class="st">&#39;Value&#39;</span>,<span class="dt">fill =</span> <span class="st">&#39;Cage (batch)&#39;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">hjust =</span> <span class="fl">0.5</span>), 
+                     <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-16-2.png" width="672" /></p>
-<p>It is easy to detect the differences between samples within different batches.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hd.lm =<span class="st"> </span><span class="kw">lm</span>(hd.tss.clr[,<span class="dv">1</span>]<span class="op">~</span><span class="st"> </span>hd.batch)
+<p>In HD data, we easily detect the differences between samples within different batches.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hd.lm =<span class="st"> </span><span class="kw">lm</span>(hd.tss.clr[,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>hd.batch)
 <span class="kw">anova</span>(hd.lm)</code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -310,72 +338,81 @@ hd.before.df =<span class="st"> </span><span class="kw">data.frame</span>(<span 
 ## Residuals  9 1.3758 0.15286                  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>As the batch <span class="math inline">\(\times\)</span> treatment design of HD data is nested and unbalanced, the linear model with both treatment (genotype) and batch (cage) is unable to fit. We therefore fit a linear model with batch effect only. The difference between cages is statistically significant (P &lt; 0.05). But the difference may also be influenced by treatment and we are unable to exclude this influence.</p>
+<p>As the batch x treatment design of HD data is nested and unbalanced, the linear model with both treatment (genotype) and batch (cage) is unable to fit. We therefore fit a linear model with batch effect only. The difference between cages is statistically significant (P &lt; 0.05). But the difference may also be influenced by treatment and we are unable to exclude treatment influence.</p>
 </div>
 <div id="rle-plots" class="section level2">
 <h2><span class="header-section-number">2.3</span> RLE plots</h2>
 <p>RLE plots can be plotted using ‘RleMicroRna’ in R package ‘AgiMicroRna’. Here, we made some changes on the function ‘RleMicroRna’, thus we call it ‘RleMicroRna2’.</p>
 <p>RLE plots are based on the assumption that the majority of microbial variables are unaffected by the effect of interest, and therefore any sample heterogeneity observed - i.e. different distributions and their variances, and medians different from zero, should indicate the presence of batch effects. In our case studies, the treatment information is known, so we generate multiple RLE plots per treatment group, as suggested by <span class="citation">(Lin et al. <a href="#ref-lin2018scmerge">2018</a>)</span>.</p>
+<p>In sponge data, we group the samples according to the tissue (choanosome / ectosome) and generate two RLE plots:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
 sponge.batch_c =<span class="st"> </span>sponge.batch[sponge.trt <span class="op">==</span><span class="st"> &#39;C&#39;</span>]
 sponge.batch_e =<span class="st"> </span>sponge.batch[sponge.trt <span class="op">==</span><span class="st"> &#39;E&#39;</span>] 
 
-<span class="co"># before</span>
-sponge.before_c =<span class="st"> </span>sponge.tss.clr[sponge.trt <span class="op">==</span><span class="st"> &#39;C&#39;</span>,]
-sponge.before_e =<span class="st"> </span>sponge.tss.clr[sponge.trt <span class="op">==</span><span class="st"> &#39;E&#39;</span>,] 
+sponge.before_c =<span class="st"> </span>sponge.tss.clr[sponge.trt <span class="op">==</span><span class="st"> &#39;C&#39;</span>, ]
+sponge.before_e =<span class="st"> </span>sponge.tss.clr[sponge.trt <span class="op">==</span><span class="st"> &#39;E&#39;</span>, ] 
 
 
-<span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.before_c),<span class="dt">batch =</span> sponge.batch_c,<span class="dt">maintitle =</span> <span class="st">&#39;Sponge (tissue: choanosome)&#39;</span>)</code></pre></div>
+<span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.before_c), <span class="dt">batch =</span> sponge.batch_c, 
+             <span class="dt">maintitle =</span> <span class="st">&#39;Sponge (tissue: choanosome)&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.before_e),<span class="dt">batch =</span> sponge.batch_e,<span class="dt">maintitle =</span> <span class="st">&#39;Sponge (tissue: ectosome)&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.before_e), <span class="dt">batch =</span> sponge.batch_e, 
+             <span class="dt">maintitle =</span> <span class="st">&#39;Sponge (tissue: ectosome)&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-18-2.png" width="672" /></p>
-<p>The batch effect before correction is not obvious as all medians of samples are close to zero, but Gel2 has a greater interquartile range (IQR) than the other samples.</p>
+<p>For both RLE plots with samples from different tissues, the batch effect is not obvious as all medians of samples are close to zero, but Gel2 has a greater interquartile range (IQR) than the other samples.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
 ad.batch_<span class="dv">05</span> =<span class="st"> </span>ad.batch[ad.trt <span class="op">==</span><span class="st"> &#39;0-0.5&#39;</span>]
 ad.batch_<span class="dv">2</span> =<span class="st"> </span>ad.batch[ad.trt <span class="op">==</span><span class="st"> &#39;1-2&#39;</span>] 
 
-<span class="co"># before</span>
-ad.before_<span class="dv">05</span> =<span class="st"> </span>ad.tss.clr[ad.trt <span class="op">==</span><span class="st"> &#39;0-0.5&#39;</span>,]
-ad.before_<span class="dv">2</span> =<span class="st"> </span>ad.tss.clr[ad.trt <span class="op">==</span><span class="st"> &#39;1-2&#39;</span>,]
+ad.before_<span class="dv">05</span> =<span class="st"> </span>ad.tss.clr[ad.trt <span class="op">==</span><span class="st"> &#39;0-0.5&#39;</span>, ]
+ad.before_<span class="dv">2</span> =<span class="st"> </span>ad.tss.clr[ad.trt <span class="op">==</span><span class="st"> &#39;1-2&#39;</span>, ]
 
-<span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.before_<span class="dv">05</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">05</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD (initial phenol conc: 0-0.5 g/L)&#39;</span>,<span class="dt">legend.cex =</span> <span class="fl">0.5</span>)</code></pre></div>
+<span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.before_<span class="dv">05</span>), <span class="dt">batch =</span> ad.batch_<span class="dv">05</span>, 
+             <span class="dt">maintitle =</span> <span class="st">&#39;AD (initial phenol conc: 0-0.5 g/L)&#39;</span>, 
+             <span class="dt">legend.cex =</span> <span class="fl">0.5</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.before_<span class="dv">2</span>),<span class="dt">batch =</span> ad.batch_<span class="dv">2</span>,<span class="dt">maintitle =</span> <span class="st">&#39;AD (initial phenol conc: 1-2 g/L)&#39;</span>,<span class="dt">cex.xaxis =</span> <span class="fl">0.7</span>,<span class="dt">legend.cex =</span> <span class="fl">0.5</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.before_<span class="dv">2</span>), <span class="dt">batch =</span> ad.batch_<span class="dv">2</span>, 
+             <span class="dt">maintitle =</span> <span class="st">&#39;AD (initial phenol conc: 1-2 g/L)&#39;</span>, 
+             <span class="dt">cex.xaxis =</span> <span class="fl">0.7</span>, <span class="dt">legend.cex =</span> <span class="fl">0.5</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-19-2.png" width="672" /></p>
-<p>In RLE plots for the AD data, the batch effect before correction is not obvious as all medians of samples are close to zero, but the samples dated 14/04/2016 may be affected by batch.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data ###########</span>
+<p>In RLE plots for the AD data, the batch effect is also not obvious as all medians of samples are close to zero, but the samples dated 14/04/2016 may be affected by batch as they have a greater IQR than the other samples.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data</span>
 hd.batch_h =<span class="st"> </span>hd.batch[hd.trt <span class="op">==</span><span class="st"> &#39;HD&#39;</span>]
 hd.batch_w =<span class="st"> </span>hd.batch[hd.trt <span class="op">==</span><span class="st"> &#39;WT&#39;</span>] 
 
-<span class="co"># before</span>
-hd.before_h =<span class="st"> </span>hd.tss.clr[hd.trt <span class="op">==</span><span class="st"> &#39;HD&#39;</span>,]
-hd.before_w =<span class="st"> </span>hd.tss.clr[hd.trt <span class="op">==</span><span class="st"> &#39;WT&#39;</span>,]
+hd.before_h =<span class="st"> </span>hd.tss.clr[hd.trt <span class="op">==</span><span class="st"> &#39;HD&#39;</span>, ]
+hd.before_w =<span class="st"> </span>hd.tss.clr[hd.trt <span class="op">==</span><span class="st"> &#39;WT&#39;</span>, ]
 
-<span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(hd.before_h),<span class="dt">batch =</span> hd.batch_h,<span class="dt">maintitle =</span> <span class="st">&#39;HD (genotype: HD)&#39;</span>)</code></pre></div>
+<span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(hd.before_h), <span class="dt">batch =</span> hd.batch_h, 
+             <span class="dt">maintitle =</span> <span class="st">&#39;HD (genotype: HD)&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(hd.before_w),<span class="dt">batch =</span> hd.batch_w,<span class="dt">maintitle =</span> <span class="st">&#39;HD (genotype: WT)&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-20-2.png" width="672" /> The batch effect in HD data is not easily detected, but Cage G has a greater interquartile range (IQR) than the other samples, which may indicate a batch effect.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(hd.before_w), <span class="dt">batch =</span> hd.batch_w, 
+             <span class="dt">maintitle =</span> <span class="st">&#39;HD (genotype: WT)&#39;</span>)</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-20-2.png" width="672" /></p>
+<p>The batch effect in HD data is not easily detected, but Cage G has a greater IQR than the other samples, which may indicate a batch effect.</p>
 </div>
 <div id="heatmap" class="section level2">
 <h2><span class="header-section-number">2.4</span> Heatmap</h2>
 <p>Clustering analysis can be used to detect batch effects. Ideally samples with the same treatment will be clustered together, data clustered by batches instead of treatments indicate a batch effect. Heatmaps and dendrograms are two common approaches to visualise the clusters.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
-<span class="co">#scale </span>
-sponge.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
-sponge.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.tss.clr.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
+<span class="co"># scale on OTUs</span>
+sponge.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
+<span class="co"># scale on samples</span>
+sponge.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.tss.clr.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
 
 sponge.anno_col =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Batch =</span> sponge.batch, <span class="dt">Tissue =</span> sponge.trt)
-sponge.anno_metabo_colors =<span class="st"> </span><span class="kw">list</span>(<span class="dt">Batch =</span> <span class="kw">c</span>(<span class="st">&#39;1&#39;</span>=<span class="st">&quot;#388ECC&quot;</span>,<span class="st">&#39;2&#39;</span>=<span class="st">&quot;#F68B33&quot;</span>),<span class="dt">Tissue =</span> <span class="kw">c</span>(<span class="dt">C=</span><span class="st">&quot;#F0E442&quot;</span>,<span class="dt">E=</span><span class="st">&quot;#D55E00&quot;</span>))
+sponge.anno_metabo_colors =<span class="st"> </span><span class="kw">list</span>(<span class="dt">Batch =</span> <span class="kw">c</span>(<span class="st">&#39;1&#39;</span> =<span class="st"> &#39;#388ECC&#39;</span>, <span class="st">&#39;2&#39;</span> =<span class="st"> &#39;#F68B33&#39;</span>), 
+                                 <span class="dt">Tissue =</span> <span class="kw">c</span>(<span class="dt">C =</span> <span class="st">&#39;#F0E442&#39;</span>, <span class="dt">E =</span> <span class="st">&#39;#D55E00&#39;</span>))
 
 
 <span class="kw">pheatmap</span>(sponge.tss.clr.scale, 
          <span class="dt">scale =</span> <span class="st">&#39;none&#39;</span>, 
          <span class="dt">cluster_rows =</span> F, 
          <span class="dt">cluster_cols =</span> T, 
-         <span class="dt">fontsize_row=</span><span class="dv">5</span>, <span class="dt">fontsize_col=</span><span class="dv">8</span>,
+         <span class="dt">fontsize_row =</span> <span class="dv">5</span>, <span class="dt">fontsize_col =</span> <span class="dv">8</span>,
          <span class="dt">fontsize =</span> <span class="dv">8</span>,
-         <span class="dt">clustering_distance_rows =</span> <span class="st">&quot;euclidean&quot;</span>,
-         <span class="dt">clustering_method =</span> <span class="st">&quot;ward.D&quot;</span>,
+         <span class="dt">clustering_distance_rows =</span> <span class="st">&#39;euclidean&#39;</span>,
+         <span class="dt">clustering_method =</span> <span class="st">&#39;ward.D&#39;</span>,
          <span class="dt">treeheight_row =</span> <span class="dv">30</span>,
          <span class="dt">annotation_col =</span> sponge.anno_col,
          <span class="dt">annotation_colors =</span> sponge.anno_metabo_colors,
@@ -383,52 +420,55 @@ sponge.anno_metabo_colors =<span class="st"> </span><span class="kw">list</span>
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - Scaled&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 <p>In sponge data, samples are preferentially clustered by batch instead of tissue type, indicating a batch effect.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">#################
-<span class="co"># AD data</span>
-<span class="co">#scale </span>
-ad.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
-ad.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.tss.clr.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># AD data</span>
+ad.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr,<span class="dt">center =</span> T, <span class="dt">scale =</span> T)
+ad.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.tss.clr.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T)
 
 ad.anno_col =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Batch =</span> ad.batch, <span class="dt">Treatment =</span> ad.trt)
-ad.anno_metabo_colors =<span class="st"> </span><span class="kw">list</span>(<span class="dt">Batch =</span> <span class="kw">c</span>(<span class="st">&#39;09/04/2015&#39;</span>=<span class="st">&quot;#388ECC&quot;</span>,<span class="st">&#39;14/04/2016&#39;</span>=<span class="st">&quot;#F68B33&quot;</span>,<span class="st">&#39;01/07/2016&#39;</span>=<span class="st">&quot;#C2C2C2&quot;</span>,<span class="st">&#39;14/11/2016&#39;</span>=<span class="st">&quot;#009E73&quot;</span>,<span class="st">&#39;21/09/2017&#39;</span>=<span class="st">&quot;#CC79A7&quot;</span>), <span class="dt">Treatment =</span> <span class="kw">c</span>(<span class="st">&quot;0-0.5&quot;</span> =<span class="st"> &quot;#0072B2&quot;</span>, <span class="st">&quot;1-2&quot;</span> =<span class="st"> &quot;#999999&quot;</span>))
+ad.anno_metabo_colors =<span class="st"> </span><span class="kw">list</span>(<span class="dt">Batch =</span> <span class="kw">c</span>(<span class="st">&#39;09/04/2015&#39;</span> =<span class="st"> &#39;#388ECC&#39;</span>, 
+                                       <span class="st">&#39;14/04/2016&#39;</span> =<span class="st"> &#39;#F68B33&#39;</span>,
+                                       <span class="st">&#39;01/07/2016&#39;</span> =<span class="st"> &#39;#C2C2C2&#39;</span>, 
+                                       <span class="st">&#39;14/11/2016&#39;</span> =<span class="st"> &#39;#009E73&#39;</span>,
+                                       <span class="st">&#39;21/09/2017&#39;</span> =<span class="st"> &#39;#CC79A7&#39;</span>), 
+                             <span class="dt">Treatment =</span> <span class="kw">c</span>(<span class="st">&#39;0-0.5&#39;</span> =<span class="st"> &#39;#0072B2&#39;</span>, <span class="st">&#39;1-2&#39;</span> =<span class="st"> &#39;#999999&#39;</span>))
 
 
 <span class="kw">pheatmap</span>(ad.tss.clr.scale, 
          <span class="dt">scale =</span> <span class="st">&#39;none&#39;</span>, 
          <span class="dt">cluster_rows =</span> F, 
          <span class="dt">cluster_cols =</span> T, 
-         <span class="dt">fontsize_row=</span><span class="dv">4</span>, <span class="dt">fontsize_col=</span><span class="dv">6</span>,
+         <span class="dt">fontsize_row =</span> <span class="dv">4</span>, <span class="dt">fontsize_col =</span> <span class="dv">6</span>,
          <span class="dt">fontsize =</span> <span class="dv">8</span>,
-         <span class="dt">clustering_distance_rows =</span> <span class="st">&quot;euclidean&quot;</span>,
-         <span class="dt">clustering_method =</span> <span class="st">&quot;ward.D&quot;</span>,
+         <span class="dt">clustering_distance_rows =</span> <span class="st">&#39;euclidean&#39;</span>,
+         <span class="dt">clustering_method =</span> <span class="st">&#39;ward.D&#39;</span>,
          <span class="dt">treeheight_row =</span> <span class="dv">30</span>,
          <span class="dt">annotation_col =</span> ad.anno_col,
-         <span class="dt">annotation_colors=</span> ad.anno_metabo_colors,
+         <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - Scaled&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
 <p>In AD data, samples within batch 14/04/2016 are clustered and distinct from other samples, also indicating a batch effect.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">#################
-<span class="co"># HD data</span>
-<span class="co">#scale </span>
-hd.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(hd.tss.clr,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
-hd.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(hd.tss.clr.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># HD data</span>
+hd.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(hd.tss.clr,<span class="dt">center =</span> T, <span class="dt">scale =</span> T)
+hd.tss.clr.scale =<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(hd.tss.clr.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T)
 
 hd.anno_col =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Batch =</span> hd.batch, <span class="dt">Treatment =</span> hd.trt)
-hd.anno_metabo_colors =<span class="st"> </span><span class="kw">list</span>(<span class="dt">Batch =</span> <span class="kw">c</span>(<span class="st">&#39;F&#39;</span>=<span class="st">&quot;#388ECC&quot;</span>,<span class="st">&#39;G&#39;</span>=<span class="st">&quot;#F68B33&quot;</span>,<span class="st">&#39;H&#39;</span>=<span class="st">&quot;#C2C2C2&quot;</span>,<span class="st">&#39;J&#39;</span>=<span class="st">&quot;#009E73&quot;</span>), <span class="dt">Treatment =</span> <span class="kw">c</span>(<span class="st">&quot;HD&quot;</span> =<span class="st"> &quot;#0072B2&quot;</span>, <span class="st">&quot;WT&quot;</span> =<span class="st"> &quot;#999999&quot;</span>))
+hd.anno_metabo_colors =<span class="st"> </span><span class="kw">list</span>(<span class="dt">Batch =</span> <span class="kw">c</span>(<span class="st">&#39;F&#39;</span> =<span class="st"> &#39;#388ECC&#39;</span>, <span class="st">&#39;G&#39;</span> =<span class="st"> &#39;#F68B33&#39;</span>,
+                                       <span class="st">&#39;H&#39;</span> =<span class="st"> &#39;#C2C2C2&#39;</span>, <span class="st">&#39;J&#39;</span> =<span class="st"> &#39;#009E73&#39;</span>), 
+                             <span class="dt">Treatment =</span> <span class="kw">c</span>(<span class="st">&#39;HD&#39;</span> =<span class="st"> &#39;#0072B2&#39;</span>, <span class="st">&#39;WT&#39;</span> =<span class="st"> &#39;#999999&#39;</span>))
 
 
 <span class="kw">pheatmap</span>(hd.tss.clr.scale, 
          <span class="dt">scale =</span> <span class="st">&#39;none&#39;</span>, 
          <span class="dt">cluster_rows =</span> F, 
          <span class="dt">cluster_cols =</span> T, 
-         <span class="dt">fontsize_row=</span><span class="dv">4</span>, <span class="dt">fontsize_col=</span><span class="dv">6</span>,
+         <span class="dt">fontsize_row =</span> <span class="dv">4</span>, <span class="dt">fontsize_col =</span> <span class="dv">6</span>,
          <span class="dt">fontsize =</span> <span class="dv">8</span>,
-         <span class="dt">clustering_distance_rows =</span> <span class="st">&quot;euclidean&quot;</span>,
-         <span class="dt">clustering_method =</span> <span class="st">&quot;ward.D&quot;</span>,
+         <span class="dt">clustering_distance_rows =</span> <span class="st">&#39;euclidean&#39;</span>,
+         <span class="dt">clustering_method =</span> <span class="st">&#39;ward.D&#39;</span>,
          <span class="dt">treeheight_row =</span> <span class="dv">30</span>,
          <span class="dt">annotation_col =</span> hd.anno_col,
-         <span class="dt">annotation_colors=</span> hd.anno_metabo_colors,
+         <span class="dt">annotation_colors =</span> hd.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;HD data - Scaled&#39;</span>)</code></pre></div>
 <p><img src="vignette_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>

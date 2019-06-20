@@ -1,12 +1,12 @@
 # Batch effect detection {#detect}
 
-In this chapter, we apply qualitative methods to assess the presence of batch effects using visualisations. 
+In this chapter, we apply qualitative methods and diagnostic plots to visually assess the presence of batch effects. 
 
 ## Principal component analysis (PCA) with density plot per component
 
-We first start with a PCA sample plot with denisty plot per PC.
-
 PCA is an unsupervised method used to explore the data variance structure by reducing its dimensions to a few principal components (PC) that explain the greatest variation in the data. Density plots are a complementary way to visualise batch effects per PC through examining the distributions of all samples.
+
+First, we run a good old PCA on the data, to assess whether major sources of variation can be explained by batch effects: in cases where batch effects account for a large source of variation in the data, the scatter plot of the top PCs should highlight a separation of the samples due to different batches. Plotting density plots on each component helps to visualise whether it is the case: samples within a batch will show similar distributions, and samples across different batches will show different distributions, if there is a batch effect.
 
 ```{r}
 # sponge data
@@ -19,103 +19,133 @@ ad.pca.before = pca(ad.tss.clr, ncomp = 3)
 hd.pca.before = pca(hd.tss.clr, ncomp = 3)
 ```
 
-The PCA sample plots detect batch effects easily.
 
 ```{r}
-Scatter_Density(data = sponge.pca.before$variates$X, batch = sponge.batch, trt = sponge.trt, expl.var = sponge.pca.before$explained_variance, xlim = c(-4.5,5), ylim = c(-3,4), batch.legend.title = 'Gel (batch)', trt.legend.title = 'Tissue (trt)', title = 'Before batch effect correction (Sponge)')
+# sponge data
+Scatter_Density(data = sponge.pca.before$variates$X, batch = sponge.batch, 
+                trt = sponge.trt, expl.var = sponge.pca.before$explained_variance, 
+                xlim = c(-4.5,5), ylim = c(-3,4), 
+                batch.legend.title = 'Gel (batch)', 
+                trt.legend.title = 'Tissue (trt)', 
+                title = 'Before batch effect correction (Sponge)')
 ```
 
-The first PC (explaining the largest source of variation) shows variation between samples from different tissues (the effect of interest), while the second PC (explaining the second largest source of variation) displays sample differences due to different batches, as also highlighted in the density plots per component. Therefore, PCA plots can inform not only of the presence of batch effects, but also which variation is the largest in the data. In this particular dataset, the effect of interest variation is larger than batch variation. 
+In sponge data, the first PC (explaining the largest source of variation) shows variation between samples from different tissues (the effect of interest), while the second PC (explaining the second largest source of variation) displays sample differences due to different batches, as also highlighted in the density plots per component. Therefore, PCA plots can inform not only of the presence of batch effects, but also which variation is the largest in the data. In this particular dataset, the effect of interest variation is larger than batch variation. 
 
 ```{r}
-Scatter_Density(data = ad.pca.before$variates$X, batch = ad.batch, trt = ad.trt, expl.var = ad.pca.before$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)', title = 'Before batch effect correction (AD)')
+# ad data
+Scatter_Density(data = ad.pca.before$variates$X, batch = ad.batch, 
+                trt = ad.trt, expl.var = ad.pca.before$explained_variance, 
+                xlim = c(-15,14), ylim = c(-13,14), 
+                batch.legend.title = 'Date (batch)', 
+                trt.legend.title = 'Conc (trt)', 
+                title = 'Before batch effect correction (AD)')
 ```
 
-In AD data, we observe a separation of samples from batch 14/04/2016.
+In AD data, we observe a separation of samples from batch 14/04/2016. The batch variation is mostly explained by the second PC.
 
 ```{r}
-Scatter_Density(data = hd.pca.before$variates$X, batch = hd.batch, trt = hd.trt, expl.var = hd.pca.before$explained_variance, xlim = c(-20,20), ylim = c(-25,15), batch.legend.title = 'Cage (batch)', trt.legend.title = 'Genotype (trt)', title = 'Before batch effect correction (HD)')
+# hd data
+Scatter_Density(data = hd.pca.before$variates$X, batch = hd.batch, 
+                trt = hd.trt, expl.var = hd.pca.before$explained_variance, 
+                xlim = c(-20,20), ylim = c(-25,15), 
+                batch.legend.title = 'Cage (batch)', 
+                trt.legend.title = 'Genotype (trt)', 
+                title = 'Before batch effect correction (HD)')
 ```
 
-In HD data, batch effect is due to different cages and obvious.
+In HD data, batch effect is due to different cages and obvious. The batch variation is both explained by the first and second PC.
 
 ## Density plot and box plot
 
-We also apply density plots and box plots on OTUs one at a time from each dataset to visualise batch effects. But only one OTU each dataset is selected as examples.
+For non systematic batch effects, it is useful to visualise a few OTUs individually. We apply density plots and box plots on OTUs, one at a time from each dataset to visualise batch effects. But only one OTU each dataset is selected as examples.
 
-For each variable (e.g. OTU), density plots and box plots can be generated separately across samples within each batch to observe whether batch effects serve as a major source of variation.
+We randomly select OTU9 in sponge data, and generate density plots and box plots separately across samples within each batch to observe whether batch effects serve as a major source of variation.
 
 ```{r}
 # sponge data
 sponge.before.df = data.frame(value = sponge.tss.clr[,9], batch = sponge.batch)
 
-box_plot_fun(data = sponge.before.df,x=sponge.before.df$batch,
-             y=sponge.before.df$value,title = 'OTU9 (Sponge)',
+box_plot_fun(data = sponge.before.df, x = sponge.before.df$batch,
+             y = sponge.before.df$value, title = 'OTU9 (Sponge)',
              batch.legend.title = 'Gel (batch)')
 
-ggplot(sponge.before.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU9 (Sponge)',x='Value',fill = 'Gel (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ggplot(sponge.before.df, aes(x = value, fill = batch)) + 
+  geom_density(alpha = 0.5) + scale_fill_manual(values = color.mixo(1:10)) + 
+  labs(title = 'OTU9 (Sponge)', x = 'Value', fill = 'Gel (batch)') + 
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5), 
+                     panel.grid = element_blank())
 ```
 
 For the abundance of OTU9, the samples within different batches are very distinct, indicating a strong batch effect in sponge data. 
 
+Assuming the data fit the distribution of the linear model (which is the case here after CLR transformation), we can also assess the effect of batch in a linear model on that particular OTU9:
+
 ```{r}
-sponge.lm = lm(sponge.tss.clr[,9]~ sponge.trt + sponge.batch)
+sponge.lm = lm(sponge.tss.clr[,9] ~ sponge.trt + sponge.batch)
 summary(sponge.lm)
 ```
 
-The batch effect observed with density and box plots was further confirmed with a linear regression model with tissue and batch effects (P $<$ 0.001 for the regression coefficient associated with the batch effect in a linear model).
+The batch (gel) effect is statistically significant (P $<$ 0.001), as indicated in the **sponge.batch2** row.
+
 
 ```{r}
-##################
 # ad data
 ad.before.df = data.frame(value = ad.tss.clr[,1], batch = ad.batch)
 
-box_plot_fun(data = ad.before.df,x=ad.before.df$batch,
-             y=ad.before.df$value,title = 'OTU12 (AD)',
+box_plot_fun(data = ad.before.df,x = ad.before.df$batch,
+             y = ad.before.df$value, title = 'OTU12 (AD)',
              batch.legend.title = 'Date (batch)',
              x.angle = 45, x.hjust = 1)
 
 
-ggplot(ad.before.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU12 (AD)',x = 'Value',fill = 'Date (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ggplot(ad.before.df, aes(x = value, fill = batch)) + 
+  geom_density(alpha = 0.5) + scale_fill_manual(values = color.mixo(1:10)) + 
+  labs(title = 'OTU12 (AD)',x = 'Value',fill = 'Date (batch)') + 
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5), 
+                     panel.grid = element_blank())
 
 ```
 
-Batch effects in AD data are also visualised.
+Batch effects in AD data are also easily visualised.
 
 
 ```{r}
-ad.lm = lm(ad.tss.clr[,1]~ ad.trt + ad.batch)
+ad.lm = lm(ad.tss.clr[,1] ~ ad.trt + ad.batch)
 anova(ad.lm)
 ```
 
-The difference between batches is statistically significant (P < 0.001, as tested with ANOVA). We can also obtain P values between each two batch categories.
+In AD data, the difference between batches (dates) is statistically significant (P < 0.001, as tested with ANOVA). We can also obtain P values between each two batch categories.
 
 ```{r}
 summary(ad.lm)
 ```
 
 ```{r}
-##################
 # hd data
 hd.before.df = data.frame(value = hd.tss.clr[,1], batch = hd.batch)
 
-box_plot_fun(data = hd.before.df,x=hd.before.df$batch,
-             y=hd.before.df$value,title = 'OTU1 (HD)',
+box_plot_fun(data = hd.before.df, x = hd.before.df$batch,
+             y = hd.before.df$value,title = 'OTU1 (HD)',
              batch.legend.title = 'Cage (batch)')
 
 
-ggplot(hd.before.df, aes(x = value, fill = batch)) + geom_density(alpha = 0.5) + scale_fill_manual(values=color.mixo(1:10)) + labs(title = 'OTU1 (HD)',x = 'Value',fill = 'Cage (batch)') + theme_bw() + theme(plot.title = element_text(hjust=0.5), panel.grid = element_blank())
+ggplot(hd.before.df, aes(x = value, fill = batch)) + 
+  geom_density(alpha = 0.5) + scale_fill_manual(values = color.mixo(1:10)) + 
+  labs(title = 'OTU1 (HD)',x = 'Value',fill = 'Cage (batch)') + 
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5), 
+                     panel.grid = element_blank())
 
 ```
 
-It is easy to detect the differences between samples within different batches.
+In HD data, we easily detect the differences between samples within different batches.
 
 ```{r}
-hd.lm = lm(hd.tss.clr[,1]~ hd.batch)
+hd.lm = lm(hd.tss.clr[,1] ~ hd.batch)
 anova(hd.lm)
 ```
 
-As the batch $\times$ treatment design of HD data is nested and unbalanced, the linear model with both treatment (genotype) and batch (cage) is unable to fit. We therefore fit a linear model with batch effect only. The difference between cages is statistically significant (P < 0.05). But the difference may also be influenced by treatment and we are unable to exclude this influence.
+As the batch x treatment design of HD data is nested and unbalanced, the linear model with both treatment (genotype) and batch (cage) is unable to fit. We therefore fit a linear model with batch effect only. The difference between cages is statistically significant (P < 0.05). But the difference may also be influenced by treatment and we are unable to exclude treatment influence.
 
 
 ## RLE plots
@@ -124,54 +154,62 @@ RLE plots can be plotted using 'RleMicroRna' in R package 'AgiMicroRna'. Here, w
 
 RLE plots are based on the assumption that the majority of microbial variables are unaffected by the effect of interest, and therefore any sample heterogeneity observed - i.e. different distributions and their variances, and medians different from zero, should indicate the presence of batch effects. In our case studies, the treatment information is known, so we generate multiple RLE plots per treatment group, as suggested by [@lin2018scmerge].
 
+In sponge data, we group the samples according to the tissue (choanosome / ectosome) and generate two RLE plots:
+
 ```{r}
 # sponge data
 sponge.batch_c = sponge.batch[sponge.trt == 'C']
 sponge.batch_e = sponge.batch[sponge.trt == 'E'] 
 
-# before
-sponge.before_c = sponge.tss.clr[sponge.trt == 'C',]
-sponge.before_e = sponge.tss.clr[sponge.trt == 'E',] 
+sponge.before_c = sponge.tss.clr[sponge.trt == 'C', ]
+sponge.before_e = sponge.tss.clr[sponge.trt == 'E', ] 
 
 
-RleMicroRna2(object = t(sponge.before_c),batch = sponge.batch_c,maintitle = 'Sponge (tissue: choanosome)')
+RleMicroRna2(object = t(sponge.before_c), batch = sponge.batch_c, 
+             maintitle = 'Sponge (tissue: choanosome)')
 
-RleMicroRna2(object = t(sponge.before_e),batch = sponge.batch_e,maintitle = 'Sponge (tissue: ectosome)')
+RleMicroRna2(object = t(sponge.before_e), batch = sponge.batch_e, 
+             maintitle = 'Sponge (tissue: ectosome)')
 
 ```
 
-The batch effect before correction is not obvious as all medians of samples are close to zero, but Gel2 has a greater interquartile range (IQR) than the other samples. 
+For both RLE plots with samples from different tissues, the batch effect is not obvious as all medians of samples are close to zero, but Gel2 has a greater interquartile range (IQR) than the other samples. 
 
 ```{r}
 # ad data
 ad.batch_05 = ad.batch[ad.trt == '0-0.5']
 ad.batch_2 = ad.batch[ad.trt == '1-2'] 
 
-# before
-ad.before_05 = ad.tss.clr[ad.trt == '0-0.5',]
-ad.before_2 = ad.tss.clr[ad.trt == '1-2',]
+ad.before_05 = ad.tss.clr[ad.trt == '0-0.5', ]
+ad.before_2 = ad.tss.clr[ad.trt == '1-2', ]
 
-RleMicroRna2(object = t(ad.before_05),batch = ad.batch_05,maintitle = 'AD (initial phenol conc: 0-0.5 g/L)',legend.cex = 0.5)
-RleMicroRna2(object = t(ad.before_2),batch = ad.batch_2,maintitle = 'AD (initial phenol conc: 1-2 g/L)',cex.xaxis = 0.7,legend.cex = 0.5)
+RleMicroRna2(object = t(ad.before_05), batch = ad.batch_05, 
+             maintitle = 'AD (initial phenol conc: 0-0.5 g/L)', 
+             legend.cex = 0.5)
+RleMicroRna2(object = t(ad.before_2), batch = ad.batch_2, 
+             maintitle = 'AD (initial phenol conc: 1-2 g/L)', 
+             cex.xaxis = 0.7, legend.cex = 0.5)
 
 ```
 
-In RLE plots for the AD data, the batch effect before correction is not obvious as all medians of samples are close to zero, but the samples dated 14/04/2016 may be affected by batch.
+In RLE plots for the AD data, the batch effect is also not obvious as all medians of samples are close to zero, but the samples dated 14/04/2016 may be affected by batch as they have a greater IQR than the other samples.
 
 ```{r}
-# hd data ###########
+# hd data
 hd.batch_h = hd.batch[hd.trt == 'HD']
 hd.batch_w = hd.batch[hd.trt == 'WT'] 
 
-# before
-hd.before_h = hd.tss.clr[hd.trt == 'HD',]
-hd.before_w = hd.tss.clr[hd.trt == 'WT',]
+hd.before_h = hd.tss.clr[hd.trt == 'HD', ]
+hd.before_w = hd.tss.clr[hd.trt == 'WT', ]
 
-RleMicroRna2(object = t(hd.before_h),batch = hd.batch_h,maintitle = 'HD (genotype: HD)')
-RleMicroRna2(object = t(hd.before_w),batch = hd.batch_w,maintitle = 'HD (genotype: WT)')
+RleMicroRna2(object = t(hd.before_h), batch = hd.batch_h, 
+             maintitle = 'HD (genotype: HD)')
+RleMicroRna2(object = t(hd.before_w), batch = hd.batch_w, 
+             maintitle = 'HD (genotype: WT)')
 
 ```
-The batch effect in HD data is not easily detected, but Cage G has a greater interquartile range (IQR) than the other samples, which may indicate a batch effect.
+
+The batch effect in HD data is not easily detected, but Cage G has a greater IQR than the other samples, which may indicate a batch effect.
 
 ## Heatmap
 
@@ -179,22 +217,24 @@ Clustering analysis can be used to detect batch effects. Ideally samples with th
  
 ```{r}
 # Sponge data
-#scale 
-sponge.tss.clr.scale = scale(sponge.tss.clr,center = T, scale = T) # scale on OTUs
-sponge.tss.clr.scale = scale(t(sponge.tss.clr.scale), center = T, scale = T) # scale on samples
+# scale on OTUs
+sponge.tss.clr.scale = scale(sponge.tss.clr, center = T, scale = T) 
+# scale on samples
+sponge.tss.clr.scale = scale(t(sponge.tss.clr.scale), center = T, scale = T) 
 
 sponge.anno_col = data.frame(Batch = sponge.batch, Tissue = sponge.trt)
-sponge.anno_metabo_colors = list(Batch = c('1'="#388ECC",'2'="#F68B33"),Tissue = c(C="#F0E442",E="#D55E00"))
+sponge.anno_metabo_colors = list(Batch = c('1' = '#388ECC', '2' = '#F68B33'), 
+                                 Tissue = c(C = '#F0E442', E = '#D55E00'))
 
 
 pheatmap(sponge.tss.clr.scale, 
          scale = 'none', 
          cluster_rows = F, 
          cluster_cols = T, 
-         fontsize_row=5, fontsize_col=8,
+         fontsize_row = 5, fontsize_col = 8,
          fontsize = 8,
-         clustering_distance_rows = "euclidean",
-         clustering_method = "ward.D",
+         clustering_distance_rows = 'euclidean',
+         clustering_method = 'ward.D',
          treeheight_row = 30,
          annotation_col = sponge.anno_col,
          annotation_colors = sponge.anno_metabo_colors,
@@ -205,27 +245,30 @@ pheatmap(sponge.tss.clr.scale,
 In sponge data, samples are preferentially clustered by batch instead of tissue type, indicating a batch effect.
 
 ```{r}
-#################
 # AD data
-#scale 
-ad.tss.clr.scale = scale(ad.tss.clr,center = T, scale = T) # scale on OTUs
-ad.tss.clr.scale = scale(t(ad.tss.clr.scale), center = T, scale = T) # scale on samples
+ad.tss.clr.scale = scale(ad.tss.clr,center = T, scale = T)
+ad.tss.clr.scale = scale(t(ad.tss.clr.scale), center = T, scale = T)
 
 ad.anno_col = data.frame(Batch = ad.batch, Treatment = ad.trt)
-ad.anno_metabo_colors = list(Batch = c('09/04/2015'="#388ECC",'14/04/2016'="#F68B33",'01/07/2016'="#C2C2C2",'14/11/2016'="#009E73",'21/09/2017'="#CC79A7"), Treatment = c("0-0.5" = "#0072B2", "1-2" = "#999999"))
+ad.anno_metabo_colors = list(Batch = c('09/04/2015' = '#388ECC', 
+                                       '14/04/2016' = '#F68B33',
+                                       '01/07/2016' = '#C2C2C2', 
+                                       '14/11/2016' = '#009E73',
+                                       '21/09/2017' = '#CC79A7'), 
+                             Treatment = c('0-0.5' = '#0072B2', '1-2' = '#999999'))
 
 
 pheatmap(ad.tss.clr.scale, 
          scale = 'none', 
          cluster_rows = F, 
          cluster_cols = T, 
-         fontsize_row=4, fontsize_col=6,
+         fontsize_row = 4, fontsize_col = 6,
          fontsize = 8,
-         clustering_distance_rows = "euclidean",
-         clustering_method = "ward.D",
+         clustering_distance_rows = 'euclidean',
+         clustering_method = 'ward.D',
          treeheight_row = 30,
          annotation_col = ad.anno_col,
-         annotation_colors= ad.anno_metabo_colors,
+         annotation_colors = ad.anno_metabo_colors,
          border_color = 'NA',
          main = 'AD data - Scaled')
 
@@ -236,27 +279,27 @@ In AD data, samples within batch 14/04/2016 are clustered and distinct from othe
 
 
 ```{r}
-#################
 # HD data
-#scale 
-hd.tss.clr.scale = scale(hd.tss.clr,center = T, scale = T) # scale on OTUs
-hd.tss.clr.scale = scale(t(hd.tss.clr.scale), center = T, scale = T) # scale on samples
+hd.tss.clr.scale = scale(hd.tss.clr,center = T, scale = T)
+hd.tss.clr.scale = scale(t(hd.tss.clr.scale), center = T, scale = T)
 
 hd.anno_col = data.frame(Batch = hd.batch, Treatment = hd.trt)
-hd.anno_metabo_colors = list(Batch = c('F'="#388ECC",'G'="#F68B33",'H'="#C2C2C2",'J'="#009E73"), Treatment = c("HD" = "#0072B2", "WT" = "#999999"))
+hd.anno_metabo_colors = list(Batch = c('F' = '#388ECC', 'G' = '#F68B33',
+                                       'H' = '#C2C2C2', 'J' = '#009E73'), 
+                             Treatment = c('HD' = '#0072B2', 'WT' = '#999999'))
 
 
 pheatmap(hd.tss.clr.scale, 
          scale = 'none', 
          cluster_rows = F, 
          cluster_cols = T, 
-         fontsize_row=4, fontsize_col=6,
+         fontsize_row = 4, fontsize_col = 6,
          fontsize = 8,
-         clustering_distance_rows = "euclidean",
-         clustering_method = "ward.D",
+         clustering_distance_rows = 'euclidean',
+         clustering_method = 'ward.D',
          treeheight_row = 30,
          annotation_col = hd.anno_col,
-         annotation_colors= hd.anno_metabo_colors,
+         annotation_colors = hd.anno_metabo_colors,
          border_color = 'NA',
          main = 'HD data - Scaled')
 

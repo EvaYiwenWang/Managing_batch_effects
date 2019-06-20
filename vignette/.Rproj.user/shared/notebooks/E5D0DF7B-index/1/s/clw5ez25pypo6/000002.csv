@@ -1,6 +1,6 @@
 "0","# ad data"
 "0","ad.index.keep = which(colSums(ad.count)*100/(sum(colSums(ad.count))) > 0.01)"
-"0","ad.count.keep = ad.count[,ad.index.keep]"
+"0","ad.count.keep = ad.count[, ad.index.keep]"
 "0","dim(ad.count.keep)"
 "1","[1]"
 "1","  75"

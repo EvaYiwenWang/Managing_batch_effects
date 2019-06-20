@@ -12,19 +12,21 @@ description: "Vignette for paper 'Managing Batch Effects in Microbiome Data'"
 
 # Examples of microbiome studies with batch effects 
 
-This vignette provides all the analyses performed in the paper "Managing Batch Effects in Microbiome Data".
+This vignette provides all the analyses performed in the paper 'Managing Batch Effects in Microbiome Data'.
 
 **Packages installation and loading**
 
 First, you will need to install then load the following packages:
 
 ```{r, message = FALSE, warning = FALSE}
-#cran.packages = c('knitr','mixOmics','xtable','ggplot2','vegan','cluster','gridExtra','pheatmap','ruv','lmerTest','bapred')
-#install.packages(cran.packages)
-#bioconductor.packages = c('sva','limma','AgiMicroRna','variancePartition','pvca')
-#if (!requireNamespace("BiocManager", quietly = TRUE))
-#    install.packages("BiocManager")
-#BiocManager::install(bioconductor.packages, version = "3.8")
+# cran.packages = c('knitr', 'mixOmics', 'xtable', 'ggplot2', 'vegan', 'cluster',
+#                   'gridExtra', 'pheatmap', 'ruv', 'lmerTest', 'bapred')
+# install.packages(cran.packages)
+# bioconductor.packages = c('sva', 'limma', 'AgiMicroRna', 
+#                           'variancePartition', 'pvca')
+# if (!requireNamespace('BiocManager', quietly = TRUE))
+#     install.packages('BiocManager')
+# BiocManager::install(bioconductor.packages, version = '3.8')
 
 library(knitr)
 library(xtable) # table
@@ -40,7 +42,7 @@ library(variancePartition) # variance calculation
 library(pvca) # PVCA
 library(pheatmap) # heatmap
 library(ruv) # RUVIII
-library(lmerTest) #lmer
+library(lmerTest) # lmer
 library(bapred) # FAbatch
 ```
 
@@ -89,7 +91,7 @@ We use a prefiltering step to remove OTUs for which the sum of counts are below 
 ```{r}
 # ad data
 ad.index.keep = which(colSums(ad.count)*100/(sum(colSums(ad.count))) > 0.01)
-ad.count.keep = ad.count[,ad.index.keep]
+ad.count.keep = ad.count[, ad.index.keep]
 dim(ad.count.keep)
 
 # hd data
@@ -103,7 +105,7 @@ Compared with the raw counts, many OTUs below the threshold are removed. As HD d
 
 Now, let’s apply a TSS scaling on the filtered data:
 
-**Note:** We need to add an offset of 1 to all count data (i.e. count data = count.keep + 1). Although sponge data are already TSS data, a 'tiny' offset is added and then TSS is redone. Because the presence of zeroes will make the next step -- log-ratio transformation impossible. 
+**Note:** We need to add an offset of 1 to all count data (i.e. count data = count.keep + 1). Although sponge data are already TSS data, a 'tiny' offset is added and then TSS is redone. Because the presence of zeroes will make the next step (log-ratio transformation) impossible. 
 
 ```{r}
 # sponge data
@@ -116,21 +118,21 @@ ad.tss = t(apply(ad.count.keep + 1, 1, TSS.divide))
 hd.tss = t(apply(hd.count.keep + 1, 1, TSS.divide))
 ```
 
-Check the library size sums to 1 for each sample. We now have compositional data.
+We then check the library size that sums to 1 for each sample. We now have compositional data.
 
 ```{r}
 # sponge data
 sponge.lib.size.tss <- apply(sponge.tss, 1, sum)
-barplot(sponge.lib.size.tss, main =  'Sponge data',las=2)
+barplot(sponge.lib.size.tss, main =  'Sponge data', las = 2)
 
 # ad data
 ad.lib.size.tss <- apply(ad.tss, 1, sum)
-barplot(ad.lib.size.tss, main =  'AD data',las=2)
+barplot(ad.lib.size.tss, main =  'AD data', las = 2)
 
 
 # hd data
 hd.lib.size.tss <- apply(hd.tss, 1, sum)
-barplot(hd.lib.size.tss, main =  'HD data',las=2)
+barplot(hd.lib.size.tss, main =  'HD data', las = 2)
 ```
 
 ### Centered log-ratio transformation
@@ -139,15 +141,15 @@ TSS results in compositional data (or proportions) that are restricted to a spac
 
 ```{r}
 # sponge data
-sponge.tss.clr <- logratio.transfo(sponge.tss,logratio = 'CLR')
+sponge.tss.clr <- logratio.transfo(sponge.tss, logratio = 'CLR')
 class(sponge.tss.clr) <- 'matrix' 
 
 # ad data
-ad.tss.clr <- logratio.transfo(ad.tss,logratio = 'CLR')
+ad.tss.clr <- logratio.transfo(ad.tss, logratio = 'CLR')
 class(ad.tss.clr) <- 'matrix' 
 
 # hd data
-hd.tss.clr <- logratio.transfo(hd.tss,logratio = 'CLR')
+hd.tss.clr <- logratio.transfo(hd.tss, logratio = 'CLR')
 class(hd.tss.clr) <- 'matrix'
 ```
 
@@ -157,6 +159,6 @@ The final TSS-CLR data of sponge study, AD study and HD study contain 32 samples
 digestion (AD) and mice models with Huntington’s disease (HD).
 
 ```{r cases,echo=F,fig.align='center'}
-knitr::include_graphics("figures/table.png")
+knitr::include_graphics('figures/table.png')
 ```
 

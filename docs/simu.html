@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang">
 
 
-<meta name="date" content="2019-06-19">
+<meta name="date" content="2019-06-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -184,10 +184,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h1><span class="header-section-number">Chapter 5</span> Simulations of systematic and non-systematic batch effects</h1>
 <div id="mean5unequal-variance" class="section level2">
 <h2><span class="header-section-number">5.1</span> Mean=5,unequal variance</h2>
+<p>`Systematic’ refers to homogeneous change amongst all microbial variables (OTUs) due to having the same source of variation. We illustrate this concept in a linear model framework where batch and treatment regression coefficients are estimated simultaneously on each OTU. For a given batch effect and a given OTU, we can formulate the systematic assumption as:</p>
+<p><span class="math display">\[\beta_{j} \sim N(\mu,\sigma^{2})\]</span></p>
+<p>where <span class="math inline">\(\beta_{j}\)</span> is the batch regression coefficient of OTU<span class="math inline">\(_{j}\)</span> (<span class="math inline">\(j = 1,...,p\)</span>). Here we consider the simplest case of a linear model with one batch predictor, but this formulation could be extended to a model with multiple batch predictors where the batch regression coefficients can represent more than two batch levels. In a univariate model that tests each OTU idividually, then the distribution of the batch coefficients of all OTUs is Gaussian with a mean <span class="math inline">\(\mu\)</span>, and standard deviation <span class="math inline">\(\sigma\)</span>. This indicates that the batch effect has a similar, though not necessarily identical, influence on all OTUs.</p>
+<p>To illustrate the type of batch effects, we simulated a set of data with 50 samples and 10,000 OTUs each, based on the simulation approach from .</p>
+<p>The dataset with a systematic batch effect:</p>
 <ul>
 <li><span class="math inline">\(\beta_{j} \sim N(5,1^{2})\)</span> for <span class="math inline">\(j=1,...,p\)</span> OTUs;<br />
 </li>
-<li><span class="math inline">\(\sigma_{j} \sim N(0,2^{2})\)</span> for <span class="math inline">\(j=1,...,p\)</span> OTUs;<br />
+<li><span class="math inline">\(\sigma_{j} \sim N(0,2^{2})\)</span> for <span class="math inline">\(j=1,...,p\)</span> OTUs; This variance per OTU is aimed to simulate data as realistically as possible.<br />
 </li>
 <li><span class="math inline">\(\beta_{ij} \sim N(\beta_{j}, \sigma_{j}^{2})\)</span> for <span class="math inline">\(i = 1,...,n\)</span> samples.</li>
 </ul>
@@ -228,16 +233,27 @@ w.cof =<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(w.cof)
 <span class="kw">qqline</span>(w.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
+<p>The histogram and density plots are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>.</p>
 </div>
 <div id="mean05unequal-variance" class="section level2">
 <h2><span class="header-section-number">5.2</span> Mean=0&amp;5,unequal variance</h2>
+<p>Non-systematic batch effects have a heterogeneous influence on microbial variables. Using a linear model framework, as described previously, we can formulate this non-systematic assumption as:</p>
+<p><span class="math display">\[
+\beta&#39;_{j} \sim 
+  \begin{cases} 
+    N(0,\delta^{2}) &amp; \text{for OTUs with no batch effect,} \\
+    N(\mu,\sigma^{2}) &amp; \text{for OTUs with batch effect.}
+  \end{cases}
+\]</span></p>
+<p>Therefore, the batch regression coefficients <span class="math inline">\(\beta&#39;_{j}\)</span> may follow skewed distributions with several modes.</p>
+<p>The dataset with non-systematic batch effect:</p>
 <ul>
-<li><span class="math inline">\(\beta_{t} \sim N(0,1^{2})\)</span> and <span class="math inline">\(\beta_{k} \sim N(5,1^{2})\)</span> for <span class="math inline">\(t=1,...,T\)</span> OTUs, <span class="math inline">\(k=1,...,K\)</span> OTUs and <span class="math inline">\(T=\frac{3}{4}p\)</span>, <span class="math inline">\(K=\frac{1}{4}p\)</span>;<br />
+<li><span class="math inline">\(\beta&#39;_{t} \sim N(0,1^{2})\)</span> and <span class="math inline">\(\beta&#39;_{k} \sim N(5,1^{2})\)</span> for <span class="math inline">\(t=1,...,T\)</span> OTUs, <span class="math inline">\(k=1,...,K\)</span> OTUs and <span class="math inline">\(T=\frac{3}{4}p\)</span>, <span class="math inline">\(K=\frac{1}{4}p\)</span>;<br />
 </li>
-<li><span class="math inline">\(\sigma_{j} \sim N(0,2^{2})\)</span> for <span class="math inline">\(j=1,...,p\)</span> OTUs;<br />
+<li><span class="math inline">\(\sigma&#39;_{j} \sim N(0,2^{2})\)</span> for <span class="math inline">\(j=1,...,p\)</span> OTUs;<br />
 </li>
-<li><span class="math inline">\(\beta_{ij} \sim N(\beta_{j}, \sigma_{j}^{2})\)</span> for <span class="math inline">\(i = 1,...,n\)</span> samples.</li>
+<li><span class="math inline">\(\beta&#39;_{ij} \sim N(\beta&#39;_{j}, \sigma_{j}^{&#39;2})\)</span> for <span class="math inline">\(i = 1,...,n\)</span> samples.</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Create the simulated data
 m =<span class="st"> </span><span class="dv">50</span>
@@ -277,7 +293,9 @@ w.cof2 =<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(w.cof2)
 <span class="kw">qqline</span>(w.cof2, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-74-1.png" width="672" /></p>
+<p>The histogram and density plots are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>, showing a bi-modal distribution.</p>
+<p>We observed similar patterns in our real case studies, suggesting that the batch effects are mixed with multiple sources and are non-systematic.</p>
 </div>
 <div id="sponge-data" class="section level2">
 <h2><span class="header-section-number">5.3</span> Sponge data</h2>
@@ -294,7 +312,7 @@ w.cof2 =<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(sponge.b.cof)
 <span class="kw">qqline</span>(sponge.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-70-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
 </div>
 <div id="ad-data" class="section level2">
 <h2><span class="header-section-number">5.4</span> AD data</h2>
@@ -312,7 +330,7 @@ ad.batch.relevel =<span class="st"> </span><span class="kw">relevel</span>(ad.ba
 <span class="kw">qqnorm</span>(ad.b.cof)
 <span class="kw">qqline</span>(ad.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
 
 </div>
 </div>

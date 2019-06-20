@@ -1,5 +1,0 @@
-"0","#############"
-"0","pvca.prop.ad.val = c(PVCA.score.ad$Batch,PVCA.score.ad$Treatment)"
-"0","pvca.prop.ad = data.frame(prop = pvca.prop.ad.val, prop.r = round(pvca.prop.ad.val,2), Method = rep(c('Before','BMC','ComBat','rBE','PN','SVD','RUVIII'),2),Type = rep(c('Batch','Treatment'),each = 7))"
-"0","pvca.prop.ad$Method =  factor(pvca.prop.ad$Method, levels = unique(pvca.prop.ad$Method))"
-"0","ggplot(data = pvca.prop.ad, aes(x=Method,y=prop,fill = Type)) + geom_bar(stat=""identity"",position = 'dodge',colour = 'black') + geom_text(data=pvca.prop.ad, aes(Method, prop+0.03, label=prop.r), position = position_dodge(width=0.9), size=3) + theme_bw() + labs(y = ""Weighted average proportion variance"") + theme(axis.text.x = element_text(angle = 60, hjust = 1), panel.grid = element_blank(),axis.text = element_text(size=12),axis.title = element_text(size=15),legend.title = element_text(size=15),legend.text = element_text(size=12)) + scale_fill_hue(l=40) + ylim(0,1)"

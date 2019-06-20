@@ -2,9 +2,20 @@
 
 ## Mean=5,unequal variance
 
+`Systematic' refers to homogeneous change amongst all microbial variables (OTUs) due to having the same source of variation. We illustrate this concept in a linear model framework where batch and treatment regression coefficients are estimated simultaneously on each OTU. For a given batch effect and a given OTU, we can formulate the systematic assumption as:
+
+$$\beta_{j} \sim N(\mu,\sigma^{2})$$
+
+where $\beta_{j}$ is the batch regression coefficient of OTU$_{j}$ ($j = 1,...,p$). Here we consider the simplest case of a linear model with one batch predictor, but this formulation could be extended to a model with multiple batch predictors where the batch regression coefficients can represent more than two batch levels. In a univariate model that tests each OTU idividually, then the distribution of the batch coefficients of all OTUs is Gaussian with a mean $\mu$, and standard deviation $\sigma$. This indicates that the batch effect has a similar, though not necessarily identical, influence on all OTUs. 
+
+To illustrate the type of batch effects, we simulated a set of data with 50 samples and 10,000 OTUs each, based on the simulation approach from \cite{gagnon2013removing}.
+
+The dataset with a systematic batch effect:
+
 + $\beta_{j} \sim N(5,1^{2})$ for $j=1,...,p$ OTUs;     
-+ $\sigma_{j} \sim N(0,2^{2})$ for $j=1,...,p$ OTUs;       
++ $\sigma_{j} \sim N(0,2^{2})$ for $j=1,...,p$ OTUs; This variance per OTU is aimed to simulate data as realistically as possible.       
 + $\beta_{ij} \sim N(\beta_{j}, \sigma_{j}^{2})$ for $i = 1,...,n$ samples.       
+
 
 ```{r}
 ## Create the simulated data
@@ -46,11 +57,27 @@ qqline(w.cof, col='red')
 par(mfrow=c(1,1))
 ```
 
+The histogram and density plots are plotted using estimated batch regression coefficients $\hat{\beta}_{j}$ for each OTU $j$. 
+
 ## Mean=0&5,unequal variance
 
-+ $\beta_{t} \sim N(0,1^{2})$ and $\beta_{k} \sim N(5,1^{2})$ for $t=1,...,T$ OTUs, $k=1,...,K$ OTUs and $T=\frac{3}{4}p$, $K=\frac{1}{4}p$;     
-+ $\sigma_{j} \sim N(0,2^{2})$ for $j=1,...,p$ OTUs;       
-+ $\beta_{ij} \sim N(\beta_{j}, \sigma_{j}^{2})$ for $i = 1,...,n$ samples.       
+Non-systematic batch effects have a heterogeneous influence on microbial variables. Using a linear model framework, as described previously, we can formulate this non-systematic assumption as:
+
+\[
+\beta'_{j} \sim 
+  \begin{cases} 
+    N(0,\delta^{2}) & \text{for OTUs with no batch effect,} \\
+    N(\mu,\sigma^{2}) & \text{for OTUs with batch effect.}
+  \end{cases}
+\]
+
+Therefore, the batch regression coefficients $\beta'_{j}$ may follow skewed distributions with several modes.
+
+The dataset with non-systematic batch effect:
+
++ $\beta'_{t} \sim N(0,1^{2})$ and $\beta'_{k} \sim N(5,1^{2})$ for $t=1,...,T$ OTUs, $k=1,...,K$ OTUs and $T=\frac{3}{4}p$, $K=\frac{1}{4}p$;     
++ $\sigma'_{j} \sim N(0,2^{2})$ for $j=1,...,p$ OTUs;       
++ $\beta'_{ij} \sim N(\beta'_{j}, \sigma_{j}^{'2})$ for $i = 1,...,n$ samples.       
 
 ```{r}
 
@@ -94,6 +121,10 @@ qqline(w.cof2, col='red')
 par(mfrow=c(1,1))
 ```
 
+The histogram and density plots are plotted using estimated batch regression coefficients $\hat{\beta}_{j}$ for each OTU $j$, showing a bi-modal distribution.
+
+We observed similar patterns in our real case studies, suggesting that the batch effects are mixed with multiple sources and are non-systematic.
+
 ## Sponge data
 
 ```{r}
@@ -111,6 +142,7 @@ qqnorm(sponge.b.cof)
 qqline(sponge.b.cof, col='red')
 par(mfrow=c(1,1))
 ```
+
 
 
 ## AD data
