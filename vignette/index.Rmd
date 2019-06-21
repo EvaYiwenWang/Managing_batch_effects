@@ -19,10 +19,10 @@ This vignette provides all the analyses performed in the paper 'Managing Batch E
 First, you will need to install then load the following packages:
 
 ```{r, message = FALSE, warning = FALSE}
-# cran.packages = c('knitr', 'mixOmics', 'xtable', 'ggplot2', 'vegan', 'cluster',
+# cran.packages <- c('knitr', 'mixOmics', 'xtable', 'ggplot2', 'vegan', 'cluster',
 #                   'gridExtra', 'pheatmap', 'ruv', 'lmerTest', 'bapred')
 # install.packages(cran.packages)
-# bioconductor.packages = c('sva', 'limma', 'AgiMicroRna', 
+# bioconductor.packages <- c('sva', 'limma', 'AgiMicroRna', 
 #                           'variancePartition', 'pvca')
 # if (!requireNamespace('BiocManager', quietly = TRUE))
 #     install.packages('BiocManager')
@@ -90,13 +90,13 @@ We use a prefiltering step to remove OTUs for which the sum of counts are below 
 
 ```{r}
 # ad data
-ad.index.keep = which(colSums(ad.count)*100/(sum(colSums(ad.count))) > 0.01)
-ad.count.keep = ad.count[, ad.index.keep]
+ad.index.keep <- which(colSums(ad.count)*100/(sum(colSums(ad.count))) > 0.01)
+ad.count.keep <- ad.count[, ad.index.keep]
 dim(ad.count.keep)
 
 # hd data
-#hd.index.keep = which(colSums(hd.count)*100/(sum(colSums(hd.count))) > 0.001)
-hd.count.keep = hd.count
+#hd.index.keep <- which(colSums(hd.count)*100/(sum(colSums(hd.count))) > 0.001)
+hd.count.keep <- hd.count
 dim(hd.count.keep)
 ```
 Compared with the raw counts, many OTUs below the threshold are removed. As HD data are small part of a big dataset and only have 13 samples, it is too strict to use the threshold 0.01% to filter the OTUs. We then maintained all the OTUs in HD data.
@@ -109,13 +109,13 @@ Now, let’s apply a TSS scaling on the filtered data:
 
 ```{r}
 # sponge data
-sponge.tss = t(apply(sponge.tss + 0.01, 1, TSS.divide))
+sponge.tss <- t(apply(sponge.tss + 0.01, 1, TSS.divide))
 
 # ad data
-ad.tss = t(apply(ad.count.keep + 1, 1, TSS.divide))
+ad.tss <- t(apply(ad.count.keep + 1, 1, TSS.divide))
 
 # hd data
-hd.tss = t(apply(hd.count.keep + 1, 1, TSS.divide))
+hd.tss <- t(apply(hd.count.keep + 1, 1, TSS.divide))
 ```
 
 We then check the library size that sums to 1 for each sample. We now have compositional data.

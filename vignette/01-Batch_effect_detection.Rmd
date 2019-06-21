@@ -10,13 +10,13 @@ First, we run a good old PCA on the data, to assess whether major sources of var
 
 ```{r}
 # sponge data
-sponge.pca.before = pca(sponge.tss.clr, ncomp = 3)
+sponge.pca.before <- pca(sponge.tss.clr, ncomp = 3)
 
 # ad data
-ad.pca.before = pca(ad.tss.clr, ncomp = 3)
+ad.pca.before <- pca(ad.tss.clr, ncomp = 3)
 
 # hd data
-hd.pca.before = pca(hd.tss.clr, ncomp = 3)
+hd.pca.before <- pca(hd.tss.clr, ncomp = 3)
 ```
 
 
@@ -64,7 +64,7 @@ We randomly select OTU9 in sponge data, and generate density plots and box plots
 
 ```{r}
 # sponge data
-sponge.before.df = data.frame(value = sponge.tss.clr[,9], batch = sponge.batch)
+sponge.before.df <- data.frame(value = sponge.tss.clr[,9], batch = sponge.batch)
 
 box_plot_fun(data = sponge.before.df, x = sponge.before.df$batch,
              y = sponge.before.df$value, title = 'OTU9 (Sponge)',
@@ -82,7 +82,7 @@ For the abundance of OTU9, the samples within different batches are very distinc
 Assuming the data fit the distribution of the linear model (which is the case here after CLR transformation), we can also assess the effect of batch in a linear model on that particular OTU9:
 
 ```{r}
-sponge.lm = lm(sponge.tss.clr[,9] ~ sponge.trt + sponge.batch)
+sponge.lm <- lm(sponge.tss.clr[,9] ~ sponge.trt + sponge.batch)
 summary(sponge.lm)
 ```
 
@@ -91,7 +91,7 @@ The batch (gel) effect is statistically significant (P $<$ 0.001), as indicated 
 
 ```{r}
 # ad data
-ad.before.df = data.frame(value = ad.tss.clr[,1], batch = ad.batch)
+ad.before.df <- data.frame(value = ad.tss.clr[,1], batch = ad.batch)
 
 box_plot_fun(data = ad.before.df,x = ad.before.df$batch,
              y = ad.before.df$value, title = 'OTU12 (AD)',
@@ -111,7 +111,7 @@ Batch effects in AD data are also easily visualised.
 
 
 ```{r}
-ad.lm = lm(ad.tss.clr[,1] ~ ad.trt + ad.batch)
+ad.lm <- lm(ad.tss.clr[,1] ~ ad.trt + ad.batch)
 anova(ad.lm)
 ```
 
@@ -123,7 +123,7 @@ summary(ad.lm)
 
 ```{r}
 # hd data
-hd.before.df = data.frame(value = hd.tss.clr[,1], batch = hd.batch)
+hd.before.df <- data.frame(value = hd.tss.clr[,1], batch = hd.batch)
 
 box_plot_fun(data = hd.before.df, x = hd.before.df$batch,
              y = hd.before.df$value,title = 'OTU1 (HD)',
@@ -141,7 +141,7 @@ ggplot(hd.before.df, aes(x = value, fill = batch)) +
 In HD data, we easily detect the differences between samples within different batches.
 
 ```{r}
-hd.lm = lm(hd.tss.clr[,1] ~ hd.batch)
+hd.lm <- lm(hd.tss.clr[,1] ~ hd.batch)
 anova(hd.lm)
 ```
 
@@ -158,11 +158,11 @@ In sponge data, we group the samples according to the tissue (choanosome / ectos
 
 ```{r}
 # sponge data
-sponge.batch_c = sponge.batch[sponge.trt == 'C']
-sponge.batch_e = sponge.batch[sponge.trt == 'E'] 
+sponge.batch_c <- sponge.batch[sponge.trt == 'C']
+sponge.batch_e <- sponge.batch[sponge.trt == 'E'] 
 
-sponge.before_c = sponge.tss.clr[sponge.trt == 'C', ]
-sponge.before_e = sponge.tss.clr[sponge.trt == 'E', ] 
+sponge.before_c <- sponge.tss.clr[sponge.trt == 'C', ]
+sponge.before_e <- sponge.tss.clr[sponge.trt == 'E', ] 
 
 
 RleMicroRna2(object = t(sponge.before_c), batch = sponge.batch_c, 
@@ -177,11 +177,11 @@ For both RLE plots with samples from different tissues, the batch effect is not 
 
 ```{r}
 # ad data
-ad.batch_05 = ad.batch[ad.trt == '0-0.5']
-ad.batch_2 = ad.batch[ad.trt == '1-2'] 
+ad.batch_05 <- ad.batch[ad.trt == '0-0.5']
+ad.batch_2 <- ad.batch[ad.trt == '1-2'] 
 
-ad.before_05 = ad.tss.clr[ad.trt == '0-0.5', ]
-ad.before_2 = ad.tss.clr[ad.trt == '1-2', ]
+ad.before_05 <- ad.tss.clr[ad.trt == '0-0.5', ]
+ad.before_2 <- ad.tss.clr[ad.trt == '1-2', ]
 
 RleMicroRna2(object = t(ad.before_05), batch = ad.batch_05, 
              maintitle = 'AD (initial phenol conc: 0-0.5 g/L)', 
@@ -196,11 +196,11 @@ In RLE plots for the AD data, the batch effect is also not obvious as all median
 
 ```{r}
 # hd data
-hd.batch_h = hd.batch[hd.trt == 'HD']
-hd.batch_w = hd.batch[hd.trt == 'WT'] 
+hd.batch_h <- hd.batch[hd.trt == 'HD']
+hd.batch_w <- hd.batch[hd.trt == 'WT'] 
 
-hd.before_h = hd.tss.clr[hd.trt == 'HD', ]
-hd.before_w = hd.tss.clr[hd.trt == 'WT', ]
+hd.before_h <- hd.tss.clr[hd.trt == 'HD', ]
+hd.before_w <- hd.tss.clr[hd.trt == 'WT', ]
 
 RleMicroRna2(object = t(hd.before_h), batch = hd.batch_h, 
              maintitle = 'HD (genotype: HD)')
@@ -218,12 +218,12 @@ Clustering analysis can be used to detect batch effects. Ideally samples with th
 ```{r}
 # Sponge data
 # scale on OTUs
-sponge.tss.clr.scale = scale(sponge.tss.clr, center = T, scale = T) 
+sponge.tss.clr.scale <- scale(sponge.tss.clr, center = T, scale = T) 
 # scale on samples
-sponge.tss.clr.scale = scale(t(sponge.tss.clr.scale), center = T, scale = T) 
+sponge.tss.clr.scale <- scale(t(sponge.tss.clr.scale), center = T, scale = T) 
 
-sponge.anno_col = data.frame(Batch = sponge.batch, Tissue = sponge.trt)
-sponge.anno_metabo_colors = list(Batch = c('1' = '#388ECC', '2' = '#F68B33'), 
+sponge.anno_col <- data.frame(Batch = sponge.batch, Tissue = sponge.trt)
+sponge.anno_metabo_colors <- list(Batch = c('1' = '#388ECC', '2' = '#F68B33'), 
                                  Tissue = c(C = '#F0E442', E = '#D55E00'))
 
 
@@ -246,11 +246,11 @@ In sponge data, samples are preferentially clustered by batch instead of tissue 
 
 ```{r}
 # AD data
-ad.tss.clr.scale = scale(ad.tss.clr,center = T, scale = T)
-ad.tss.clr.scale = scale(t(ad.tss.clr.scale), center = T, scale = T)
+ad.tss.clr.scale <- scale(ad.tss.clr,center = T, scale = T)
+ad.tss.clr.scale <- scale(t(ad.tss.clr.scale), center = T, scale = T)
 
-ad.anno_col = data.frame(Batch = ad.batch, Treatment = ad.trt)
-ad.anno_metabo_colors = list(Batch = c('09/04/2015' = '#388ECC', 
+ad.anno_col <- data.frame(Batch = ad.batch, Treatment = ad.trt)
+ad.anno_metabo_colors <- list(Batch = c('09/04/2015' = '#388ECC', 
                                        '14/04/2016' = '#F68B33',
                                        '01/07/2016' = '#C2C2C2', 
                                        '14/11/2016' = '#009E73',
@@ -280,11 +280,11 @@ In AD data, samples within batch 14/04/2016 are clustered and distinct from othe
 
 ```{r}
 # HD data
-hd.tss.clr.scale = scale(hd.tss.clr,center = T, scale = T)
-hd.tss.clr.scale = scale(t(hd.tss.clr.scale), center = T, scale = T)
+hd.tss.clr.scale <- scale(hd.tss.clr,center = T, scale = T)
+hd.tss.clr.scale <- scale(t(hd.tss.clr.scale), center = T, scale = T)
 
-hd.anno_col = data.frame(Batch = hd.batch, Treatment = hd.trt)
-hd.anno_metabo_colors = list(Batch = c('F' = '#388ECC', 'G' = '#F68B33',
+hd.anno_col <- data.frame(Batch = hd.batch, Treatment = hd.trt)
+hd.anno_metabo_colors <- list(Batch = c('F' = '#388ECC', 'G' = '#F68B33',
                                        'H' = '#C2C2C2', 'J' = '#009E73'), 
                              Treatment = c('HD' = '#0072B2', 'WT' = '#999999'))
 

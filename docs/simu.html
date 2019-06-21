@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang">
 
 
-<meta name="date" content="2019-06-20">
+<meta name="date" content="2019-06-21">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -184,10 +184,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h1><span class="header-section-number">Chapter 5</span> Simulations of systematic and non-systematic batch effects</h1>
 <div id="mean5unequal-variance" class="section level2">
 <h2><span class="header-section-number">5.1</span> Mean=5,unequal variance</h2>
-<p>`Systematic’ refers to homogeneous change amongst all microbial variables (OTUs) due to having the same source of variation. We illustrate this concept in a linear model framework where batch and treatment regression coefficients are estimated simultaneously on each OTU. For a given batch effect and a given OTU, we can formulate the systematic assumption as:</p>
+<p>‘Systematic’ refers to homogeneous change amongst all microbial variables (OTUs) due to having the same source of variation. We illustrate this concept in a linear model framework where batch and treatment regression coefficients are estimated simultaneously on each OTU. For a given batch effect and a given OTU, we can formulate the systematic assumption as:</p>
 <p><span class="math display">\[\beta_{j} \sim N(\mu,\sigma^{2})\]</span></p>
 <p>where <span class="math inline">\(\beta_{j}\)</span> is the batch regression coefficient of OTU<span class="math inline">\(_{j}\)</span> (<span class="math inline">\(j = 1,...,p\)</span>). Here we consider the simplest case of a linear model with one batch predictor, but this formulation could be extended to a model with multiple batch predictors where the batch regression coefficients can represent more than two batch levels. In a univariate model that tests each OTU idividually, then the distribution of the batch coefficients of all OTUs is Gaussian with a mean <span class="math inline">\(\mu\)</span>, and standard deviation <span class="math inline">\(\sigma\)</span>. This indicates that the batch effect has a similar, though not necessarily identical, influence on all OTUs.</p>
-<p>To illustrate the type of batch effects, we simulated a set of data with 50 samples and 10,000 OTUs each, based on the simulation approach from .</p>
+<p>To illustrate the type of batch effects, we simulated a set of data with 50 samples and 10,000 OTUs each, based on the simulation approach from <span class="citation">(Gagnon-Bartsch, Jacob, and Speed <a href="#ref-gagnon2013removing">2013</a>)</span>.</p>
 <p>The dataset with a systematic batch effect:</p>
 <ul>
 <li><span class="math inline">\(\beta_{j} \sim N(5,1^{2})\)</span> for <span class="math inline">\(j=1,...,p\)</span> OTUs;<br />
@@ -196,44 +196,45 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </li>
 <li><span class="math inline">\(\beta_{ij} \sim N(\beta_{j}, \sigma_{j}^{2})\)</span> for <span class="math inline">\(i = 1,...,n\)</span> samples.</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Create the simulated data
-m =<span class="st"> </span><span class="dv">50</span>
-n =<span class="st"> </span><span class="dv">10000</span>
-nc =<span class="st"> </span><span class="dv">1000</span> <span class="co">#negative controls without treatment effects</span>
-p =<span class="st"> </span><span class="dv">1</span>
-k =<span class="st"> </span><span class="dv">1</span>
-ctl =<span class="st"> </span><span class="kw">rep</span>(<span class="ot">FALSE</span>, n)
-ctl[<span class="dv">1</span><span class="op">:</span>nc] =<span class="st"> </span><span class="ot">TRUE</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create the simulated data</span>
+m &lt;-<span class="st"> </span><span class="dv">50</span>
+n &lt;-<span class="st"> </span><span class="dv">10000</span>
+nc &lt;-<span class="st"> </span><span class="dv">1000</span> <span class="co"># negative controls without treatment effects</span>
+p &lt;-<span class="st"> </span><span class="dv">1</span>
+k &lt;-<span class="st"> </span><span class="dv">1</span>
+ctl &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="ot">FALSE</span>, n)
+ctl[<span class="dv">1</span><span class="op">:</span>nc] &lt;-<span class="st"> </span><span class="ot">TRUE</span>
 <span class="co"># treatment effect</span>
-X =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">floor</span>(m<span class="op">/</span><span class="dv">2</span>)), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="kw">ceiling</span>(m<span class="op">/</span><span class="dv">2</span>))), m, p)
-beta =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(p<span class="op">*</span>n,<span class="dv">5</span>,<span class="dv">1</span>), p, n) <span class="co">#treatment coefficients</span>
-beta[,ctl] =<span class="st"> </span><span class="dv">0</span>
+X &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">floor</span>(m<span class="op">/</span><span class="dv">2</span>)), <span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">ceiling</span>(m<span class="op">/</span><span class="dv">2</span>))), m, p)
+beta &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(p<span class="op">*</span>n, <span class="dv">5</span>, <span class="dv">1</span>), p, n) <span class="co">#treatment coefficients</span>
+beta[ ,ctl] &lt;-<span class="st"> </span><span class="dv">0</span>
 <span class="co"># batch effect</span>
-W =<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>,m),m,k)
-W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>),<span class="dv">1</span>] =<span class="st">  </span><span class="dv">1</span>
-alpha =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(k<span class="op">*</span>n,<span class="dv">5</span>,<span class="dv">1</span>),k,n)
-Y_alpha =<span class="st"> </span><span class="kw">sapply</span>(alpha, <span class="cf">function</span>(alpha){<span class="kw">rnorm</span>(m, <span class="dt">mean =</span>  alpha, <span class="kw">abs</span>(<span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">2</span>)))})
-YY_alpha =<span class="st"> </span><span class="kw">apply</span>(Y_alpha,<span class="dv">2</span>,<span class="cf">function</span>(x){x<span class="op">*</span>W})
+W &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>, m), m, k)
+W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>),<span class="dv">1</span>] &lt;-<span class="st">  </span><span class="dv">1</span>
+alpha &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(k<span class="op">*</span>n, <span class="dv">5</span>, <span class="dv">1</span>), k, n)
+Y_alpha &lt;-<span class="st"> </span><span class="kw">sapply</span>(alpha, <span class="cf">function</span>(alpha){<span class="kw">rnorm</span>(m, <span class="dt">mean =</span>  alpha, 
+                                              <span class="kw">abs</span>(<span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">2</span>)))})
+YY_alpha &lt;-<span class="st"> </span><span class="kw">apply</span>(Y_alpha, <span class="dv">2</span>, <span class="cf">function</span>(x){x<span class="op">*</span>W})
 
-epsilon =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(m<span class="op">*</span>n,<span class="dv">0</span>,<span class="dv">1</span>),m,n)
-Y =<span class="st"> </span>X<span class="op">%*%</span>beta <span class="op">+</span><span class="st"> </span>YY_alpha <span class="op">+</span><span class="st"> </span>epsilon
+epsilon &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(m<span class="op">*</span>n, <span class="dv">0</span>, <span class="dv">1</span>), m, n)
+Y &lt;-<span class="st"> </span>X<span class="op">%*%</span>beta <span class="op">+</span><span class="st"> </span>YY_alpha <span class="op">+</span><span class="st"> </span>epsilon
 
 
 <span class="co"># estimate batch coefficient for each OTU</span>
-w.cof =<span class="st"> </span><span class="kw">c</span>()
+w.cof &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(Y)){
-  res =<span class="st"> </span><span class="kw">lm</span>(Y[,i] <span class="op">~</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span>W)
-  sum.res =<span class="st"> </span><span class="kw">summary</span>(res)
-  w.cof[i] =<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
+  res &lt;-<span class="st"> </span><span class="kw">lm</span>(Y[ ,i] <span class="op">~</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span>W)
+  sum.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res)
+  w.cof[i] &lt;-<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
 }
 
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
 <span class="kw">hist</span>(w.cof,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
 <span class="kw">plot</span>(<span class="kw">density</span>(w.cof))
 <span class="kw">qqnorm</span>(w.cof)
-<span class="kw">qqline</span>(w.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
+<span class="kw">qqline</span>(w.cof, <span class="dt">col =</span> <span class="st">&#39;red&#39;</span>)
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
 <p>The histogram and density plots are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>.</p>
 </div>
 <div id="mean05unequal-variance" class="section level2">
@@ -255,83 +256,90 @@ w.cof =<span class="st"> </span><span class="kw">c</span>()
 </li>
 <li><span class="math inline">\(\beta&#39;_{ij} \sim N(\beta&#39;_{j}, \sigma_{j}^{&#39;2})\)</span> for <span class="math inline">\(i = 1,...,n\)</span> samples.</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Create the simulated data
-m =<span class="st"> </span><span class="dv">50</span>
-n =<span class="st"> </span><span class="dv">10000</span>
-nc =<span class="st"> </span><span class="dv">1000</span> <span class="co">#negative controls without treatment effects</span>
-p =<span class="st"> </span><span class="dv">1</span>
-k =<span class="st"> </span><span class="dv">1</span>
-ctl =<span class="st"> </span><span class="kw">rep</span>(<span class="ot">FALSE</span>, n)
-ctl[<span class="dv">1</span><span class="op">:</span>nc] =<span class="st"> </span><span class="ot">TRUE</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create the simulated data</span>
+m &lt;-<span class="st"> </span><span class="dv">50</span>
+n &lt;-<span class="st"> </span><span class="dv">10000</span>
+nc &lt;-<span class="st"> </span><span class="dv">1000</span> <span class="co"># negative controls without treatment effects</span>
+p &lt;-<span class="st"> </span><span class="dv">1</span>
+k &lt;-<span class="st"> </span><span class="dv">1</span>
+ctl &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="ot">FALSE</span>, n)
+ctl[<span class="dv">1</span><span class="op">:</span>nc] &lt;-<span class="st"> </span><span class="ot">TRUE</span>
 <span class="co"># treatment effect</span>
-X =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">floor</span>(m<span class="op">/</span><span class="dv">2</span>)), <span class="kw">rep</span>(<span class="dv">1</span>,<span class="kw">ceiling</span>(m<span class="op">/</span><span class="dv">2</span>))), m, p)
-beta =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(p<span class="op">*</span>n,<span class="dv">5</span>,<span class="dv">1</span>), p, n) <span class="co">#treatment coefficients</span>
-beta[,ctl] =<span class="st"> </span><span class="dv">0</span>
+X &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">floor</span>(m<span class="op">/</span><span class="dv">2</span>)), <span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">ceiling</span>(m<span class="op">/</span><span class="dv">2</span>))), m, p)
+beta &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(p<span class="op">*</span>n, <span class="dv">5</span>, <span class="dv">1</span>), p, n) <span class="co">#treatment coefficients</span>
+beta[ ,ctl] &lt;-<span class="st"> </span><span class="dv">0</span>
 <span class="co"># batch effect</span>
-W =<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>,m),m,k)
-W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>),<span class="dv">1</span>] =<span class="st">  </span><span class="dv">1</span>
-alpha2 =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="kw">c</span>(<span class="kw">rnorm</span>(k<span class="op">*</span>(<span class="dv">3</span><span class="op">*</span>n<span class="op">/</span><span class="dv">4</span>),<span class="dv">0</span>,<span class="dv">1</span>),<span class="kw">rnorm</span>(k<span class="op">*</span>(n<span class="op">/</span><span class="dv">4</span>),<span class="dv">5</span>,<span class="dv">1</span>)),n),k,n)
-Y_alpha2 =<span class="st"> </span><span class="kw">sapply</span>(alpha2, <span class="cf">function</span>(alpha){<span class="kw">rnorm</span>(m, <span class="dt">mean =</span>  alpha, <span class="dt">sd =</span> <span class="kw">abs</span>(<span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">2</span>)) )})
-YY_alpha2 =<span class="st"> </span><span class="kw">apply</span>(Y_alpha2,<span class="dv">2</span>,<span class="cf">function</span>(x){x<span class="op">*</span>W})
+W &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>, m), m, k)
+W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>),<span class="dv">1</span>] &lt;-<span class="st">  </span><span class="dv">1</span>
+alpha2 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="kw">c</span>(<span class="kw">rnorm</span>(k<span class="op">*</span>(<span class="dv">3</span><span class="op">*</span>n<span class="op">/</span><span class="dv">4</span>), <span class="dv">0</span>, <span class="dv">1</span>),<span class="kw">rnorm</span>(k<span class="op">*</span>(n<span class="op">/</span><span class="dv">4</span>), <span class="dv">5</span>, <span class="dv">1</span>)), n), k, n)
+Y_alpha2 &lt;-<span class="st"> </span><span class="kw">sapply</span>(alpha2, <span class="cf">function</span>(alpha){<span class="kw">rnorm</span>(m, <span class="dt">mean =</span>  alpha, 
+                                                <span class="dt">sd =</span> <span class="kw">abs</span>(<span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">2</span>)))})
+YY_alpha2 &lt;-<span class="st"> </span><span class="kw">apply</span>(Y_alpha2, <span class="dv">2</span>, <span class="cf">function</span>(x){x<span class="op">*</span>W})
 
-epsilon =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(m<span class="op">*</span>n,<span class="dv">0</span>,<span class="dv">1</span>),m,n)
-Y2 =<span class="st"> </span>X<span class="op">%*%</span>beta <span class="op">+</span><span class="st"> </span>YY_alpha2 <span class="op">+</span><span class="st"> </span>epsilon
+epsilon &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(m<span class="op">*</span>n, <span class="dv">0</span>, <span class="dv">1</span>), m, n)
+Y2 &lt;-<span class="st"> </span>X<span class="op">%*%</span>beta <span class="op">+</span><span class="st"> </span>YY_alpha2 <span class="op">+</span><span class="st"> </span>epsilon
 
 
 
 
-w.cof2 =<span class="st"> </span><span class="kw">c</span>()
+w.cof2 &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(Y2)){
-  res =<span class="st"> </span><span class="kw">lm</span>(Y2[,i] <span class="op">~</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span>W)
-  sum.res =<span class="st"> </span><span class="kw">summary</span>(res)
-  w.cof2[i] =<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
+  res &lt;-<span class="st"> </span><span class="kw">lm</span>(Y2[ ,i] <span class="op">~</span><span class="st"> </span>X <span class="op">+</span><span class="st"> </span>W)
+  sum.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res)
+  w.cof2[i] &lt;-<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
 }
 
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
-<span class="kw">hist</span>(w.cof2,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(w.cof2, <span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
 <span class="kw">plot</span>(<span class="kw">density</span>(w.cof2))
 <span class="kw">qqnorm</span>(w.cof2)
-<span class="kw">qqline</span>(w.cof2, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-74-1.png" width="672" /></p>
+<span class="kw">qqline</span>(w.cof2, <span class="dt">col =</span> <span class="st">&#39;red&#39;</span>)
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
 <p>The histogram and density plots are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>, showing a bi-modal distribution.</p>
 <p>We observed similar patterns in our real case studies, suggesting that the batch effects are mixed with multiple sources and are non-systematic.</p>
 </div>
 <div id="sponge-data" class="section level2">
 <h2><span class="header-section-number">5.3</span> Sponge data</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.b.cof =<span class="st"> </span><span class="kw">c</span>()
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.b.cof &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(sponge.tss.clr)){
-  res =<span class="st"> </span><span class="kw">lm</span>(sponge.tss.clr[,i] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
-  sum.res =<span class="st"> </span><span class="kw">summary</span>(res)
-  sponge.b.cof[i] =<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
+  res &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.tss.clr[ ,i] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
+  sum.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res)
+  sponge.b.cof[i] &lt;-<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
 }
 
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
 <span class="kw">hist</span>(sponge.b.cof,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
 <span class="kw">plot</span>(<span class="kw">density</span>(sponge.b.cof))
 <span class="kw">qqnorm</span>(sponge.b.cof)
 <span class="kw">qqline</span>(sponge.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
 </div>
 <div id="ad-data" class="section level2">
 <h2><span class="header-section-number">5.4</span> AD data</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.b.cof =<span class="st"> </span><span class="kw">c</span>()
-ad.batch.relevel =<span class="st"> </span><span class="kw">relevel</span>(ad.batch, <span class="st">&#39;01/07/2016&#39;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.b.cof &lt;-<span class="st"> </span><span class="kw">c</span>()
+ad.batch.relevel &lt;-<span class="st"> </span><span class="kw">relevel</span>(ad.batch, <span class="st">&#39;01/07/2016&#39;</span>)
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.tss.clr)){
-  res =<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[,i] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch.relevel)
-  sum.res =<span class="st"> </span><span class="kw">summary</span>(res)
-  ad.b.cof[i] =<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">4</span>,<span class="dv">1</span>]
+  res &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[,i] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch.relevel)
+  sum.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res)
+  ad.b.cof[i] &lt;-<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">4</span>,<span class="dv">1</span>]
 }
 
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
 <span class="kw">hist</span>(ad.b.cof,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
 <span class="kw">plot</span>(<span class="kw">density</span>(ad.b.cof))
 <span class="kw">qqnorm</span>(ad.b.cof)
 <span class="kw">qqline</span>(ad.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-78-1.png" width="672" /></p>
 
+</div>
+</div>
+<h3>Bibliography</h3>
+<div id="refs" class="references">
+<div id="ref-gagnon2013removing">
+<p>Gagnon-Bartsch, Johann A, Laurent Jacob, and Terence P Speed. 2013. “Removing Unwanted Variation from High Dimensional Data with Negative Controls.” <em>Berkeley: Tech Reports from Dep Stat Univ California</em>. Citeseer, 1–112.</p>
 </div>
 </div>
             </section>

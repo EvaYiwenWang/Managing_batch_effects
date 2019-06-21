@@ -1,4 +1,4 @@
-"0","hd.lm = lm(hd.tss.clr[,1]~ hd.batch)"
+"0","hd.lm = lm(hd.tss.clr[,1] ~ hd.batch)"
 "0","anova(hd.lm)"
 "1","Analysis of Variance Table
 "

@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang">
 
 
-<meta name="date" content="2019-06-20">
+<meta name="date" content="2019-06-21">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -188,163 +188,171 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="linear-model-and-linear-mixed-model" class="section level3">
 <h3><span class="header-section-number">3.1.1</span> Linear model and linear mixed model</h3>
 <p>LM and LMM are suitable for known batch effects, and can consider batch x treatment interaction and deal with unbalanced batch x treatment design. But they are univariate and rely on a Gaussian likelihood assumption, which may not apply to zero-inflated microbiome data despite CLR transformation.</p>
-<p>We fit a linear model for both sponge and AD data.</p>
+<p>We fit a linear model with effect of interest and batch effect for each OTU in both sponge and AD data. The P-value for the regression coefficient associated with the <em>effect of interest</em> in a linear model is then extracted and multiple testing corrected with “FDR”. We name the adjusted P-values as Q-values.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
 sponge.trt_p &lt;-<span class="st"> </span><span class="kw">apply</span>(sponge.tss.clr, <span class="dv">2</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(x){
   res.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(x <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
-  summary.res =<span class="st"> </span><span class="kw">summary</span>(res.lm)
-  p =<span class="st"> </span>summary.res<span class="op">$</span>coefficients[<span class="dv">2</span>,<span class="dv">4</span>]
+  summary.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res.lm)
+  p &lt;-<span class="st"> </span>summary.res<span class="op">$</span>coefficients[<span class="dv">2</span>,<span class="dv">4</span>]
 })
 
-sponge.trt_q =<span class="st"> </span><span class="kw">p.adjust</span>(sponge.trt_p,<span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)
+sponge.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(sponge.trt_p, <span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)
 
 <span class="co"># AD data</span>
 ad.trt_p &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr, <span class="dv">2</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(x){
   res.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(x <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
-  summary.res =<span class="st"> </span><span class="kw">summary</span>(res.lm)
-  p =<span class="st"> </span>summary.res<span class="op">$</span>coefficients[<span class="dv">2</span>,<span class="dv">4</span>]
+  summary.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res.lm)
+  p &lt;-<span class="st"> </span>summary.res<span class="op">$</span>coefficients[<span class="dv">2</span>,<span class="dv">4</span>]
 })
 
-ad.trt_q =<span class="st"> </span><span class="kw">p.adjust</span>(ad.trt_p,<span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)</code></pre></div>
-<p>As the batch x treatment design of AD data is unbalaced, we fit a linear mixed model considering batch (cage) as random effects.</p>
+ad.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.trt_p, <span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)</code></pre></div>
+<p>As the batch x treatment design of HD data is unbalaced, we fit a linear mixed model considering batch (cage) as random effects.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># HD data</span>
 hd.trt_p &lt;-<span class="st"> </span><span class="kw">apply</span>(hd.tss.clr, <span class="dv">2</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(x){
   res.lmm &lt;-<span class="st"> </span><span class="kw">lmer</span>(x <span class="op">~</span><span class="st"> </span>hd.trt <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>hd.batch))
-  summary.res =<span class="st"> </span><span class="kw">summary</span>(res.lmm)
-  p =<span class="st"> </span>summary.res<span class="op">$</span>coefficients[<span class="dv">2</span>,<span class="dv">5</span>]
+  summary.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res.lmm)
+  p &lt;-<span class="st"> </span>summary.res<span class="op">$</span>coefficients[<span class="dv">2</span>,<span class="dv">5</span>]
 })
 
-hd.trt_q =<span class="st"> </span><span class="kw">p.adjust</span>(hd.trt_p,<span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)</code></pre></div>
+hd.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(hd.trt_p, <span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)</code></pre></div>
 </div>
 <div id="sva" class="section level3">
 <h3><span class="header-section-number">3.1.2</span> SVA</h3>
 <p>SVA can account for unknown batch effects. But it is univariate, relies on a Gaussian likelihood assumption and implicitly introduces a correlation between treatment and batch.</p>
-<p>The <em>sva</em> function performs two different steps. First it identifies the number of latent factors that need to be estimated. The number of factors can be estimated using the <em>num.sv</em>.</p>
+<p>The <em>sva</em> function performs two different steps. First it identifies the number of latent factors that need to be estimated. The number of factors can be estimated using the function <em>num.sv</em>.</p>
+<p>We first fit a full model with effect of interest and a null model with no effect, and use the full model in the function <em>num.sv</em> to estimate the number of latent factors.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
-sponge.mod =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span>sponge.trt) <span class="co"># full model</span>
-sponge.mod0 =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span><span class="dv">1</span>,<span class="dt">data =</span> sponge.trt) <span class="co"># null model</span>
+sponge.mod &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span>sponge.trt) <span class="co"># full model</span>
+sponge.mod0 &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,<span class="dt">data =</span> sponge.trt) <span class="co"># null model</span>
 sponge.sva.n &lt;-<span class="st"> </span><span class="kw">num.sv</span>(<span class="dt">dat =</span> <span class="kw">t</span>(sponge.tss.clr), <span class="dt">mod =</span> sponge.mod)</code></pre></div>
-<p>Next we apply the <em>sva</em> function to estimate the surrogate variables:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.sva =<span class="st"> </span><span class="kw">sva</span>(<span class="kw">t</span>(sponge.tss.clr), sponge.mod, sponge.mod0, <span class="dt">n.sv =</span> sponge.sva.n)</code></pre></div>
+<p>Next we apply the <em>sva</em> function to estimate the surrogate variables with both full and null models:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.sva &lt;-<span class="st"> </span><span class="kw">sva</span>(<span class="dt">dat =</span> <span class="kw">t</span>(sponge.tss.clr), <span class="dt">mod =</span> sponge.mod, 
+                 <span class="dt">mod0 =</span> sponge.mod0, <span class="dt">n.sv =</span> sponge.sva.n)</code></pre></div>
 <pre><code>## Number of significant surrogate variables is:  3 
 ## Iteration (out of 5 ):1  2  3  4  5</code></pre>
-<p>We include the estimated surrogate variables in both the null and full models. The reason is that we want to adjust for the surrogate variables, so we treat them as adjustment variables that must be included in both models. The <em>f.pvalue</em> function is then used to calculate parametric F-test P-values and Q-values (adjusted P-values) for each OTU of sponge data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.mod.bat =<span class="st"> </span><span class="kw">cbind</span>(sponge.mod,sponge.sva<span class="op">$</span>sv)
-sponge.mod0.bat =<span class="st"> </span><span class="kw">cbind</span>(sponge.mod0,sponge.sva<span class="op">$</span>sv)
+<p>We then include the estimated surrogate variables in both the null and full models. The reason is that we want to adjust for the surrogate variables, so we treat them as adjustment variables that must be included in both models. The <em>f.pvalue</em> function is then used to calculate parametric F-test P-values and Q-values (adjusted P-values) for each OTU of sponge data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.mod.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(sponge.mod, sponge.sva<span class="op">$</span>sv)
+sponge.mod0.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(sponge.mod0, sponge.sva<span class="op">$</span>sv)
 
-sponge.sva.trt_p =<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(sponge.tss.clr),sponge.mod.bat,sponge.mod0.bat)
-sponge.sva.trt_q =<span class="st"> </span><span class="kw">p.adjust</span>(sponge.sva.trt_p,<span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)</code></pre></div>
+sponge.sva.trt_p &lt;-<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(sponge.tss.clr), sponge.mod.bat, sponge.mod0.bat)
+sponge.sva.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(sponge.sva.trt_p, <span class="dt">method=</span><span class="st">&#39;fdr&#39;</span>)</code></pre></div>
 <p>Now these P-values and Q-values are accounting for surrogate variables (estimated batch effects).</p>
 <p>We also apply SVA on both AD and HD data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
-ad.mod =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span>ad.trt)
-ad.mod0 =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span><span class="dv">1</span>,<span class="dt">data =</span> ad.trt)
+ad.mod &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span>ad.trt)
+ad.mod0 &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> ad.trt)
 ad.sva.n &lt;-<span class="st"> </span><span class="kw">num.sv</span>(<span class="dt">dat =</span> <span class="kw">t</span>(ad.tss.clr), <span class="dt">mod =</span> ad.mod)
-ad.sva =<span class="st"> </span><span class="kw">sva</span>(<span class="kw">t</span>(ad.tss.clr), ad.mod, ad.mod0, <span class="dt">n.sv =</span> ad.sva.n)</code></pre></div>
+ad.sva &lt;-<span class="st"> </span><span class="kw">sva</span>(<span class="kw">t</span>(ad.tss.clr), ad.mod, ad.mod0, <span class="dt">n.sv =</span> ad.sva.n)</code></pre></div>
 <pre><code>## Number of significant surrogate variables is:  6 
 ## Iteration (out of 5 ):1  2  3  4  5</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.mod.bat =<span class="st"> </span><span class="kw">cbind</span>(ad.mod,ad.sva<span class="op">$</span>sv)
-ad.mod0.bat =<span class="st"> </span><span class="kw">cbind</span>(ad.mod0,ad.sva<span class="op">$</span>sv)
-ad.sva.trt_p =<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(ad.tss.clr),ad.mod.bat,ad.mod0.bat)
-ad.sva.trt_q =<span class="st"> </span><span class="kw">p.adjust</span>(ad.sva.trt_p,<span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.mod.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(ad.mod, ad.sva<span class="op">$</span>sv)
+ad.mod0.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(ad.mod0, ad.sva<span class="op">$</span>sv)
+ad.sva.trt_p &lt;-<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(ad.tss.clr), ad.mod.bat, ad.mod0.bat)
+ad.sva.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.sva.trt_p, <span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)
 
 <span class="co"># hd data</span>
-hd.mod =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span>hd.trt)
-hd.mod0 =<span class="st"> </span><span class="kw">model.matrix</span>(<span class="op">~</span><span class="dv">1</span>,<span class="dt">data =</span> hd.trt)
+hd.mod &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span>hd.trt)
+hd.mod0 &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,<span class="dt">data =</span> hd.trt)
 hd.sva.n &lt;-<span class="st"> </span><span class="kw">num.sv</span>(<span class="dt">dat =</span> <span class="kw">t</span>(hd.tss.clr), <span class="dt">mod =</span> hd.mod)
-hd.sva =<span class="st"> </span><span class="kw">sva</span>(<span class="kw">t</span>(hd.tss.clr), hd.mod, hd.mod0, <span class="dt">n.sv =</span> hd.sva.n)</code></pre></div>
+hd.sva &lt;-<span class="st"> </span><span class="kw">sva</span>(<span class="kw">t</span>(hd.tss.clr), hd.mod, hd.mod0, <span class="dt">n.sv =</span> hd.sva.n)</code></pre></div>
 <pre><code>## Number of significant surrogate variables is:  3 
 ## Iteration (out of 5 ):1  2  3  4  5</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hd.mod.bat =<span class="st"> </span><span class="kw">cbind</span>(hd.mod,hd.sva<span class="op">$</span>sv)
-hd.mod0.bat =<span class="st"> </span><span class="kw">cbind</span>(hd.mod0,hd.sva<span class="op">$</span>sv)
-hd.sva.trt_p =<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(hd.tss.clr),hd.mod.bat,hd.mod0.bat)
-hd.sva.trt_q =<span class="st"> </span><span class="kw">p.adjust</span>(hd.sva.trt_p,<span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hd.mod.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(hd.mod, hd.sva<span class="op">$</span>sv)
+hd.mod0.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(hd.mod0, hd.sva<span class="op">$</span>sv)
+hd.sva.trt_p &lt;-<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(hd.tss.clr), hd.mod.bat, hd.mod0.bat)
+hd.sva.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(hd.sva.trt_p, <span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)</code></pre></div>
 </div>
 <div id="ruv2" class="section level3">
 <h3><span class="header-section-number">3.1.3</span> RUV2</h3>
 <p>RUV2 estimates and accounts for unknown batch effects. But it needs negative control variables that are affected by batch effects but not treatment effects.</p>
 <p>In the real world, we design negative control variables that are not affected by treatment effects only, we are not sure but assume these controls are affected by batch effects. RUV2 can only account for the difference captured by these controls.</p>
-<p>Since our three datasets do not have negative control variables, we use a linear model (or linear mixed model) to identify OTUs less likely to be affected by treatment effects as negative controls to fit the assumptions. The P-values of treatment effects calculated in section ‘Linear model and linear mixed model’ are therefore used here.</p>
-<p><strong>Note:</strong> it is not a optimal way to obtain negative control variables like what we did. Negative control variables should be known and designed before the experiment. The reason we obtained controls using this way is just to fit the assumption and demonstrate hwo to use RUV series.</p>
+<p>Since our three datasets do not have negative control variables, we use a linear model (or linear mixed model) to identify OTUs that are not affected by treatment, those will be considered as <em>pseudo negative control variables</em> to fit the assumptions of RUV2. The P-values of treatment effects calculated in section ‘linear model and linear mixed model’ are therefore used here.</p>
+<p><strong>Note:</strong> it is not an optimal way to use <em>pseudo negative control variables</em>. Negative control variables should be known and designed before the experiment. The reason we obtained controls using this way is just to fit the assumption and demonstrate hwo to use RUV series.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
-sponge.nc =<span class="st"> </span>sponge.trt_q <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.05</span>
+sponge.nc &lt;-<span class="st"> </span>sponge.trt_q <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.05</span>
 
 <span class="co"># AD data</span>
-ad.nc =<span class="st"> </span>ad.trt_q <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.05</span>
+ad.nc &lt;-<span class="st"> </span>ad.trt_q <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.05</span>
 
 <span class="co"># HD data</span>
-hd.nc =<span class="st"> </span>hd.trt_p <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.05</span></code></pre></div>
+hd.nc &lt;-<span class="st"> </span>hd.trt_p <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.05</span></code></pre></div>
+<p><strong>Note:</strong> In HD data, there is no OTU having statistically siginificant difference between genotypes. We use P-values instead of adjusted P-values (Q-values) to set the negative controls, otherwise, all the OTUs would be negative controls.</p>
 <p>We then apply the <em>RUV2</em> function. This function needs to specify the number of unwanted factors (components of negative controls). We therefore specify k = 3, but the number is very subjective and can be changed to any number. After that, we extract the P-values of treatment effects considering unwanted batch effects and then Q-values after FDR adjustment.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
-sponge.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> sponge.tss.clr, <span class="dt">X =</span> sponge.trt, <span class="dt">ctl =</span> sponge.nc, <span class="dt">k =</span> <span class="dv">3</span>) <span class="co"># k is subjective</span>
+sponge.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> sponge.tss.clr, <span class="dt">X =</span> sponge.trt, 
+                    <span class="dt">ctl =</span> sponge.nc, <span class="dt">k =</span> <span class="dv">3</span>) <span class="co"># k is subjective</span>
 sponge.ruv2.trt_p &lt;-<span class="st"> </span>sponge.ruv2<span class="op">$</span>p
-sponge.ruv2.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(sponge.ruv2.trt_p,<span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
+sponge.ruv2.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(sponge.ruv2.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
 
 <span class="co"># AD data</span>
-ad.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">X =</span> ad.trt, <span class="dt">ctl =</span> ad.nc, <span class="dt">k =</span> <span class="dv">3</span>) <span class="co"># k is subjective</span>
+ad.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">X =</span> ad.trt, 
+                <span class="dt">ctl =</span> ad.nc, <span class="dt">k =</span> <span class="dv">3</span>) <span class="co"># k is subjective</span>
 ad.ruv2.trt_p &lt;-<span class="st"> </span>ad.ruv2<span class="op">$</span>p
-ad.ruv2.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.ruv2.trt_p,<span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
+ad.ruv2.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.ruv2.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
 
 <span class="co"># HD data</span>
-hd.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> hd.tss.clr, <span class="dt">X =</span> hd.trt, <span class="dt">ctl =</span> hd.nc, <span class="dt">k =</span> <span class="dv">3</span>) <span class="co"># k is subjective</span>
+hd.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> hd.tss.clr, <span class="dt">X =</span> hd.trt, 
+                <span class="dt">ctl =</span> hd.nc, <span class="dt">k =</span> <span class="dv">3</span>) <span class="co"># k is subjective</span>
 hd.ruv2.trt_p &lt;-<span class="st"> </span>hd.ruv2<span class="op">$</span>p
-hd.ruv2.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(hd.ruv2.trt_p,<span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)</code></pre></div>
+hd.ruv2.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(hd.ruv2.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)</code></pre></div>
 </div>
 <div id="ruv4" class="section level3">
 <h3><span class="header-section-number">3.1.4</span> RUV4</h3>
 <p>RUV4 is an updated version of RUV2 that uses negative control variables and the residual matrix that has no treatment effect to estimate unwanted batch effects.</p>
 <p><em>RUV4</em> also needs to specify the number of unwanted factors as <em>RUV2</em>, and here we use a function called <em>getK</em> to estimate this number. This function is only for <em>RUV4</em> and the estimated k is not always suitable. If the estimated k is 0, k can be forced to 1 and still to account for unwanted variation captured from negative controls.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
-sponge.k.obj =<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> sponge.tss.clr, <span class="dt">X =</span> sponge.trt, <span class="dt">ctl =</span> sponge.nc)
-sponge.k =<span class="st"> </span>sponge.k.obj<span class="op">$</span>k
-sponge.k =<span class="st"> </span><span class="kw">ifelse</span>(sponge.k <span class="op">!=</span><span class="dv">0</span>, sponge.k, <span class="dv">1</span>)
+sponge.k.obj &lt;-<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> sponge.tss.clr, <span class="dt">X =</span> sponge.trt, <span class="dt">ctl =</span> sponge.nc)
+sponge.k &lt;-<span class="st"> </span>sponge.k.obj<span class="op">$</span>k
+sponge.k &lt;-<span class="st"> </span><span class="kw">ifelse</span>(sponge.k <span class="op">!=</span><span class="dv">0</span>, sponge.k, <span class="dv">1</span>)
 sponge.ruv4 &lt;-<span class="st"> </span><span class="kw">RUV4</span>(<span class="dt">Y =</span> sponge.tss.clr, <span class="dt">X =</span> sponge.trt, <span class="dt">ctl =</span> sponge.nc, <span class="dt">k =</span> sponge.k) 
 sponge.ruv4.trt_p &lt;-<span class="st"> </span>sponge.ruv4<span class="op">$</span>p
-sponge.ruv4.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(sponge.ruv4.trt_p,<span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
+sponge.ruv4.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(sponge.ruv4.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
 
 <span class="co"># AD data</span>
-ad.k.obj =<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">X =</span> ad.trt, <span class="dt">ctl =</span> ad.nc)
-ad.k =ad.k.obj<span class="op">$</span>k
-ad.k =<span class="st"> </span><span class="kw">ifelse</span>(ad.k <span class="op">!=</span><span class="dv">0</span>, ad.k, <span class="dv">1</span>)
+ad.k.obj &lt;-<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">X =</span> ad.trt, <span class="dt">ctl =</span> ad.nc)
+ad.k &lt;-<span class="st"> </span>ad.k.obj<span class="op">$</span>k
+ad.k &lt;-<span class="st"> </span><span class="kw">ifelse</span>(ad.k <span class="op">!=</span><span class="dv">0</span>, ad.k, <span class="dv">1</span>)
 ad.ruv4 &lt;-<span class="st"> </span><span class="kw">RUV4</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">X =</span> ad.trt, <span class="dt">ctl =</span> ad.nc, <span class="dt">k =</span> ad.k) 
 ad.ruv4.trt_p &lt;-<span class="st"> </span>ad.ruv4<span class="op">$</span>p
-ad.ruv4.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.ruv4.trt_p,<span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
+ad.ruv4.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.ruv4.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
 
 <span class="co"># HD data</span>
-hd.k.obj =<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> hd.tss.clr, <span class="dt">X =</span> hd.trt, <span class="dt">ctl =</span> hd.nc)
-hd.k =<span class="st"> </span>hd.k.obj<span class="op">$</span>k
-hd.k =<span class="st"> </span><span class="kw">ifelse</span>(hd.k <span class="op">!=</span><span class="dv">0</span>, hd.k, <span class="dv">1</span>)
+hd.k.obj &lt;-<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> hd.tss.clr, <span class="dt">X =</span> hd.trt, <span class="dt">ctl =</span> hd.nc)
+hd.k &lt;-<span class="st"> </span>hd.k.obj<span class="op">$</span>k
+hd.k &lt;-<span class="st"> </span><span class="kw">ifelse</span>(hd.k <span class="op">!=</span><span class="dv">0</span>, hd.k, <span class="dv">1</span>)
 hd.ruv4 &lt;-<span class="st"> </span><span class="kw">RUV4</span>(<span class="dt">Y =</span> hd.tss.clr, <span class="dt">X =</span> hd.trt, <span class="dt">ctl =</span> hd.nc, <span class="dt">k =</span> hd.k) 
 hd.ruv4.trt_p &lt;-<span class="st"> </span>hd.ruv4<span class="op">$</span>p
-hd.ruv4.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(hd.ruv4.trt_p,<span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)</code></pre></div>
+hd.ruv4.trt_q &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(hd.ruv4.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)</code></pre></div>
 </div>
 </div>
 <div id="correcting-for-batch-effects" class="section level2">
 <h2><span class="header-section-number">3.2</span> Correcting for batch effects</h2>
+<p>An alternative approach to manage batch effects is to remove batch effects from the original microbiome data, then use the corrected data in any subsequent data analysis. Compared with methods accounting for batch effects, batch effect correction methods are practical and enable broader application in a variety of analyses. However, the methods do not consider the correlation (linear) and interaction (non-linear) between batch and treatment effects and may result in over-adjusted batch effects, statistical power loss, and an inability to detect variables associated with the treatment effect.</p>
 <div id="bmc-batch-mean-centering" class="section level3">
 <h3><span class="header-section-number">3.2.1</span> BMC (batch mean centering)</h3>
 <p>We centers data within a batch across all variables. As a result, each batch mean is standardised to zero. The disadvantages of BMC are it is univariate and not optimal for non-Gaussian distributed microbiome data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
-sponge.b1 =<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr[sponge.batch<span class="op">==</span><span class="st"> </span><span class="dv">1</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-sponge.b2 =<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr[sponge.batch<span class="op">==</span><span class="st"> </span><span class="dv">2</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-sponge.bmc =<span class="st"> </span><span class="kw">rbind</span>(sponge.b1,sponge.b2)
-sponge.bmc =<span class="st"> </span>sponge.bmc[<span class="kw">rownames</span>(sponge.tss.clr),]
+sponge.b1 &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr[sponge.batch <span class="op">==</span><span class="st"> </span><span class="dv">1</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+sponge.b2 &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr[sponge.batch <span class="op">==</span><span class="st"> </span><span class="dv">2</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+sponge.bmc &lt;-<span class="st"> </span><span class="kw">rbind</span>(sponge.b1, sponge.b2)
+sponge.bmc &lt;-<span class="st"> </span>sponge.bmc[<span class="kw">rownames</span>(sponge.tss.clr), ]
 
 ##############
 <span class="co"># AD data</span>
-ad.b1 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch<span class="op">==</span><span class="st">&quot;09/04/2015&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-ad.b2 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch<span class="op">==</span><span class="st">&quot;14/04/2016&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-ad.b3 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch<span class="op">==</span><span class="st">&quot;14/11/2016&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-ad.b4 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch<span class="op">==</span><span class="st">&quot;01/07/2016&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-ad.b5 =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch<span class="op">==</span><span class="st">&quot;21/09/2017&quot;</span>,],<span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-ad.bmc =<span class="st"> </span><span class="kw">rbind</span>(ad.b1,ad.b2,ad.b3,ad.b4,ad.b5)
-ad.bmc =<span class="st"> </span>ad.bmc[<span class="kw">rownames</span>(ad.tss.clr),]</code></pre></div>
+ad.b1 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;09/04/2015&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b2 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;14/04/2016&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b3 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;14/11/2016&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b4 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;01/07/2016&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b5 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;21/09/2017&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.bmc &lt;-<span class="st"> </span><span class="kw">rbind</span>(ad.b1, ad.b2, ad.b3, ad.b4, ad.b5)
+ad.bmc &lt;-<span class="st"> </span>ad.bmc[<span class="kw">rownames</span>(ad.tss.clr), ]</code></pre></div>
 </div>
 <div id="combat" class="section level3">
 <h3><span class="header-section-number">3.2.2</span> ComBat</h3>
 <p>ComBat works on known and systematic batch effects. If the treatment information is known, the option <em>mod</em> can be fitted with a full model having treatment informationn to efficiently maintain enough treatment variation, like what we do here on sponge and AD data. The <em>mod</em> can also be NULL if the treatment information is unknown.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
-sponge.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">ComBat</span>(<span class="kw">t</span>(sponge.tss.clr),<span class="dt">batch=</span>sponge.batch,<span class="dt">mod =</span> sponge.mod,<span class="dt">par.prior=</span>F,<span class="dt">prior.plots =</span> F))</code></pre></div>
+sponge.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">ComBat</span>(<span class="kw">t</span>(sponge.tss.clr), <span class="dt">batch =</span> sponge.batch, 
+                          <span class="dt">mod =</span> sponge.mod, <span class="dt">par.prior =</span> F, <span class="dt">prior.plots =</span> F))</code></pre></div>
 <pre><code>## Found2batches</code></pre>
 <pre><code>## Adjusting for1covariate(s) or covariate level(s)</code></pre>
 <pre><code>## Standardizing Data across genes</code></pre>
@@ -353,7 +361,8 @@ sponge.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span clas
 <pre><code>## Adjusting the Data</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##############
 <span class="co"># AD data</span>
-ad.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">ComBat</span>(<span class="kw">t</span>(ad.tss.clr),<span class="dt">batch=</span>ad.batch,<span class="dt">mod =</span> ad.mod, <span class="dt">par.prior=</span>F,<span class="dt">prior.plots =</span> F))</code></pre></div>
+ad.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">ComBat</span>(<span class="kw">t</span>(ad.tss.clr), <span class="dt">batch =</span> ad.batch, 
+                      <span class="dt">mod =</span> ad.mod, <span class="dt">par.prior =</span> F, <span class="dt">prior.plots =</span> F))</code></pre></div>
 <pre><code>## Found5batches</code></pre>
 <pre><code>## Adjusting for1covariate(s) or covariate level(s)</code></pre>
 <pre><code>## Standardizing Data across genes</code></pre>
@@ -365,81 +374,88 @@ ad.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="k
 <h3><span class="header-section-number">3.2.3</span> removeBatchEffect</h3>
 <p><em>removeBatchEffect</em> is a function implemented in the LIMMA package that fits a linear model for each variable given a series of conditions as explanatory variables, including the batch effect and treatment effect. Contrary to a standard linear or linear mixed models (see section ‘linear model and linear mixed model’) that simultaneously estimate treatment and batch effects, <em>removeBatchEffect</em> subtracts the batch effect from the original data, resulting in a residual matrix that contains any and only treatment effect. The option <em>design</em> is the same as option <em>mod</em> in ComBat.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
-sponge.limma &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">removeBatchEffect</span>(<span class="kw">t</span>(sponge.tss.clr),<span class="dt">batch =</span> sponge.batch,<span class="dt">design =</span> sponge.mod))
+sponge.limma &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">removeBatchEffect</span>(<span class="kw">t</span>(sponge.tss.clr), <span class="dt">batch =</span> sponge.batch, 
+                                    <span class="dt">design =</span> sponge.mod))
 
 #############
-ad.limma &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">removeBatchEffect</span>(<span class="kw">t</span>(ad.tss.clr),<span class="dt">batch =</span> ad.batch,<span class="dt">design =</span> ad.mod))</code></pre></div>
+ad.limma &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">removeBatchEffect</span>(<span class="kw">t</span>(ad.tss.clr), <span class="dt">batch =</span> ad.batch, 
+                                <span class="dt">design =</span> ad.mod))</code></pre></div>
 </div>
 <div id="fabatch" class="section level3">
 <h3><span class="header-section-number">3.2.4</span> FAbatch</h3>
 <p>FAbatch is a combination of location-scale adjustment and factor analysis. We fit <em>y</em> with the treatment information and <em>batch</em> with batch information. Since this method only accepts numeric variables, the levels of variables are changed to be numeric (e.g. ‘1’, ‘2’ and so on). However, FAbatch is unable to converge on both sponge data and AD data. This may influence the effect of batch correction. We therefore do not compare the results from FAbatch with those from other methods.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
-sponge.fabatch.obj =<span class="st"> </span><span class="kw">fabatch</span>(<span class="dt">x =</span> sponge.tss.clr,<span class="dt">y =</span> <span class="kw">as.factor</span>(<span class="kw">as.numeric</span>(sponge.trt)), <span class="dt">batch =</span> sponge.batch)
+sponge.fabatch.obj &lt;-<span class="st"> </span><span class="kw">fabatch</span>(<span class="dt">x =</span> sponge.tss.clr, 
+                             <span class="dt">y =</span> <span class="kw">as.factor</span>(<span class="kw">as.numeric</span>(sponge.trt)), 
+                             <span class="dt">batch =</span> sponge.batch)
 sponge.fabatch &lt;-<span class="st"> </span>sponge.fabatch.obj<span class="op">$</span>xadj
 
 <span class="co"># ad data</span>
-ad.fabatch.obj =<span class="st"> </span><span class="kw">fabatch</span>(<span class="dt">x =</span> ad.tss.clr,<span class="dt">y =</span> <span class="kw">as.factor</span>(<span class="kw">as.numeric</span>(ad.trt)), <span class="dt">batch =</span> <span class="kw">as.factor</span>(<span class="kw">as.numeric</span>(ad.batch)))
+ad.fabatch.obj &lt;-<span class="st"> </span><span class="kw">fabatch</span>(<span class="dt">x =</span> ad.tss.clr, 
+                         <span class="dt">y =</span> <span class="kw">as.factor</span>(<span class="kw">as.numeric</span>(ad.trt)), 
+                         <span class="dt">batch =</span> <span class="kw">as.factor</span>(<span class="kw">as.numeric</span>(ad.batch)))
 ad.fabatch &lt;-<span class="st"> </span>ad.fabatch.obj<span class="op">$</span>xadj</code></pre></div>
 </div>
 <div id="percentile-normalisation" class="section level3">
 <h3><span class="header-section-number">3.2.5</span> percentile normalisation</h3>
 <p>Percentile normalisation (PN) is developed for microbiome data integration. For each batch, it transforms the relative abundance of control samples to their own percentiles while converting the relative abundance of case samples into the percentiles of their corresponding control distribution. The method thus only applies to case-control studies, and may lose a large amount of information as it uses percentiles rather than the original values.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.percentile =<span class="st"> </span><span class="kw">percentile_norm</span>(<span class="dt">data =</span> sponge.tss, <span class="dt">batch =</span> sponge.batch, <span class="dt">trt =</span> sponge.trt)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.percentile &lt;-<span class="st"> </span><span class="kw">percentile_norm</span>(<span class="dt">data =</span> sponge.tss, <span class="dt">batch =</span> sponge.batch, 
+                                    <span class="dt">trt =</span> sponge.trt)
 
 <span class="co"># ad data</span>
-ad.percentile =<span class="st"> </span><span class="kw">percentile_norm</span>(<span class="dt">data =</span> ad.tss, <span class="dt">batch =</span> ad.batch, <span class="dt">trt =</span> ad.trt)</code></pre></div>
+ad.percentile &lt;-<span class="st"> </span><span class="kw">percentile_norm</span>(<span class="dt">data =</span> ad.tss, <span class="dt">batch =</span> ad.batch, 
+                                <span class="dt">trt =</span> ad.trt)</code></pre></div>
 </div>
 <div id="svd-based-method" class="section level3">
 <h3><span class="header-section-number">3.2.6</span> SVD-based method</h3>
 <p>We center and scale the data before SVD. After SVD, we deflate the first component, which has the highest variation and is assumed to related to batch effects.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">#################
-<span class="co"># sponge data</span>
-sponge.sd =<span class="st"> </span><span class="kw">apply</span>(sponge.tss.clr,<span class="dv">2</span>,sd)
-sponge.mean =<span class="st"> </span><span class="kw">apply</span>(sponge.tss.clr,<span class="dv">2</span>,mean)
-sponge.X =<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr,<span class="dt">center =</span> T,<span class="dt">scale =</span> T)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
+sponge.sd &lt;-<span class="st"> </span><span class="kw">apply</span>(sponge.tss.clr, <span class="dv">2</span>, sd)
+sponge.mean &lt;-<span class="st"> </span><span class="kw">apply</span>(sponge.tss.clr, <span class="dv">2</span>, mean)
+sponge.X &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr, <span class="dt">center =</span> T, <span class="dt">scale =</span> T)
 
-sponge.m =<span class="st"> </span><span class="kw">crossprod</span>(sponge.X)
-sponge.m.svd =<span class="st"> </span><span class="kw">svd</span>(sponge.m)
+sponge.m &lt;-<span class="st"> </span><span class="kw">crossprod</span>(sponge.X)
+sponge.m.svd &lt;-<span class="st"> </span><span class="kw">svd</span>(sponge.m)
 <span class="co">#barplot(sponge.m.svd$d)</span>
 
-sponge.a1 =<span class="st"> </span>sponge.m.svd<span class="op">$</span>u[,<span class="dv">1</span>]
-sponge.b1 =<span class="st"> </span>sponge.m.svd<span class="op">$</span>v[,<span class="dv">1</span>]
+sponge.a1 &lt;-<span class="st"> </span>sponge.m.svd<span class="op">$</span>u[ ,<span class="dv">1</span>]
+sponge.b1 &lt;-<span class="st"> </span>sponge.m.svd<span class="op">$</span>v[ ,<span class="dv">1</span>]
 
 <span class="co"># component 1</span>
-sponge.t1 =<span class="st"> </span>sponge.X <span class="op">%*%</span><span class="st"> </span>sponge.a1 <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">sqrt</span>(<span class="kw">crossprod</span>(sponge.a1)))
-sponge.c1 =<span class="st"> </span><span class="kw">crossprod</span>(sponge.X, sponge.t1) <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">crossprod</span>(sponge.t1))
-sponge.svd.defl.matrix1  =<span class="st"> </span>sponge.X <span class="op">-</span><span class="st"> </span>sponge.t1 <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(sponge.c1)
+sponge.t1 &lt;-<span class="st"> </span>sponge.X <span class="op">%*%</span><span class="st"> </span>sponge.a1 <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">sqrt</span>(<span class="kw">crossprod</span>(sponge.a1)))
+sponge.c1 &lt;-<span class="st"> </span><span class="kw">crossprod</span>(sponge.X, sponge.t1) <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">crossprod</span>(sponge.t1))
+sponge.svd.defl.matrix1  &lt;-<span class="st"> </span>sponge.X <span class="op">-</span><span class="st"> </span>sponge.t1 <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(sponge.c1)
 
 ## add back mean and variance
-sponge.svd =<span class="st"> </span>sponge.svd.defl.matrix1
-sponge.svd[<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(sponge.svd),<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(sponge.svd)] =<span class="st"> </span><span class="ot">NA</span>
+sponge.svd &lt;-<span class="st"> </span>sponge.svd.defl.matrix1
+sponge.svd[<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(sponge.svd), <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(sponge.svd)] =<span class="st"> </span><span class="ot">NA</span>
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(sponge.svd.defl.matrix1)){
   <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(sponge.svd.defl.matrix1)){
     sponge.svd[j,i] =<span class="st"> </span>sponge.svd.defl.matrix1[j,i]<span class="op">*</span>sponge.sd[i] <span class="op">+</span><span class="st"> </span>sponge.mean[i]
   }
 }
 
-#####################
-<span class="co"># ad data</span>
-ad.sd =<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr,<span class="dv">2</span>,sd)
-ad.mean =<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr,<span class="dv">2</span>,mean)
-ad.X =<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr,<span class="dt">center =</span> T,<span class="dt">scale =</span> T)
 
-ad.m =<span class="st"> </span><span class="kw">crossprod</span>(ad.X)
-ad.m.svd =<span class="st"> </span><span class="kw">svd</span>(ad.m)
-<span class="kw">barplot</span>(ad.m.svd<span class="op">$</span>d)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.a1 =<span class="st"> </span>ad.m.svd<span class="op">$</span>u[,<span class="dv">1</span>]
-ad.b1 =<span class="st"> </span>ad.m.svd<span class="op">$</span>v[,<span class="dv">1</span>]
+<span class="co"># ad data</span>
+ad.sd &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr, <span class="dv">2</span>, sd)
+ad.mean &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr, <span class="dv">2</span>, mean)
+ad.X &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr,<span class="dt">center =</span> T, <span class="dt">scale =</span> T)
+
+ad.m &lt;-<span class="st"> </span><span class="kw">crossprod</span>(ad.X)
+ad.m.svd &lt;-<span class="st"> </span><span class="kw">svd</span>(ad.m)
+<span class="co">#barplot(ad.m.svd$d)</span>
+
+ad.a1 &lt;-<span class="st"> </span>ad.m.svd<span class="op">$</span>u[ ,<span class="dv">1</span>]
+ad.b1 &lt;-<span class="st"> </span>ad.m.svd<span class="op">$</span>v[ ,<span class="dv">1</span>]
 
 <span class="co"># component 1</span>
-ad.t1 =<span class="st"> </span>ad.X <span class="op">%*%</span><span class="st"> </span>ad.a1 <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">sqrt</span>(<span class="kw">crossprod</span>(ad.a1)))
-ad.c1 =<span class="st"> </span><span class="kw">crossprod</span>(ad.X, ad.t1) <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">crossprod</span>(ad.t1))
-ad.svd.defl.matrix1  =<span class="st"> </span>ad.X <span class="op">-</span><span class="st"> </span>ad.t1 <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(ad.c1)
+ad.t1 &lt;-<span class="st"> </span>ad.X <span class="op">%*%</span><span class="st"> </span>ad.a1 <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">sqrt</span>(<span class="kw">crossprod</span>(ad.a1)))
+ad.c1 &lt;-<span class="st"> </span><span class="kw">crossprod</span>(ad.X, ad.t1) <span class="op">/</span><span class="st"> </span><span class="kw">drop</span>(<span class="kw">crossprod</span>(ad.t1))
+ad.svd.defl.matrix1  &lt;-<span class="st"> </span>ad.X <span class="op">-</span><span class="st"> </span>ad.t1 <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(ad.c1)
 
-<span class="co"># #</span>
-ad.svd =<span class="st"> </span>ad.svd.defl.matrix1
-ad.svd[<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ad.svd),<span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.svd)] =<span class="st"> </span><span class="ot">NA</span>
+
+ad.svd &lt;-<span class="st"> </span>ad.svd.defl.matrix1
+ad.svd[<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ad.svd), <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.svd)] =<span class="st"> </span><span class="ot">NA</span>
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.svd.defl.matrix1)){
   <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(ad.svd.defl.matrix1)){
     ad.svd[j,i] =<span class="st"> </span>ad.svd.defl.matrix1[j,i]<span class="op">*</span>ad.sd[i] <span class="op">+</span><span class="st"> </span>ad.mean[i]
@@ -451,13 +467,12 @@ ad.svd[<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</
 <p>RUVIII needs not only negative control variables as RUV2 and RUV4, but also technical sample replicates. As only AD data have sample replicates, RUVIII is only applied on AD data.</p>
 <p>In contrast to RUV2 and RUV4, RUVIII is a multivariate method that accounts for the dependency between microbial variables, but it is currently limited to the correction of technical and computational sources of batch effects.</p>
 <p><strong>Note:</strong> RUVIII requires the number of negative control variables to be larger than the sample size in order to fully use the sample information.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">#####################
-<span class="co"># ad data only</span>
-ad.replicates =<span class="st"> </span>ad.metadata<span class="op">$</span>sample_name.data.extraction
-ad.replicates.matrix =<span class="st"> </span><span class="kw">replicate.matrix</span>(ad.replicates)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data only</span>
+ad.replicates &lt;-<span class="st"> </span>ad.metadata<span class="op">$</span>sample_name.data.extraction
+ad.replicates.matrix &lt;-<span class="st"> </span><span class="kw">replicate.matrix</span>(ad.replicates)
 
-ad.ruvIII &lt;-<span class="st"> </span><span class="kw">RUVIII</span>(<span class="dt">Y=</span>ad.tss.clr,<span class="dt">M =</span> ad.replicates.matrix, <span class="dt">ctl =</span> ad.nc)
-<span class="kw">rownames</span>(ad.ruvIII) =<span class="st"> </span><span class="kw">rownames</span>(ad.tss.clr)</code></pre></div>
+ad.ruvIII &lt;-<span class="st"> </span><span class="kw">RUVIII</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">M =</span> ad.replicates.matrix, <span class="dt">ctl =</span> ad.nc)
+<span class="kw">rownames</span>(ad.ruvIII) &lt;-<span class="st"> </span><span class="kw">rownames</span>(ad.tss.clr)</code></pre></div>
 
 </div>
 </div>

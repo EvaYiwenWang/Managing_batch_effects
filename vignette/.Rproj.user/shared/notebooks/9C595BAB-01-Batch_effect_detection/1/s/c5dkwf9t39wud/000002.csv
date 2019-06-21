@@ -1,4 +1,4 @@
-"0","sponge.lm = lm(sponge.tss.clr[,9]~ sponge.trt + sponge.batch)"
+"0","sponge.lm = lm(sponge.tss.clr[,9] ~ sponge.trt + sponge.batch)"
 "0","summary(sponge.lm)"
 "1","
 Call:
