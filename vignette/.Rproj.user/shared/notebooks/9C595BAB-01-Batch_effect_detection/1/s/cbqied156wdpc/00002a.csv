@@ -1,0 +1,7 @@
+"0","# sponge data"
+"0","sponge.batch_c <- sponge.batch[sponge.trt == 'C']"
+"0","sponge.batch_e <- sponge.batch[sponge.trt == 'E'] "
+"0","sponge.before_c <- sponge.tss.clr[sponge.trt == 'C', ]"
+"0","sponge.before_e <- sponge.tss.clr[sponge.trt == 'E', ] "
+"0","RleMicroRna2(object = t(sponge.before_c), batch = sponge.batch_c, "
+"0","             maintitle = 'Sponge (tissue: choanosome)')"

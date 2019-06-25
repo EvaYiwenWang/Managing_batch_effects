@@ -77,7 +77,7 @@ ggplot(sponge.before.df, aes(x = value, fill = batch)) +
                      panel.grid = element_blank())
 ```
 
-For the abundance of OTU9, the samples within different batches are very distinct, indicating a strong batch effect in sponge data. 
+For the proportional abundance of OTU9, the samples within different batches are very distinct, indicating a strong batch effect in sponge data. 
 
 Assuming the data fit the distribution of the linear model (which is the case here after CLR transformation), we can also assess the effect of batch in a linear model on that particular OTU9:
 
@@ -150,7 +150,7 @@ As the batch x treatment design of HD data is nested and unbalanced, the linear 
 
 ## RLE plots
 
-RLE plots can be plotted using 'RleMicroRna' in R package 'AgiMicroRna'. Here, we made some changes on the function 'RleMicroRna', thus we call it 'RleMicroRna2'.
+RLE plots can be plotted using 'RleMicroRna' in R package 'AgiMicroRna'. Here, we made some changes on the function 'RleMicroRna', called 'RleMicroRna2' and available on our extra functions 'Functions.R'.
 
 RLE plots are based on the assumption that the majority of microbial variables are unaffected by the effect of interest, and therefore any sample heterogeneity observed - i.e. different distributions and their variances, and medians different from zero, should indicate the presence of batch effects. In our case studies, the treatment information is known, so we generate multiple RLE plots per treatment group, as suggested by [@lin2018scmerge].
 
@@ -305,4 +305,5 @@ pheatmap(hd.tss.clr.scale,
 
 ```
 
-The batch effect in HD data is not very obviously visualised through heatmap, because there is no batch with samples clustered together and separated from other samples.
+The batch effect in HD data is not obvious in this heatmap, as we observe not clustering according to batch.
+

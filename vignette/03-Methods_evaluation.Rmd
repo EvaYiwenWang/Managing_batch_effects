@@ -245,7 +245,7 @@ grid.arrange(sponge.boxplot.before, sponge.boxplot.percentile,
 From the boxplots of OTU9 in sponge data, the difference between two batches are removed by BMC, ComBat, removeBatchEffect and percentile normalisation correction. Among these methods, percentile normalisation does not remove as much batch difference as the other methods.
 
 ```{r}
-## density plot
+# density plot
 # before
 sponge.dens.before <- ggplot(sponge.before.df, aes(x = value, fill = batch)) + 
   geom_density(alpha = 0.5) + scale_fill_manual(values = color.mixo(1:10)) + 
@@ -301,14 +301,27 @@ grid.arrange(sponge.dens.before, sponge.dens.percentile,
              sponge.dens.svd, ncol = 2)
 ```
 
+We can also assess the effect of batch in a linear model before and after batch correction.
+
 ```{r}
 # P-values
 sponge.lm.before <- lm(sponge.tss.clr[ ,9] ~ sponge.trt + sponge.batch)
 summary(sponge.lm.before)
 
+```
+
+Before correction, the batch effect is statistically significant (P $<$ 0.001), as indicated in the **sponge.batch2** row.
+
+```{r}
 sponge.lm.bmc <- lm(sponge.bmc[ ,9] ~ sponge.trt + sponge.batch)
 summary(sponge.lm.bmc)
+```
 
+After BMC correction, the batch effect is not statistically significant (P $>$ 0.05), as indicated in the **sponge.batch2** row.
+
+The results from other batch correction methods are similar as BMC correction.
+
+```{r, eval = F, echo = T}
 sponge.lm.combat <- lm(sponge.combat[ ,9] ~ sponge.trt + sponge.batch)
 summary(sponge.lm.combat)
 
@@ -323,7 +336,9 @@ summary(sponge.lm.svd)
 
 ```
 
-The results of density plots and P-values of batch effects from linear models reach a consesus with boxplots, the difference between two batches are removed by BMC, ComBat, removeBatchEffect and percentile normalisation correction. But percentile normalisation changes a lot of the distribution of samples from two batches.
+
+In sponge data, the results of density plots and P-values of batch effects from linear models reach a consesus with boxplots, the difference between two batches are removed by BMC, ComBat, removeBatchEffect and percentile normalisation correction. We observe that percentile normalisation modifies the distribution of the samples from the two batches.
+
 
 ```{r}
 # ad data
@@ -389,7 +404,7 @@ grid.arrange(ad.boxplot.before, ad.boxplot.percentile,
              ad.boxplot.svd, ad.boxplot.ruv, ncol = 2)
 ```
 
-From the boxplots of OTU9 in AD data, the difference between five batches are removed by BMC, ComBat, removeBatchEffect and RUVIII correction. Among these methods, RUVIII does not remove as much batch difference as the other methods.
+From the boxplots of OTU9 in AD data, the difference between five batches are removed by BMC, ComBat, removeBatchEffect and RUVIII correction. Among these methods, RUVIII did not remove as much batch difference as the other methods.
 
 ```{r}
 # density plot
@@ -456,16 +471,28 @@ grid.arrange(ad.dens.before, ad.dens.percentile,
              ad.dens.svd, ad.dens.ruv, ncol = 2)
 ```
 
+
+Similar as sponge data, we can also assess the batch effect in AD data using linear model.
+
+
 ```{r}
 #p-values
 ad.lm.before <- lm(ad.tss.clr[ ,1] ~ ad.trt + ad.batch)
 anova(ad.lm.before)
 #summary(ad.lm.before)
+```
 
+Before correction, the batch effect is statistically significant (P $<$ 0.001), as indicated in the **ad.batch** row.
+
+```{r}
 ad.lm.bmc <- lm(ad.bmc[ ,1] ~ ad.trt + ad.batch)
 anova(ad.lm.bmc)
 #summary(ad.lm.bmc)
+```
 
+After BMC correction, the batch effect is not statistically significant (P $>$ 0.05), as indicated in the **ad.batch** row.The results from other batch correction methods are similar as BMC correction.
+
+```{r, eval = F, echo = T}
 ad.lm.combat <- lm(ad.combat[ ,1] ~ ad.trt + ad.batch)
 anova(ad.lm.combat)
 #summary(ad.lm.combat)
@@ -493,26 +520,27 @@ The results of density plots and P-values of batch effects from linear models re
 
 ### RLE plots
 
+In sponge data, we group the samples according to the tissue (choanosome / ectosome) and generate two RLE plots respectively in all datasets before and after batch correction with different methods:
+
 ```{r}
 # sponge data
-
-###### BMC
+# BMC
 sponge.bmc_c <- sponge.bmc[sponge.trt == 'C', ]
 sponge.bmc_e <- sponge.bmc[sponge.trt == 'E', ] 
 
-###### ComBat
+# ComBat
 sponge.combat_c <- sponge.combat[sponge.trt == 'C', ]
 sponge.combat_e <- sponge.combat[sponge.trt == 'E', ] 
 
-###### rBE
+# rBE
 sponge.limma_c <- sponge.limma[sponge.trt == 'C', ]
 sponge.limma_e <- sponge.limma[sponge.trt == 'E', ] 
 
-###### PN
+# PN
 sponge.percentile_c <- sponge.percentile[sponge.trt == 'C', ]
 sponge.percentile_e <- sponge.percentile[sponge.trt == 'E', ] 
 
-###### SVD
+# SVD
 sponge.svd_c <- sponge.svd[sponge.trt == 'C', ]
 sponge.svd_e <- sponge.svd[sponge.trt == 'E', ] 
 
@@ -570,30 +598,32 @@ par(mfrow = c(1,1))
 
 In tissue ectosome of sponge data, batch effect is not easily detected, but percentile normalisation increased batch variation.
 
+
+In AD data, we group the samples according to the inital phenol concentration (0-0.5 g/L / 1-2 g/L) and generate two RLE plots respectively in all datasets before and after batch correction, as sponge data:
+
 ```{r}
 # ad data
-
-###### BMC
+# BMC
 ad.bmc_05 <- ad.bmc[ad.trt == '0-0.5', ]
 ad.bmc_2 <- ad.bmc[ad.trt == '1-2', ]
 
-###### ComBat
+# ComBat
 ad.combat_05 <- ad.combat[ad.trt == '0-0.5', ]
 ad.combat_2 <- ad.combat[ad.trt == '1-2', ]
 
-###### rBE
+# rBE
 ad.limma_05 <- ad.limma[ad.trt == '0-0.5', ]
 ad.limma_2 <- ad.limma[ad.trt == '1-2', ]
 
-###### PN
+# PN
 ad.percentile_05 <- ad.percentile[ad.trt == '0-0.5', ]
 ad.percentile_2 <- ad.percentile[ad.trt == '1-2', ]
 
-###### SVD
+# SVD
 ad.svd_05 <- ad.svd[ad.trt == '0-0.5', ]
 ad.svd_2 <- ad.svd[ad.trt == '1-2', ]
 
-###### RUVIII
+# RUVIII
 ad.ruv_05 <- ad.ruvIII[ad.trt == '0-0.5', ]
 ad.ruv_2 <- ad.ruvIII[ad.trt == '1-2', ]
 
@@ -674,6 +704,8 @@ In AD data with initial phenol concentration between 1-2 g/L, batch effect is no
 
 ### Heatmap
 
+We use the heatmap to visualise data clusters. Samples clustered by batches instead of treatments indicate a batch effect. 
+
 ```{r}
 # Sponge data
 # before 
@@ -701,8 +733,37 @@ pheatmap(sponge.tss.clr.scale,
          border_color = 'NA',
          main = 'Sponge data - before')
 
+```
+
+Before correction, samples in sponge data are preferentially clustered by batch instead of tissue type, indicating a batch effect.
+
+```{r}
+# ComBat 
+sponge.combat.scale <- scale(sponge.combat, center = T, scale = T) 
+# scale on OTUs
+sponge.combat.scale <- scale(t(sponge.combat.scale), center = T, scale = T) 
+# scale on samples
+
+pheatmap(sponge.combat.scale, 
+         scale = 'none', 
+         cluster_rows = F, 
+         cluster_cols = T, 
+         fontsize_row = 5, fontsize_col = 8,
+         fontsize = 8,
+         clustering_distance_rows = 'euclidean',
+         clustering_method = 'ward.D',
+         treeheight_row = 30,
+         annotation_col = sponge.anno_col,
+         annotation_colors = sponge.anno_metabo_colors,
+         border_color = 'NA',
+         main = 'Sponge data - ComBat')
+
+```
+
+After batch correction with ComBat, the data are clustered by tissues rather than batches, therefore, ComBat not only removed batch effects, but also disengaged the effect of interest. The results from batch correction with other methods are similar.
 
 
+```{r, eval = F, echo = T}
 # BMC 
 sponge.bmc.scale <- scale(sponge.bmc, center = T, scale = T) 
 # scale on OTUs
@@ -723,26 +784,6 @@ pheatmap(sponge.bmc.scale,
          border_color = 'NA',
          main = 'Sponge data - BMC')
 
-
-# ComBat 
-sponge.combat.scale <- scale(sponge.combat, center = T, scale = T) 
-# scale on OTUs
-sponge.combat.scale <- scale(t(sponge.combat.scale), center = T, scale = T) 
-# scale on samples
-
-pheatmap(sponge.combat.scale, 
-         scale = 'none', 
-         cluster_rows = F, 
-         cluster_cols = T, 
-         fontsize_row = 5, fontsize_col = 8,
-         fontsize = 8,
-         clustering_distance_rows = 'euclidean',
-         clustering_method = 'ward.D',
-         treeheight_row = 30,
-         annotation_col = sponge.anno_col,
-         annotation_colors = sponge.anno_metabo_colors,
-         border_color = 'NA',
-         main = 'Sponge data - ComBat')
 
 # removeBatchEffect
 sponge.limma.scale <- scale(sponge.limma, center = T, scale = T) 
@@ -806,7 +847,7 @@ pheatmap(sponge.svd.scale,
          main = 'Sponge data - SVD')
 ```
 
-From heatmaps, the sponge data are clustered by batches instead of tissues indicating a batch effect. After batch correction with ComBat, the data are clustered by tissues rather than batches, therefore, ComBat not only removes batch effects, but also disengages the effect of interest. 
+In the heatmap of AD data before batch correction, samples within batch 14/04/2016 are clustered and distinct from other samples, indicating a batch effect. 
 
 ```{r}
 # AD data
@@ -836,7 +877,32 @@ pheatmap(ad.tss.clr.scale,
          annotation_colors = ad.anno_metabo_colors,
          border_color = 'NA',
          main = 'AD data - before')
+```
 
+
+```{r}
+# removeBatchEffect
+ad.limma.scale <- scale(ad.limma, center = T, scale = T) # scale on OTUs
+ad.limma.scale <- scale(t(ad.limma.scale), center = T, scale = T) # scale on samples
+
+pheatmap(ad.limma.scale, 
+         scale = 'none', 
+         cluster_rows = F, 
+         cluster_cols = T, 
+         fontsize_row = 4, fontsize_col = 6,
+         fontsize = 8,
+         clustering_distance_rows = 'euclidean',
+         clustering_method = 'ward.D',
+         treeheight_row = 30,
+         annotation_col = ad.anno_col,
+         annotation_colors = ad.anno_metabo_colors,
+         border_color = 'NA',
+         main = 'AD data - removeBatchEffect')
+```
+
+After batch correction with removeBatchEffect, the data are almost clustered by treatments rather than batches, therefore, removeBatchEffect not only removed batch effects, but also disengaged the treatment effects. The results from batch correction with other methods are similar.
+
+```{r, eval = F, echo = T}
 # BMC
 ad.bmc.scale <- scale(ad.bmc, center = T, scale = T) # scale on OTUs
 ad.bmc.scale <- scale(t(ad.bmc.scale), center = T, scale = T) # scale on samples
@@ -873,23 +939,7 @@ pheatmap(ad.combat.scale,
          border_color = 'NA',
          main = 'AD data - ComBat')
 
-# removeBatchEffect
-ad.limma.scale <- scale(ad.limma, center = T, scale = T) # scale on OTUs
-ad.limma.scale <- scale(t(ad.limma.scale), center = T, scale = T) # scale on samples
 
-pheatmap(ad.limma.scale, 
-         scale = 'none', 
-         cluster_rows = F, 
-         cluster_cols = T, 
-         fontsize_row = 4, fontsize_col = 6,
-         fontsize = 8,
-         clustering_distance_rows = 'euclidean',
-         clustering_method = 'ward.D',
-         treeheight_row = 30,
-         annotation_col = ad.anno_col,
-         annotation_colors = ad.anno_metabo_colors,
-         border_color = 'NA',
-         main = 'AD data - removeBatchEffect')
 
 # percentile normalisation
 ad.percentile.scale <- scale(ad.percentile, center = T, scale = T) # scale on OTUs
@@ -948,7 +998,6 @@ pheatmap(ad.ruv.scale,
 
 ```
 
-In the heatmaps of AD data, samples within batch 14/04/2016 are clustered and distinct from other samples, indicating a batch effect. After batch correction with removeBatchEffect and percentile normalisation, the data are almost clustered by treatments rather than batches, therefore, removeBatchEffect and percentile normalisation not only remove batch effects, but also disengage the treatment effects. 
 
 ## Variance calculation
 
@@ -960,8 +1009,8 @@ The variance explained by batch or treatment per OTU can be calculated by a line
 
 We use a function *fitExtractVarPartModel* to calculate and extract the variance of batch and treatment per OTU. 
        
-```{r, warning=F, message=F}
-## Sponge data
+```{r, warning = F, message = F}
+# Sponge data
 sponge.form <- ~ sponge.trt + sponge.batch
 sponge.info <- as.data.frame(cbind(rownames(sponge.tss.clr), sponge.trt, sponge.batch))
 rownames(sponge.info) <- rownames(sponge.tss.clr)
@@ -999,35 +1048,32 @@ sponge.varPart.svd <- fitExtractVarPartModel(exprObj = t(sponge.svd),
 ```
 
 ```{r}
-# merge results
-sponge.variance <- rbind(cbind(variance = sponge.varPart.before$sponge.batch,
-                               Type = rep('Batch', 24), method = rep('Before', 24)), 
-                         cbind(variance = sponge.varPart.before$sponge.trt,
-                               Type = rep('Tissue', 24), method = rep('Before', 24)), 
-                         cbind(variance = sponge.varPart.bmc$sponge.batch, 
-                               Type = rep('Batch', 24), method = rep('BMC', 24)), 
-                         cbind(variance = sponge.varPart.bmc$sponge.trt,
-                               Type = rep('Tissue', 24), method = rep('BMC', 24)), 
-                         cbind(variance = sponge.varPart.combat$sponge.batch,
-                               Type = rep('Batch', 24), method = rep('ComBat', 24)), 
-                         cbind(variance = sponge.varPart.combat$sponge.trt,
-                               Type = rep('Tissue', 24), method = rep('ComBat', 24)), 
-                         cbind(variance = sponge.varPart.limma$sponge.batch, 
-                               Type = rep('Batch', 24), method = rep('rBE', 24)), 
-                         cbind(variance = sponge.varPart.limma$sponge.trt, 
-                               Type = rep('Tissue', 24), method = rep('rBE', 24)), 
-                         cbind(variance = sponge.varPart.percentile$sponge.batch, 
-                               Type = rep('Batch', 24), method = rep('PN', 24)), 
-                         cbind(variance = sponge.varPart.percentile$sponge.trt, 
-                               Type = rep('Tissue', 24), method = rep('PN', 24)), 
-                         cbind(variance = sponge.varPart.svd$sponge.batch, 
-                               Type = rep('Batch', 24), method = rep('SVD', 24)), 
-                         cbind(variance = sponge.varPart.svd$sponge.trt, 
-                               Type = rep('Tissue', 24), method = rep('SVD', 24)))
+# extract the variance of trt and batch
+# before
+sponge.varmat.before <- as.matrix(sponge.varPart.before[ ,1:2])
+# BMC
+sponge.varmat.bmc <- as.matrix(sponge.varPart.bmc[ ,1:2])
+# ComBat
+sponge.varmat.combat <- as.matrix(sponge.varPart.combat[ ,1:2])
+# removeBatchEffect
+sponge.varmat.limma <- as.matrix(sponge.varPart.limma[ ,1:2])
+# percentile normalisation
+sponge.varmat.percentile <- as.matrix(sponge.varPart.percentile[ ,1:2])
+# SVD
+sponge.varmat.svd <- as.matrix(sponge.varPart.svd[ ,1:2])
 
+# merge results
+sponge.variance <- c(as.vector(sponge.varmat.before), as.vector(sponge.varmat.bmc),
+                     as.vector(sponge.varmat.combat), as.vector(sponge.varmat.limma),
+                     as.vector(sponge.varmat.percentile), as.vector(sponge.varmat.svd))
+
+# add batch, trt and methods info
+sponge.variance <- cbind(variance = sponge.variance, 
+                         Type = rep(c('Tissue', 'Batch'), each = ncol(sponge.tss.clr)),
+                         method = rep(c('Before', 'BMC', 'ComBat', 'rBE', 
+                                        'PN', 'SVD'), each = 2*ncol(sponge.tss.clr)))
+# reorder levels  
 sponge.variance <- as.data.frame(sponge.variance)
-sponge.variance$Type <- factor(sponge.variance$Type, 
-                              levels = unique(sponge.variance$Type))
 sponge.variance$method <- factor(sponge.variance$method, 
                                 levels = unique(sponge.variance$method))
 sponge.variance$variance <- as.numeric(as.character(sponge.variance$variance))
@@ -1038,7 +1084,7 @@ ggplot(sponge.variance, aes(x = Type, y = variance, fill = Type)) +
         strip.text = element_text(size = 12), panel.grid = element_blank(), 
         axis.text = element_text(size = 12), axis.title = element_text(size = 15), 
         legend.title = element_text(size = 15), legend.text = element_text(size = 12)) + 
-  labs(x = "Type", y = "Proportion Variance", name='Type') + ylim(0,1)
+  labs(x = 'Type', y = 'Proportion Variance', name = 'Type') + ylim(0,1)
 ```
 
 BMC, ComBat and removeBatchEffect successfully removed batch variation while preserving treatment variation, but SVD performed poorly. Percentile normalisation preserved sufficient treatment variation, but removed less batch effect variation than BMC, ComBat and removeBatchEffect. Percentile normalisation used percentiles instead of actual values. This leads to information loss. Moreover, it was designed for case-control microbiome studies, which differ from our example studies. This method would therefore be more effective with control samples in each batch. SVD was inefficient at targeting batch effects, as it assumes that batch effects cause the largest variation in the data and should therefore appear as the first component. However, in sponge data the batch effect is mainly present on the second component as was shown in PCA sample plots with density, which results in a miscorrection of batch effects. 
@@ -1083,39 +1129,36 @@ ad.varPart.ruv <- fitExtractVarPartModel(exprObj = t(ad.ruvIII),
 
 
 ```{r}
-# merge results
-ad.variance <- rbind(cbind(variance = ad.varPart.before$ad.batch, 
-                           Type = rep('Batch', 231), method = rep('Before', 231)), 
-                     cbind(variance = ad.varPart.before$ad.trt, 
-                           Type = rep('Treatment', 231), method = rep('Before', 231)), 
-                     cbind(variance = ad.varPart.bmc$ad.batch, 
-                           Type = rep('Batch', 231), method = rep('BMC', 231)), 
-                     cbind(variance = ad.varPart.bmc$ad.trt, 
-                           Type = rep('Treatment', 231), method = rep('BMC', 231)), 
-                     cbind(variance = ad.varPart.combat$ad.batch, 
-                           Type = rep('Batch', 231), method = rep('ComBat', 231)), 
-                     cbind(variance = ad.varPart.combat$ad.trt, 
-                           Type = rep('Treatment', 231), method = rep('ComBat', 231)), 
-                     cbind(variance = ad.varPart.limma$ad.batch, 
-                           Type = rep('Batch', 231), method = rep('rBE', 231)), 
-                     cbind(variance = ad.varPart.limma$ad.trt, 
-                           Type = rep('Treatment', 231), method = rep('rBE', 231)), 
-                     cbind(variance = ad.varPart.percentile$ad.batch, 
-                           Type = rep('Batch', 231), method = rep('PN', 231)), 
-                     cbind(variance = ad.varPart.percentile$ad.trt, 
-                           Type = rep('Treatment', 231), method = rep('PN', 231)), 
-                     cbind(variance = ad.varPart.svd$ad.batch, 
-                           Type = rep('Batch', 231), method = rep('SVD', 231)), 
-                     cbind(variance = ad.varPart.svd$ad.trt, 
-                           Type = rep('Treatment', 231), method = rep('SVD', 231)), 
-                     cbind(variance = ad.varPart.ruv$ad.batch, 
-                           Type = rep('Batch', 231), method = rep('RUVIII', 231)), 
-                     cbind(variance = ad.varPart.ruv$ad.trt, 
-                           Type = rep('Treatment', 231), method = rep('RUVIII', 231)))
+# extract the variance of trt and batch
+# before
+ad.varmat.before <- as.matrix(ad.varPart.before[ ,1:2])
+# BMC
+ad.varmat.bmc <- as.matrix(ad.varPart.bmc[ ,1:2])
+# ComBat
+ad.varmat.combat <- as.matrix(ad.varPart.combat[ ,1:2])
+# removeBatchEffect
+ad.varmat.limma <- as.matrix(ad.varPart.limma[ ,1:2])
+# percentile normalisation
+ad.varmat.percentile <- as.matrix(ad.varPart.percentile[ ,1:2])
+# SVD
+ad.varmat.svd <- as.matrix(ad.varPart.svd[ ,1:2])
+# RUVIII
+ad.varmat.ruv <- as.matrix(ad.varPart.ruv[ ,1:2])
 
+
+# merge results
+ad.variance <- c(as.vector(ad.varmat.before), as.vector(ad.varmat.bmc),
+                 as.vector(ad.varmat.combat), as.vector(ad.varmat.limma),
+                 as.vector(ad.varmat.percentile), as.vector(ad.varmat.svd), 
+                 as.vector(ad.varmat.ruv))
+
+# add batch, trt and methods info
+ad.variance <- cbind(variance = ad.variance, 
+                     Type = rep(c( 'Treatment', 'Batch'), each = ncol(ad.tss.clr)),
+                     method = rep(c('Before', 'BMC', 'ComBat', 'rBE', 'PN', 
+                                    'SVD', 'RUVIII'), each = 2*ncol(ad.tss.clr)))
+# reorder levels  
 ad.variance <- as.data.frame(ad.variance)
-ad.variance$Type <- factor(ad.variance$Type, 
-                          levels = unique(ad.variance$Type))
 ad.variance$method <- factor(ad.variance$method, 
                             levels = unique(ad.variance$method))
 ad.variance$variance <- as.numeric(as.character(ad.variance$variance))
@@ -1232,15 +1275,19 @@ sponge.rda.prop.percentile <- c(sponge.rda.bat_prop.percentile,
 sponge.rda.prop.svd <- c(sponge.rda.bat_prop.svd, 
                         sponge.rda.trt_prop.svd)
 
+# merge results
 sponge.rda.prop.val <- c(sponge.rda.prop.before, sponge.rda.prop.bmc, 
                         sponge.rda.prop.combat, sponge.rda.prop.limma, 
                         sponge.rda.prop.percentile, sponge.rda.prop.svd)
+
+# add batch, trt and method info
 sponge.rda.prop <- data.frame(prop = sponge.rda.prop.val, 
                              prop.r = round(sponge.rda.prop.val, 2), 
                              Method = rep(c('Before', 'BMC', 'ComBat', 
                                             'rBE', 'PN', 'SVD'), each = 2), 
                              Type = rep(c('Batch', 'Tissue'), 6))
 
+# reorder levels
 sponge.rda.prop$Method <- factor(sponge.rda.prop$Method, 
                                 levels = unique(sponge.rda.prop$Method))
 
@@ -1260,7 +1307,7 @@ In sponge data, pRDA shows that BMC, ComBat and removeBatchEffect were more effi
 
 We also apply pRDA on AD data.
 
-```{r,warning=F}
+```{r,warning = F}
 # AD data
 ad.data.design <- numeric()
 ad.data.design$group <- ad.trt
@@ -1350,16 +1397,19 @@ ad.rda.prop.percentile <- c(ad.rda.bat_prop.percentile, ad.rda.trt_prop.percenti
 ad.rda.prop.svd <- c(ad.rda.bat_prop.svd, ad.rda.trt_prop.svd)
 ad.rda.prop.ruv <- c(ad.rda.bat_prop.ruv, ad.rda.trt_prop.ruv)
 
-#############
+# merge results
 ad.rda.prop.val <- c(ad.rda.prop.before, ad.rda.prop.bmc, 
                     ad.rda.prop.combat, ad.rda.prop.limma, 
                     ad.rda.prop.percentile, ad.rda.prop.svd, 
                     ad.rda.prop.ruv)
+
+# add batch, trt and method info
 ad.rda.prop <- data.frame(prop = ad.rda.prop.val, prop.r = round(ad.rda.prop.val, 2), 
                          Method = rep(c('Before', 'BMC', 'ComBat', 'rBE', 
                                         'PN', 'SVD', 'RUVIII'), each = 2), 
                          Type = rep(c('Batch', 'Treatment'), 7))
 
+# reorder levels
 ad.rda.prop$Method <- factor(ad.rda.prop$Method, levels = unique(ad.rda.prop$Method))
 
 ggplot(data = ad.rda.prop, aes(x = Method, y = prop, fill = Type)) + 
@@ -1379,7 +1429,7 @@ In sponge data, the results of BMC and removeBatchEffect are the same, while in 
 
 ### PVCA
 
-PVCA can be applied as a validation method that complements pRDA, but it does not work for dataset with only 24 samples, therefore it cannot be applied on sponge data.
+PVCA can be applied as a validation method that complements pRDA, but it requires 42 OTUs minimum. Therefore, it did not apply on sponge data.
 
 ```{r,message = F,warning = F}
 # AD data
@@ -1447,12 +1497,16 @@ rownames(ad.PVCA.score) <- c('Before', 'BMC', 'ComBat', 'rBE', 'PN', 'SVD', 'RUV
 ```
 
 ```{r}
+# merge results
 ad.pvca.prop.val <- c(ad.PVCA.score$Batch, ad.PVCA.score$Treatment)
+
+# add batch, trt and method info
 ad.pvca.prop <- data.frame(prop = ad.pvca.prop.val, prop.r = round(ad.pvca.prop.val, 2), 
                           Method = rep(c('Before', 'BMC', 'ComBat', 'rBE', 
                                          'PN', 'SVD', 'RUVIII'), 2), 
                           Type = rep(c('Batch', 'Treatment'), each = 7))
 
+# reorder levels
 ad.pvca.prop$Method <- factor(ad.pvca.prop$Method, levels = unique(ad.pvca.prop$Method))
 
 ggplot(data = ad.pvca.prop, aes(x = Method, y = prop, fill = Type)) + 
@@ -1477,7 +1531,6 @@ Finally we assess the quality of the clusters, based on either batch or treatmen
 The average silhouette coefficient width across all samples in one group (batch $\bar{s}_{b}$ or treatment $\bar{s}_{t}$) is calculated and plotted here. If $\bar{s}_{b}$ is close to $0$ there is no batch effect, and if $\bar{s}_{t}$ is close to $1$ or $-1$ there is a treatment effect.  
 
 ```{r}
-###################
 # Sponge data
 sponge.silh.before <- calc.sil(sponge.pca.before$variates$X, 
                               y1 = sponge.batch, y2 = sponge.trt, 
@@ -1531,7 +1584,6 @@ $\bar{s}_{b}$ of different batches in sponge data decreased to $0$ after correct
 We also calculate the silhouette coefficients for AD data.
 
 ```{r}
-############
 # AD data
 ad.silh.before <- calc.sil(ad.pca.before$variates$X, y1 = ad.batch, 
                           y2 = ad.trt, name.y1 = 'Batch', name.y2 = 'Treatment')

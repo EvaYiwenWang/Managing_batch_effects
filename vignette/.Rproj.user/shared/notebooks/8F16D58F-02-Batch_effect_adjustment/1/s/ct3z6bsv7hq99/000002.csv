@@ -1,0 +1,748 @@
+"0","ad.trt_q = p.adjust(ad.trt_p,method = 'fdr')"
+"0","# HD data"
+"0","hd.trt_p <- apply(hd.tss.clr, 2, FUN = function(x){"
+"0","  res.lmm <- lmer(x ~ hd.trt + 1|hd.batch)"
+"0","  summary.res = summary(res.lmm)"
+"0","  p = summary.res$coefficients[1,5]"
+"0","})"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.6e-05"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.1e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.3e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -5.7e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.7e-06"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -1.1e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.5e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -8.2e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.5e-05"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -1.7e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.1e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.1e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.2e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.0e-03"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.5e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -6.9e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.4e-06"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -9.2e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.4e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -2.1e-05"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -5.7e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.2e-04"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -3.4e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.4e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -7.0e-05"
+"2","Model failed to converge with max|grad| = 0.00319245 (tol = 0.002, component 1)"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -2.2e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.8e-03"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.5e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -6.6e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.5e-05"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.1e-04"
+"2","singular fit
+"
+"2","Model failed to converge with max|grad| = 0.00648134 (tol = 0.002, component 1)"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.8e-03"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.2e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.3e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.1e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -7.0e-01"
+"2","singular fit
+"
+"2","Model failed to converge with max|grad| = 0.0059279 (tol = 0.002, component 1)"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -6.9e-06"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -8.3e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.4e-03"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -5.6e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.3e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.3e-03"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.7e-05"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.0e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -5.8e-05"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -2.3e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.9e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -6.1e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.5e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.2e-06"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.5e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.7e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.1e-05"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -1.4e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.6e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.8e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.0e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.9e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.6e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.8e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.3e-03"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -1.4e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -1.3e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -2.6e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.1e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -8.3e-04"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -4.6e-03"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.7e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with max|grad| = 0.00249567 (tol = 0.002, component 1)"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.0e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -1.3e-03"
+"2","singular fit
+"
+"2","Model is nearly unidentifiable: large eigenvalue ratio
+ - Rescale variables?"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -5.1e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.2e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.4e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.7e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.0e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -4.1e-03"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.4e-04"
+"2","singular fit
+"
+"2","Model failed to converge with max|grad| = 0.00589296 (tol = 0.002, component 1)"
+"2","Model failed to converge with max|grad| = 0.0418545 (tol = 0.002, component 1)"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.7e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -3.9e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -1.9e-01"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -3.6e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -9.3e-03"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.9e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.4e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.6e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.5e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -9.9e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -3.9e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.3e-03"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -1.6e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -1.1e-03"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -1.8e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -9.1e-04"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -2.1e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with max|grad| = 0.00218739 (tol = 0.002, component 1)"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -9.9e-03"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -3.3e-04"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -6.4e-05"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -6.0e-04"
+"2","unable to evaluate scaled gradient"
+"2","Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"
+"2","Model failed to converge with 1 negative eigenvalue: -8.8e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -6.4e-04"
+"2","singular fit
+"
+"2","Model failed to converge with 1 negative eigenvalue: -2.2e-04"
+"2","singular fit
+"
+"0","hd.trt_q = p.adjust(hd.trt_p,method = 'fdr')"

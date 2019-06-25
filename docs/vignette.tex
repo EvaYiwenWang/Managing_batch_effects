@@ -125,7 +125,7 @@
   \postauthor{\par}
       \predate{\centering\large\emph}
   \postdate{\par}
-    \date{2019-06-21}
+    \date{2019-06-25}
 
 \usepackage{booktabs}
 \usepackage{amsthm}
@@ -146,7 +146,7 @@
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0.5pt}
 \lhead{\includegraphics[width=10cm,height=1.5cm]{logo-unimelb}}
-\cfoot{\scriptsize PhD CONFIRMATION REPORT | School of Math \& Stats, Melbourne Integrative Genomics, University of Melbourne}
+\cfoot{\scriptsize Vignette | School of Math \& Stats, Melbourne Integrative Genomics, University of Melbourne}
 \rfoot{\scriptsize \thepage}
 \fancyhead[R]{\slshape\leftmark}
 \fancypagestyle{plain}{\pagestyle{fancy}}
@@ -165,11 +165,12 @@
 effects}\label{examples-of-microbiome-studies-with-batch-effects}
 
 This vignette provides all the analyses performed in the paper `Managing
-Batch Effects in Microbiome Data'.
+Batch Effects in Microbiome Data' by Yiwen Wang and Kim-Anh Lê Cao.
 
 \textbf{Packages installation and loading}
 
-First, you will need to install then load the following packages:
+First, you will need to install then load the following packages from
+the CRAN and Bioconductor:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -216,7 +217,14 @@ concentration. The authors concluded that differences in bacterial
 profiles were not only due to tissue variation (the main effect of
 interest), but also because the samples were run on two separate
 denaturing gradient gels during processing. Gel thus acted as a
-technical batch effect as described in Table 1.
+technical batch effect as described in Table 1 below.
+
+\textbf{Table 1. Overview of exemplar datasets with batch effects.} We
+considered microbiome studies from sponge \emph{Aplysina aerophoba};
+organic matter in anaerobic digestion (AD) and mice models with
+Huntington's disease (HD).
+
+\begin{center}\includegraphics{figures/table} \end{center}
 
 \subsection{Anaerobic digestion study}\label{anaerobic-digestion-study}
 
@@ -286,7 +294,8 @@ counts, with no offset.
 
 \section{Data processing}\label{data-processing}
 
-\textbf{Data processing steps for microbiome data}:
+Here are the processing steps for the \textbf{raw count} microbiome
+data:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -295,18 +304,19 @@ counts, with no offset.
   Prefilter the count data to remove features with excess zeroes across
   all samples\\
 \item
-  Add an offset of 1 to the whole data matrix\\
+  Add an offset of 1 to the whole data matrix --- note that this is not
+  ideal but provides a pracitical way to handle zero counts.\\
 \item
   Total Sum Scaling transformation\\
 \item
-  Log-ratio transformation
+  Log-ratio transformation with Centered Log Ratio (CLR)
 \end{enumerate}
 
 \subsection{Prefiltering}\label{prefiltering}
 
 We use a prefiltering step to remove OTUs for which the sum of counts
 are below a set threshold (0.01\%) compared to the total sum of all
-counts from \citep{arumugam2011enterotypes}.
+counts \citep{arumugam2011enterotypes}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -324,7 +334,6 @@ counts from \citep{arumugam2011enterotypes}.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# hd data}
-\CommentTok{#hd.index.keep <- which(colSums(hd.count)*100/(sum(colSums(hd.count))) > 0.001)}
 \NormalTok{hd.count.keep <-}\StringTok{ }\NormalTok{hd.count}
 \KeywordTok{dim}\NormalTok{(hd.count.keep)}
 \end{Highlighting}
@@ -334,20 +343,18 @@ counts from \citep{arumugam2011enterotypes}.
 ## [1]  13 368
 \end{verbatim}
 
-Compared with the raw counts, many OTUs below the threshold are removed.
-As HD data are small part of a big dataset and only have 13 samples, it
-is too strict to use the threshold 0.01\% to filter the OTUs. We then
-maintained all the OTUs in HD data.
+\textbf{Note:} The HD data only include 13 samples, which are a small
+part of a big dataset that has already been prefiltered. We retained all
+the OTUs in the data and did not redo the prefiltering again.
 
 \subsection{Total sum scaling}\label{total-sum-scaling}
 
 Now, let's apply a TSS scaling on the filtered data:
 
-\textbf{Note:} We need to add an offset of 1 to all count data
-(i.e.~count data = count.keep + 1). Although sponge data are already TSS
-data, a `tiny' offset is added and then TSS is redone. Because the
-presence of zeroes will make the next step (log-ratio transformation)
-impossible.
+\textbf{Note:} We need to add an offset of 1 to all count data to handle
+zeroes for the CLR transformation. As the sponge data were already TSS
+scaled, a small offset is added in this specific case. However, we
+recommend starting from the raw count (not TSS) for those analyses.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -362,18 +369,8 @@ impossible.
 \end{Highlighting}
 \end{Shaded}
 
-We then check the library size that sums to 1 for each sample. We now
-have compositional data.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# sponge data}
-\NormalTok{sponge.lib.size.tss <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(sponge.tss, }\DecValTok{1}\NormalTok{, sum)}
-\KeywordTok{barplot}\NormalTok{(sponge.lib.size.tss, }\DataTypeTok{main =}  \StringTok{'Sponge data'}\NormalTok{, }\DataTypeTok{las =} \DecValTok{2}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-5-1.pdf}
+We then check the library size that sums to 1 for each sample for the AD
+and HD data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -383,7 +380,7 @@ have compositional data.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-5-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-5-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -393,16 +390,16 @@ have compositional data.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-5-3.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-5-2.pdf}
 
 \subsection{Centered log-ratio
 transformation}\label{centered-log-ratio-transformation}
 
-TSS results in compositional data (or proportions) that are restricted
-to a space where the sum of all OTU proportions for a given sample sums
-to 1. Using standard statistical methods on such data may lead to
-spurious results and therefore the data must be further transformed. The
-CLR is the transformation of choice.
+Microbiome data are compostional, and not only because of the TSS
+transformation. The data are restricted to a space where the sum of all
+OTU proportions for a given sample sums to 1. Using standard statistical
+methods on such data may lead to spurious results and therefore the data
+must be further transformed. The CLR is the transformation of choice.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -423,13 +420,6 @@ CLR is the transformation of choice.
 The final TSS-CLR data of sponge study, AD study and HD study contain 32
 samples and 24 OTUs, 75 samples and 231 OTUs, 13 samples and 368 OTUs,
 respectively as described in Table 1.
-
-\textbf{Table 1. Overview of exemplar datasets with batch effects.} We
-considered microbiome studies from sponge \emph{Aplysina aerophoba};
-organic matter in anaerobic digestion (AD) and mice models with
-Huntington's disease (HD).
-
-\begin{center}\includegraphics{figures/table} \end{center}
 
 \chapter{Batch effect detection}\label{detect}
 
@@ -561,8 +551,9 @@ batch effects serve as a major source of variation.
 
 \includegraphics{vignette_files/figure-latex/unnamed-chunk-11-2.pdf}
 
-For the abundance of OTU9, the samples within different batches are very
-distinct, indicating a strong batch effect in sponge data.
+For the proportional abundance of OTU9, the samples within different
+batches are very distinct, indicating a strong batch effect in sponge
+data.
 
 Assuming the data fit the distribution of the linear model (which is the
 case here after CLR transformation), we can also assess the effect of
@@ -738,8 +729,8 @@ unable to exclude treatment influence.
 \section{RLE plots}\label{rle-plots}
 
 RLE plots can be plotted using `RleMicroRna' in R package `AgiMicroRna'.
-Here, we made some changes on the function `RleMicroRna', thus we call
-it `RleMicroRna2'.
+Here, we made some changes on the function `RleMicroRna', called
+`RleMicroRna2' and available on our extra functions `Functions.R'.
 
 RLE plots are based on the assumption that the majority of microbial
 variables are unaffected by the effect of interest, and therefore any
@@ -949,9 +940,8 @@ from other samples, also indicating a batch effect.
 
 \includegraphics{vignette_files/figure-latex/unnamed-chunk-23-1.pdf}
 
-The batch effect in HD data is not very obviously visualised through
-heatmap, because there is no batch with samples clustered together and
-separated from other samples.
+The batch effect in HD data is not obvious in this heatmap, as we
+observe not clustering according to batch.
 
 \chapter{Batch effect adjustment}\label{adjust}
 
@@ -974,8 +964,7 @@ CLR transformation.
 We fit a linear model with effect of interest and batch effect for each
 OTU in both sponge and AD data. The P-value for the regression
 coefficient associated with the \emph{effect of interest} in a linear
-model is then extracted and multiple testing corrected with ``FDR''. We
-name the adjusted P-values as Q-values.
+model is then extracted and multiple testing corrected with ``FDR''.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -986,7 +975,7 @@ name the adjusted P-values as Q-values.
 \NormalTok{  p <-}\StringTok{ }\NormalTok{summary.res}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{]}
 \NormalTok{\})}
 
-\NormalTok{sponge.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
+\NormalTok{sponge.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
 
 \CommentTok{# AD data}
 \NormalTok{ad.trt_p <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(ad.tss.clr, }\DecValTok{2}\NormalTok{, }\DataTypeTok{FUN =} \ControlFlowTok{function}\NormalTok{(x)\{}
@@ -995,7 +984,7 @@ name the adjusted P-values as Q-values.
 \NormalTok{  p <-}\StringTok{ }\NormalTok{summary.res}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{]}
 \NormalTok{\})}
 
-\NormalTok{ad.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
+\NormalTok{ad.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1011,15 +1000,15 @@ mixed model considering batch (cage) as random effects.
 \NormalTok{  p <-}\StringTok{ }\NormalTok{summary.res}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{2}\NormalTok{,}\DecValTok{5}\NormalTok{]}
 \NormalTok{\})}
 
-\NormalTok{hd.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
+\NormalTok{hd.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \subsection{SVA}\label{sva}
 
-SVA can account for unknown batch effects. But it is univariate, relies
-on a Gaussian likelihood assumption and implicitly introduces a
-correlation between treatment and batch.
+SVA can account for unknown batch effects, but is a univariate approach
+that relies on a Gaussian likelihood assumption and implicitly
+introduces a correlation between treatment and batch.
 
 The \emph{sva} function performs two different steps. First it
 identifies the number of latent factors that need to be estimated. The
@@ -1066,7 +1055,7 @@ for each OTU of sponge data.
 \NormalTok{sponge.mod0.bat <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(sponge.mod0, sponge.sva}\OperatorTok{$}\NormalTok{sv)}
 
 \NormalTok{sponge.sva.trt_p <-}\StringTok{ }\KeywordTok{f.pvalue}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.tss.clr), sponge.mod.bat, sponge.mod0.bat)}
-\NormalTok{sponge.sva.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.sva.trt_p, }\DataTypeTok{method=}\StringTok{'fdr'}\NormalTok{)}
+\NormalTok{sponge.sva.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.sva.trt_p, }\DataTypeTok{method=}\StringTok{'fdr'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1095,7 +1084,7 @@ We also apply SVA on both AD and HD data.
 \NormalTok{ad.mod.bat <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(ad.mod, ad.sva}\OperatorTok{$}\NormalTok{sv)}
 \NormalTok{ad.mod0.bat <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(ad.mod0, ad.sva}\OperatorTok{$}\NormalTok{sv)}
 \NormalTok{ad.sva.trt_p <-}\StringTok{ }\KeywordTok{f.pvalue}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.tss.clr), ad.mod.bat, ad.mod0.bat)}
-\NormalTok{ad.sva.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.sva.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
+\NormalTok{ad.sva.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.sva.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
 
 \CommentTok{# hd data}
 \NormalTok{hd.mod <-}\StringTok{ }\KeywordTok{model.matrix}\NormalTok{( }\OperatorTok{~}\StringTok{ }\NormalTok{hd.trt)}
@@ -1115,20 +1104,20 @@ We also apply SVA on both AD and HD data.
 \NormalTok{hd.mod.bat <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(hd.mod, hd.sva}\OperatorTok{$}\NormalTok{sv)}
 \NormalTok{hd.mod0.bat <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(hd.mod0, hd.sva}\OperatorTok{$}\NormalTok{sv)}
 \NormalTok{hd.sva.trt_p <-}\StringTok{ }\KeywordTok{f.pvalue}\NormalTok{(}\KeywordTok{t}\NormalTok{(hd.tss.clr), hd.mod.bat, hd.mod0.bat)}
-\NormalTok{hd.sva.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.sva.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
+\NormalTok{hd.sva.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.sva.trt_p, }\DataTypeTok{method =} \StringTok{'fdr'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \subsection{RUV2}\label{ruv2}
 
-RUV2 estimates and accounts for unknown batch effects. But it needs
-negative control variables that are affected by batch effects but not
-treatment effects.
+RUV2 estimates and accounts for unknown batch effects, but the method
+requires negative control variables that are affected by batch effects
+but not treatment effects.
 
-In the real world, we design negative control variables that are not
-affected by treatment effects only, we are not sure but assume these
-controls are affected by batch effects. RUV2 can only account for the
-difference captured by these controls.
+Practically, negative control variables are chosen prior during the
+experimental design so that they are not affected by treatments (and
+assume they are affected by batch effects). RUV2 can only account for
+the difference captured by these controls.
 
 Since our three datasets do not have negative control variables, we use
 a linear model (or linear mixed model) to identify OTUs that are not
@@ -1137,19 +1126,17 @@ control variables} to fit the assumptions of RUV2. The P-values of
 treatment effects calculated in section `linear model and linear mixed
 model' are therefore used here.
 
-\textbf{Note:} it is not an optimal way to use \emph{pseudo negative
-control variables}. Negative control variables should be known and
-designed before the experiment. The reason we obtained controls using
-this way is just to fit the assumption and demonstrate hwo to use RUV
-series.
+\textbf{Note:} This analysis is not optimal as we use \emph{pseudo
+negative control variables}, but we wish to provide this as a practical
+example.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# sponge data}
-\NormalTok{sponge.nc <-}\StringTok{ }\NormalTok{sponge.trt_q }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
+\NormalTok{sponge.nc <-}\StringTok{ }\NormalTok{sponge.trt_adjp }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
 
 \CommentTok{# AD data}
-\NormalTok{ad.nc <-}\StringTok{ }\NormalTok{ad.trt_q }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
+\NormalTok{ad.nc <-}\StringTok{ }\NormalTok{ad.trt_adjp }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
 
 \CommentTok{# HD data}
 \NormalTok{hd.nc <-}\StringTok{ }\NormalTok{hd.trt_p }\OperatorTok{>}\StringTok{ }\FloatTok{0.05}
@@ -1158,15 +1145,12 @@ series.
 
 \textbf{Note:} In HD data, there is no OTU having statistically
 siginificant difference between genotypes. We use P-values instead of
-adjusted P-values (Q-values) to set the negative controls, otherwise,
-all the OTUs would be negative controls.
+adjusted P-values to set the negative controls.
 
 We then apply the \emph{RUV2} function. This function needs to specify
-the number of unwanted factors (components of negative controls). We
-therefore specify k = 3, but the number is very subjective and can be
-changed to any number. After that, we extract the P-values of treatment
-effects considering unwanted batch effects and then Q-values after FDR
-adjustment.
+the number of unwanted factors (components of negative controls), which
+we arbitrarily set to k = 3. We then extract the P-values of treatment
+effects considering unwanted batch effects after FDR adjustment.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1174,19 +1158,19 @@ adjustment.
 \NormalTok{sponge.ruv2 <-}\StringTok{ }\KeywordTok{RUV2}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ sponge.tss.clr, }\DataTypeTok{X =}\NormalTok{ sponge.trt, }
                     \DataTypeTok{ctl =}\NormalTok{ sponge.nc, }\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\CommentTok{# k is subjective}
 \NormalTok{sponge.ruv2.trt_p <-}\StringTok{ }\NormalTok{sponge.ruv2}\OperatorTok{$}\NormalTok{p}
-\NormalTok{sponge.ruv2.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.ruv2.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+\NormalTok{sponge.ruv2.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.ruv2.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 
 \CommentTok{# AD data}
 \NormalTok{ad.ruv2 <-}\StringTok{ }\KeywordTok{RUV2}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ ad.tss.clr, }\DataTypeTok{X =}\NormalTok{ ad.trt, }
                 \DataTypeTok{ctl =}\NormalTok{ ad.nc, }\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\CommentTok{# k is subjective}
 \NormalTok{ad.ruv2.trt_p <-}\StringTok{ }\NormalTok{ad.ruv2}\OperatorTok{$}\NormalTok{p}
-\NormalTok{ad.ruv2.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.ruv2.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+\NormalTok{ad.ruv2.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.ruv2.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 
 \CommentTok{# HD data}
 \NormalTok{hd.ruv2 <-}\StringTok{ }\KeywordTok{RUV2}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ hd.tss.clr, }\DataTypeTok{X =}\NormalTok{ hd.trt, }
                 \DataTypeTok{ctl =}\NormalTok{ hd.nc, }\DataTypeTok{k =} \DecValTok{3}\NormalTok{) }\CommentTok{# k is subjective}
 \NormalTok{hd.ruv2.trt_p <-}\StringTok{ }\NormalTok{hd.ruv2}\OperatorTok{$}\NormalTok{p}
-\NormalTok{hd.ruv2.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.ruv2.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+\NormalTok{hd.ruv2.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.ruv2.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1196,12 +1180,12 @@ RUV4 is an updated version of RUV2 that uses negative control variables
 and the residual matrix that has no treatment effect to estimate
 unwanted batch effects.
 
-\emph{RUV4} also needs to specify the number of unwanted factors as
-\emph{RUV2}, and here we use a function called \emph{getK} to estimate
-this number. This function is only for \emph{RUV4} and the estimated k
-is not always suitable. If the estimated k is 0, k can be forced to 1
-and still to account for unwanted variation captured from negative
-controls.
+\emph{RUV4} also requires to specify the number of unwanted factors as
+\emph{RUV2}, which we estimate with the function \emph{`getK'} (from the
+\emph{ruv} package). This function is only for \emph{RUV4} and the
+estimated k is not always suitable. If the estimated k is 0, k can be
+set to 1 instead to account for unwanted variation captured from
+negative controls.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1211,7 +1195,7 @@ controls.
 \NormalTok{sponge.k <-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(sponge.k }\OperatorTok{!=}\DecValTok{0}\NormalTok{, sponge.k, }\DecValTok{1}\NormalTok{)}
 \NormalTok{sponge.ruv4 <-}\StringTok{ }\KeywordTok{RUV4}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ sponge.tss.clr, }\DataTypeTok{X =}\NormalTok{ sponge.trt, }\DataTypeTok{ctl =}\NormalTok{ sponge.nc, }\DataTypeTok{k =}\NormalTok{ sponge.k) }
 \NormalTok{sponge.ruv4.trt_p <-}\StringTok{ }\NormalTok{sponge.ruv4}\OperatorTok{$}\NormalTok{p}
-\NormalTok{sponge.ruv4.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.ruv4.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+\NormalTok{sponge.ruv4.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(sponge.ruv4.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 
 \CommentTok{# AD data}
 \NormalTok{ad.k.obj <-}\StringTok{ }\KeywordTok{getK}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ ad.tss.clr, }\DataTypeTok{X =}\NormalTok{ ad.trt, }\DataTypeTok{ctl =}\NormalTok{ ad.nc)}
@@ -1219,7 +1203,7 @@ controls.
 \NormalTok{ad.k <-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(ad.k }\OperatorTok{!=}\DecValTok{0}\NormalTok{, ad.k, }\DecValTok{1}\NormalTok{)}
 \NormalTok{ad.ruv4 <-}\StringTok{ }\KeywordTok{RUV4}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ ad.tss.clr, }\DataTypeTok{X =}\NormalTok{ ad.trt, }\DataTypeTok{ctl =}\NormalTok{ ad.nc, }\DataTypeTok{k =}\NormalTok{ ad.k) }
 \NormalTok{ad.ruv4.trt_p <-}\StringTok{ }\NormalTok{ad.ruv4}\OperatorTok{$}\NormalTok{p}
-\NormalTok{ad.ruv4.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.ruv4.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+\NormalTok{ad.ruv4.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(ad.ruv4.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 
 \CommentTok{# HD data}
 \NormalTok{hd.k.obj <-}\StringTok{ }\KeywordTok{getK}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ hd.tss.clr, }\DataTypeTok{X =}\NormalTok{ hd.trt, }\DataTypeTok{ctl =}\NormalTok{ hd.nc)}
@@ -1227,7 +1211,7 @@ controls.
 \NormalTok{hd.k <-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(hd.k }\OperatorTok{!=}\DecValTok{0}\NormalTok{, hd.k, }\DecValTok{1}\NormalTok{)}
 \NormalTok{hd.ruv4 <-}\StringTok{ }\KeywordTok{RUV4}\NormalTok{(}\DataTypeTok{Y =}\NormalTok{ hd.tss.clr, }\DataTypeTok{X =}\NormalTok{ hd.trt, }\DataTypeTok{ctl =}\NormalTok{ hd.nc, }\DataTypeTok{k =}\NormalTok{ hd.k) }
 \NormalTok{hd.ruv4.trt_p <-}\StringTok{ }\NormalTok{hd.ruv4}\OperatorTok{$}\NormalTok{p}
-\NormalTok{hd.ruv4.trt_q <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.ruv4.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
+\NormalTok{hd.ruv4.trt_adjp <-}\StringTok{ }\KeywordTok{p.adjust}\NormalTok{(hd.ruv4.trt_p, }\DataTypeTok{method=}\StringTok{"fdr"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1246,9 +1230,10 @@ variables associated with the treatment effect.
 
 \subsection{BMC (batch mean centering)}\label{bmc-batch-mean-centering}
 
-We centers data within a batch across all variables. As a result, each
-batch mean is standardised to zero. The disadvantages of BMC are it is
-univariate and not optimal for non-Gaussian distributed microbiome data.
+We center data within a batch across all variables. As a result, each
+batch mean is standardised to zero. BMC has several disadvantages: it is
+a univariate method and it is not optimal for non-Gaussian distributed
+microbiome data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1257,8 +1242,11 @@ univariate and not optimal for non-Gaussian distributed microbiome data.
 \NormalTok{sponge.b2 <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.tss.clr[sponge.batch }\OperatorTok{==}\StringTok{ }\DecValTok{2}\NormalTok{, ], }\DataTypeTok{center =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{scale =} \OtherTok{FALSE}\NormalTok{)}
 \NormalTok{sponge.bmc <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(sponge.b1, sponge.b2)}
 \NormalTok{sponge.bmc <-}\StringTok{ }\NormalTok{sponge.bmc[}\KeywordTok{rownames}\NormalTok{(sponge.tss.clr), ]}
+\end{Highlighting}
+\end{Shaded}
 
-\NormalTok{##############}
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# AD data}
 \NormalTok{ad.b1 <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.tss.clr[ad.batch }\OperatorTok{==}\StringTok{ '09/04/2015'}\NormalTok{, ], }\DataTypeTok{center =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{scale =} \OtherTok{FALSE}\NormalTok{)}
 \NormalTok{ad.b2 <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.tss.clr[ad.batch }\OperatorTok{==}\StringTok{ '14/04/2016'}\NormalTok{, ], }\DataTypeTok{center =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{scale =} \OtherTok{FALSE}\NormalTok{)}
@@ -1272,10 +1260,10 @@ univariate and not optimal for non-Gaussian distributed microbiome data.
 
 \subsection{ComBat}\label{combat}
 
-ComBat works on known and systematic batch effects. If the treatment
+ComBat requires known and systematic batch effects. If the treatment
 information is known, the option \emph{mod} can be fitted with a full
 model having treatment informationn to efficiently maintain enough
-treatment variation, like what we do here on sponge and AD data. The
+treatment variation (see examples below for sponge and AD data). The
 \emph{mod} can also be NULL if the treatment information is unknown.
 
 \begin{Shaded}
@@ -1312,7 +1300,6 @@ treatment variation, like what we do here on sponge and AD data. The
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{##############}
 \CommentTok{# AD data}
 \NormalTok{ad.combat <-}\StringTok{ }\KeywordTok{t}\NormalTok{(}\KeywordTok{ComBat}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.tss.clr), }\DataTypeTok{batch =}\NormalTok{ ad.batch, }
                       \DataTypeTok{mod =}\NormalTok{ ad.mod, }\DataTypeTok{par.prior =}\NormalTok{ F, }\DataTypeTok{prior.plots =}\NormalTok{ F))}
@@ -1360,8 +1347,11 @@ the same as option \emph{mod} in ComBat.
 \CommentTok{# Sponge data}
 \NormalTok{sponge.limma <-}\StringTok{ }\KeywordTok{t}\NormalTok{(}\KeywordTok{removeBatchEffect}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.tss.clr), }\DataTypeTok{batch =}\NormalTok{ sponge.batch, }
                                     \DataTypeTok{design =}\NormalTok{ sponge.mod))}
+\end{Highlighting}
+\end{Shaded}
 
-\NormalTok{#############}
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{ad.limma <-}\StringTok{ }\KeywordTok{t}\NormalTok{(}\KeywordTok{removeBatchEffect}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.tss.clr), }\DataTypeTok{batch =}\NormalTok{ ad.batch, }
                                 \DataTypeTok{design =}\NormalTok{ ad.mod))}
 \end{Highlighting}
@@ -1373,10 +1363,9 @@ FAbatch is a combination of location-scale adjustment and factor
 analysis. We fit \emph{y} with the treatment information and
 \emph{batch} with batch information. Since this method only accepts
 numeric variables, the levels of variables are changed to be numeric
-(e.g. `1', `2' and so on). However, FAbatch is unable to converge on
-both sponge data and AD data. This may influence the effect of batch
-correction. We therefore do not compare the results from FAbatch with
-those from other methods.
+(e.g. `1', `2' and so on). However, on our example, FAbatch did not
+converge, potentially leading to suboptimal results. We therefore did
+not compare the results from FAbatch with those from other methods.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1394,9 +1383,9 @@ those from other methods.
 \end{Highlighting}
 \end{Shaded}
 
-\subsection{percentile normalisation}\label{percentile-normalisation}
+\subsection{Percentile normalisation}\label{percentile-normalisation}
 
-Percentile normalisation (PN) is developed for microbiome data
+Percentile normalisation (PN) was developed for microbiome data
 integration. For each batch, it transforms the relative abundance of
 control samples to their own percentiles while converting the relative
 abundance of case samples into the percentiles of their corresponding
@@ -1406,6 +1395,7 @@ percentiles rather than the original values.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{# sponge data}
 \NormalTok{sponge.percentile <-}\StringTok{ }\KeywordTok{percentile_norm}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ sponge.tss, }\DataTypeTok{batch =}\NormalTok{ sponge.batch, }
                                     \DataTypeTok{trt =}\NormalTok{ sponge.trt)}
 
@@ -1418,29 +1408,30 @@ percentiles rather than the original values.
 \subsection{SVD-based method}\label{svd-based-method}
 
 We center and scale the data before SVD. After SVD, we deflate the first
-component, which has the highest variation and is assumed to related to
-batch effects.
+component, which has the highest variation and is assumed to be related
+to batch effects.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# sponge data}
-\NormalTok{sponge.sd <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(sponge.tss.clr, }\DecValTok{2}\NormalTok{, sd)}
-\NormalTok{sponge.mean <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(sponge.tss.clr, }\DecValTok{2}\NormalTok{, mean)}
-\NormalTok{sponge.X <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.tss.clr, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T)}
+\NormalTok{sponge.sd <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(sponge.tss.clr, }\DecValTok{2}\NormalTok{, sd) }\CommentTok{# calculate standard deviation}
+\NormalTok{sponge.mean <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(sponge.tss.clr, }\DecValTok{2}\NormalTok{, mean) }\CommentTok{# calculate mean}
+\NormalTok{sponge.X <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.tss.clr, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# center and scale}
 
-\NormalTok{sponge.m <-}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(sponge.X)}
-\NormalTok{sponge.m.svd <-}\StringTok{ }\KeywordTok{svd}\NormalTok{(sponge.m)}
-\CommentTok{#barplot(sponge.m.svd$d)}
+\NormalTok{sponge.m <-}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(sponge.X) }\CommentTok{# generate a square matrix}
+\NormalTok{sponge.m.svd <-}\StringTok{ }\KeywordTok{svd}\NormalTok{(sponge.m) }\CommentTok{# SVD }
+\CommentTok{# barplot(sponge.m.svd$d)}
 
-\NormalTok{sponge.a1 <-}\StringTok{ }\NormalTok{sponge.m.svd}\OperatorTok{$}\NormalTok{u[ ,}\DecValTok{1}\NormalTok{]}
+\CommentTok{# extract 1st singular vectors}
+\NormalTok{sponge.a1 <-}\StringTok{ }\NormalTok{sponge.m.svd}\OperatorTok{$}\NormalTok{u[ ,}\DecValTok{1}\NormalTok{] }
 \NormalTok{sponge.b1 <-}\StringTok{ }\NormalTok{sponge.m.svd}\OperatorTok{$}\NormalTok{v[ ,}\DecValTok{1}\NormalTok{]}
 
-\CommentTok{# component 1}
+\CommentTok{# deflate component 1 from the data}
 \NormalTok{sponge.t1 <-}\StringTok{ }\NormalTok{sponge.X }\OperatorTok{%*%}\StringTok{ }\NormalTok{sponge.a1 }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(sponge.a1)))}
 \NormalTok{sponge.c1 <-}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(sponge.X, sponge.t1) }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(sponge.t1))}
 \NormalTok{sponge.svd.defl.matrix1  <-}\StringTok{ }\NormalTok{sponge.X }\OperatorTok{-}\StringTok{ }\NormalTok{sponge.t1 }\OperatorTok{%*%}\StringTok{ }\KeywordTok{t}\NormalTok{(sponge.c1)}
 
-\NormalTok{## add back mean and variance}
+\CommentTok{# add back mean and standard deviation}
 \NormalTok{sponge.svd <-}\StringTok{ }\NormalTok{sponge.svd.defl.matrix1}
 \NormalTok{sponge.svd[}\DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(sponge.svd), }\DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(sponge.svd)] =}\StringTok{ }\OtherTok{NA}
 \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(sponge.svd.defl.matrix1))\{}
@@ -1448,26 +1439,30 @@ batch effects.
 \NormalTok{    sponge.svd[j,i] =}\StringTok{ }\NormalTok{sponge.svd.defl.matrix1[j,i]}\OperatorTok{*}\NormalTok{sponge.sd[i] }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.mean[i]}
 \NormalTok{  \}}
 \NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
 
-
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# ad data}
-\NormalTok{ad.sd <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(ad.tss.clr, }\DecValTok{2}\NormalTok{, sd)}
-\NormalTok{ad.mean <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(ad.tss.clr, }\DecValTok{2}\NormalTok{, mean)}
-\NormalTok{ad.X <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.tss.clr,}\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T)}
+\NormalTok{ad.sd <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(ad.tss.clr, }\DecValTok{2}\NormalTok{, sd) }\CommentTok{# calculate standard deviation}
+\NormalTok{ad.mean <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(ad.tss.clr, }\DecValTok{2}\NormalTok{, mean) }\CommentTok{# calculate mean}
+\NormalTok{ad.X <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.tss.clr,}\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# center and scale}
 
-\NormalTok{ad.m <-}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(ad.X)}
-\NormalTok{ad.m.svd <-}\StringTok{ }\KeywordTok{svd}\NormalTok{(ad.m)}
-\CommentTok{#barplot(ad.m.svd$d)}
+\NormalTok{ad.m <-}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(ad.X) }\CommentTok{# generate a square matrix}
+\NormalTok{ad.m.svd <-}\StringTok{ }\KeywordTok{svd}\NormalTok{(ad.m) }\CommentTok{# SVD }
+\CommentTok{# barplot(ad.m.svd$d)}
 
+\CommentTok{# extract 1st singular vectors}
 \NormalTok{ad.a1 <-}\StringTok{ }\NormalTok{ad.m.svd}\OperatorTok{$}\NormalTok{u[ ,}\DecValTok{1}\NormalTok{]}
 \NormalTok{ad.b1 <-}\StringTok{ }\NormalTok{ad.m.svd}\OperatorTok{$}\NormalTok{v[ ,}\DecValTok{1}\NormalTok{]}
 
-\CommentTok{# component 1}
+\CommentTok{# deflate component 1 from the data}
 \NormalTok{ad.t1 <-}\StringTok{ }\NormalTok{ad.X }\OperatorTok{%*%}\StringTok{ }\NormalTok{ad.a1 }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(ad.a1)))}
 \NormalTok{ad.c1 <-}\StringTok{ }\KeywordTok{crossprod}\NormalTok{(ad.X, ad.t1) }\OperatorTok{/}\StringTok{ }\KeywordTok{drop}\NormalTok{(}\KeywordTok{crossprod}\NormalTok{(ad.t1))}
 \NormalTok{ad.svd.defl.matrix1  <-}\StringTok{ }\NormalTok{ad.X }\OperatorTok{-}\StringTok{ }\NormalTok{ad.t1 }\OperatorTok{%*%}\StringTok{ }\KeywordTok{t}\NormalTok{(ad.c1)}
 
-
+\CommentTok{# add back mean and standard deviation}
 \NormalTok{ad.svd <-}\StringTok{ }\NormalTok{ad.svd.defl.matrix1}
 \NormalTok{ad.svd[}\DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(ad.svd), }\DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(ad.svd)] =}\StringTok{ }\OtherTok{NA}
 \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(ad.svd.defl.matrix1))\{}
@@ -1481,8 +1476,8 @@ batch effects.
 \subsection{RUVIII}\label{ruviii}
 
 RUVIII needs not only negative control variables as RUV2 and RUV4, but
-also technical sample replicates. As only AD data have sample
-replicates, RUVIII is only applied on AD data.
+also technical sample replicates. As only AD data include sample
+replicates, we illustrate RUVIII on these data only.
 
 In contrast to RUV2 and RUV4, RUVIII is a multivariate method that
 accounts for the dependency between microbial variables, but it is
@@ -1556,7 +1551,7 @@ rBE: removeBatchEffect; SVD: singular value decomposition
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-42-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-46-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1565,7 +1560,7 @@ rBE: removeBatchEffect; SVD: singular value decomposition
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-42-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-46-2.pdf}
 
 In sponge data, SVD performed the worse, compared to BMC,
 removeBatchEffect and percentile normalisation, as it did not remove
@@ -1578,7 +1573,7 @@ batch effects but removed tissue variation instead.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-44-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-48-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1587,7 +1582,7 @@ batch effects but removed tissue variation instead.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-44-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-48-2.pdf}
 
 In AD data, BMC, removeBatchEffect, percentile normalisation and RUVIII
 removed the batch effects, and maintained the treatment effects. SVD did
@@ -1652,7 +1647,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-46-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-50-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1661,7 +1656,7 @@ plot}\label{density-plot-and-box-plot-1}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-46-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-50-2.pdf}
 
 From the boxplots of OTU9 in sponge data, the difference between two
 batches are removed by BMC, ComBat, removeBatchEffect and percentile
@@ -1670,7 +1665,7 @@ does not remove as much batch difference as the other methods.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{## density plot}
+\CommentTok{# density plot}
 \CommentTok{# before}
 \NormalTok{sponge.dens.before <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(sponge.before.df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ value, }\DataTypeTok{fill =}\NormalTok{ batch)) }\OperatorTok{+}\StringTok{ }
 \StringTok{  }\KeywordTok{geom_density}\NormalTok{(}\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{scale_fill_manual}\NormalTok{(}\DataTypeTok{values =} \KeywordTok{color.mixo}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{)) }\OperatorTok{+}\StringTok{ }
@@ -1726,7 +1721,7 @@ does not remove as much batch difference as the other methods.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-48-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-52-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1735,7 +1730,10 @@ does not remove as much batch difference as the other methods.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-48-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-52-2.pdf}
+
+We can also assess the effect of batch in a linear model before and
+after batch correction.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1767,6 +1765,9 @@ does not remove as much batch difference as the other methods.
 ## F-statistic: 10.66 on 2 and 29 DF,  p-value: 0.0003391
 \end{verbatim}
 
+Before correction, the batch effect is statistically significant (P
+\(<\) 0.001), as indicated in the \textbf{sponge.batch2} row.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{sponge.lm.bmc <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.bmc[ ,}\DecValTok{9}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
@@ -1794,127 +1795,34 @@ does not remove as much batch difference as the other methods.
 ## F-statistic: 0.1896 on 2 and 29 DF,  p-value: 0.8283
 \end{verbatim}
 
+After BMC correction, the batch effect is not statistically significant
+(P \(>\) 0.05), as indicated in the \textbf{sponge.batch2} row.
+
+The results from other batch correction methods are similar as BMC
+correction.
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{sponge.lm.combat <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.combat[ ,}\DecValTok{9}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
 \KeywordTok{summary}\NormalTok{(sponge.lm.combat)}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = sponge.combat[, 9] ~ sponge.trt + sponge.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.64583 -0.22414  0.05092  0.24065  0.88585 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)    1.46291    0.13491  10.844 1.02e-11 ***
-## sponge.trtE    0.09081    0.15578   0.583    0.564    
-## sponge.batch2 -0.16201    0.15578  -1.040    0.307    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.4406 on 29 degrees of freedom
-## Multiple R-squared:  0.04672,    Adjusted R-squared:  -0.01902 
-## F-statistic: 0.7107 on 2 and 29 DF,  p-value: 0.4996
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{sponge.lm.limma <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.limma[ ,}\DecValTok{9}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
 \KeywordTok{summary}\NormalTok{(sponge.lm.limma)}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = sponge.limma[, 9] ~ sponge.trt + sponge.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.87967 -0.24705  0.04588  0.24492  1.00757 
-## 
-## Coefficients:
-##                Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)   1.389e+00  1.497e-01   9.280 3.49e-10 ***
-## sponge.trtE   1.065e-01  1.729e-01   0.616    0.543    
-## sponge.batch2 2.355e-16  1.729e-01   0.000    1.000    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.489 on 29 degrees of freedom
-## Multiple R-squared:  0.01291,    Adjusted R-squared:  -0.05517 
-## F-statistic: 0.1896 on 2 and 29 DF,  p-value: 0.8283
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{sponge.lm.percentile <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.percentile[ ,}\DecValTok{9}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
 \KeywordTok{summary}\NormalTok{(sponge.lm.percentile)}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = sponge.percentile[, 9] ~ sponge.trt + sponge.batch)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -0.4531 -0.2070 -0.0625  0.1797  0.6562 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)    0.48438    0.09515   5.090 1.97e-05 ***
-## sponge.trtE   -0.17187    0.10987  -1.564    0.129    
-## sponge.batch2  0.03125    0.10987   0.284    0.778    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.3108 on 29 degrees of freedom
-## Multiple R-squared:  0.08018,    Adjusted R-squared:  0.01674 
-## F-statistic: 1.264 on 2 and 29 DF,  p-value: 0.2976
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{sponge.lm.svd <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.svd[ ,}\DecValTok{9}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
 \KeywordTok{summary}\NormalTok{(sponge.lm.svd)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## 
-## Call:
-## lm(formula = sponge.svd[, 9] ~ sponge.trt + sponge.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.82982 -0.27539  0.05228  0.28204  1.05932 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)     1.6433     0.1526  10.766 1.21e-11 ***
-## sponge.trtE     0.2817     0.1763   1.598  0.12085    
-## sponge.batch2  -0.6831     0.1763  -3.875  0.00056 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 0.4985 on 29 degrees of freedom
-## Multiple R-squared:  0.3773, Adjusted R-squared:  0.3344 
-## F-statistic: 8.787 on 2 and 29 DF,  p-value: 0.001039
-\end{verbatim}
-
-The results of density plots and P-values of batch effects from linear
-models reach a consesus with boxplots, the difference between two
-batches are removed by BMC, ComBat, removeBatchEffect and percentile
-normalisation correction. But percentile normalisation changes a lot of
-the distribution of samples from two batches.
+In sponge data, the results of density plots and P-values of batch
+effects from linear models reach a consesus with boxplots, the
+difference between two batches are removed by BMC, ComBat,
+removeBatchEffect and percentile normalisation correction. We observe
+that percentile normalisation modifies the distribution of the samples
+from the two batches.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1981,7 +1889,7 @@ the distribution of samples from two batches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-51-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-57-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1990,11 +1898,11 @@ the distribution of samples from two batches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-51-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-57-2.pdf}
 
 From the boxplots of OTU9 in AD data, the difference between five
 batches are removed by BMC, ComBat, removeBatchEffect and RUVIII
-correction. Among these methods, RUVIII does not remove as much batch
+correction. Among these methods, RUVIII did not remove as much batch
 difference as the other methods.
 
 \begin{Shaded}
@@ -2063,7 +1971,7 @@ difference as the other methods.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-53-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2072,7 +1980,10 @@ difference as the other methods.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-53-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-2.pdf}
+
+Similar as sponge data, we can also assess the batch effect in AD data
+using linear model.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2097,7 +2008,14 @@ difference as the other methods.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{#summary(ad.lm.before)}
+\end{Highlighting}
+\end{Shaded}
 
+Before correction, the batch effect is statistically significant (P
+\(<\) 0.001), as indicated in the \textbf{ad.batch} row.
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{ad.lm.bmc <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.bmc[ ,}\DecValTok{1}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
 \KeywordTok{anova}\NormalTok{(ad.lm.bmc)}
 \end{Highlighting}
@@ -2116,107 +2034,34 @@ difference as the other methods.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{#summary(ad.lm.bmc)}
-
-\NormalTok{ad.lm.combat <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.combat[ ,}\DecValTok{1}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
-\KeywordTok{anova}\NormalTok{(ad.lm.combat)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: ad.combat[, 1]
-##           Df  Sum Sq Mean Sq F value Pr(>F)
-## ad.trt     1  0.6695 0.66954  1.6980 0.1969
-## ad.batch   4  0.2373 0.05932  0.1504 0.9622
-## Residuals 69 27.2080 0.39432
-\end{verbatim}
+After BMC correction, the batch effect is not statistically significant
+(P \(>\) 0.05), as indicated in the \textbf{ad.batch} row.The results
+from other batch correction methods are similar as BMC correction.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{ad.lm.combat <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.combat[ ,}\DecValTok{1}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
+\KeywordTok{anova}\NormalTok{(ad.lm.combat)}
 \CommentTok{#summary(ad.lm.combat)}
 
 \NormalTok{ad.lm.limma <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.limma[ ,}\DecValTok{1}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
 \KeywordTok{anova}\NormalTok{(ad.lm.limma)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: ad.limma[, 1]
-##           Df Sum Sq Mean Sq F value Pr(>F)
-## ad.trt     1  0.704 0.70428   1.495 0.2256
-## ad.batch   4  0.000 0.00000   0.000 1.0000
-## Residuals 69 32.506 0.47110
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{#summary(ad.lm.limma)}
 
 \NormalTok{ad.lm.percentile <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.percentile[ ,}\DecValTok{1}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
 \KeywordTok{anova}\NormalTok{(ad.lm.percentile)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: ad.percentile[, 1]
-##           Df Sum Sq Mean Sq F value  Pr(>F)  
-## ad.trt     1 0.4670 0.46705  3.8934 0.05248 .
-## ad.batch   4 1.7037 0.42592  3.5506 0.01081 *
-## Residuals 69 8.2772 0.11996                  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{#summary(ad.lm.percentile)}
 
 \NormalTok{ad.lm.svd <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.svd[ ,}\DecValTok{1}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
 \KeywordTok{anova}\NormalTok{(ad.lm.svd)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: ad.svd[, 1]
-##           Df Sum Sq Mean Sq F value    Pr(>F)    
-## ad.trt     1  0.222  0.2218  0.4841    0.4889    
-## ad.batch   4 33.914  8.4784 18.5081 2.256e-10 ***
-## Residuals 69 31.608  0.4581                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{#summary(ad.lm.svd)}
 
 
 \NormalTok{ad.lm.ruv <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.ruvIII[ ,}\DecValTok{1}\NormalTok{] }\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch)}
 \KeywordTok{anova}\NormalTok{(ad.lm.ruv)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Response: ad.ruvIII[, 1]
-##           Df  Sum Sq Mean Sq F value  Pr(>F)  
-## ad.trt     1  2.1333 2.13330  5.4144 0.02291 *
-## ad.batch   4  2.0222 0.50554  1.2831 0.28512  
-## Residuals 69 27.1862 0.39400                  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{#summary(ad.lm.ruv)}
 \end{Highlighting}
 \end{Shaded}
@@ -2228,27 +2073,30 @@ correction.
 
 \subsection{RLE plots}\label{rle-plots-1}
 
+In sponge data, we group the samples according to the tissue (choanosome
+/ ectosome) and generate two RLE plots respectively in all datasets
+before and after batch correction with different methods:
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# sponge data}
-
-\NormalTok{###### BMC}
+\CommentTok{# BMC}
 \NormalTok{sponge.bmc_c <-}\StringTok{ }\NormalTok{sponge.bmc[sponge.trt }\OperatorTok{==}\StringTok{ 'C'}\NormalTok{, ]}
 \NormalTok{sponge.bmc_e <-}\StringTok{ }\NormalTok{sponge.bmc[sponge.trt }\OperatorTok{==}\StringTok{ 'E'}\NormalTok{, ] }
 
-\NormalTok{###### ComBat}
+\CommentTok{# ComBat}
 \NormalTok{sponge.combat_c <-}\StringTok{ }\NormalTok{sponge.combat[sponge.trt }\OperatorTok{==}\StringTok{ 'C'}\NormalTok{, ]}
 \NormalTok{sponge.combat_e <-}\StringTok{ }\NormalTok{sponge.combat[sponge.trt }\OperatorTok{==}\StringTok{ 'E'}\NormalTok{, ] }
 
-\NormalTok{###### rBE}
+\CommentTok{# rBE}
 \NormalTok{sponge.limma_c <-}\StringTok{ }\NormalTok{sponge.limma[sponge.trt }\OperatorTok{==}\StringTok{ 'C'}\NormalTok{, ]}
 \NormalTok{sponge.limma_e <-}\StringTok{ }\NormalTok{sponge.limma[sponge.trt }\OperatorTok{==}\StringTok{ 'E'}\NormalTok{, ] }
 
-\NormalTok{###### PN}
+\CommentTok{# PN}
 \NormalTok{sponge.percentile_c <-}\StringTok{ }\NormalTok{sponge.percentile[sponge.trt }\OperatorTok{==}\StringTok{ 'C'}\NormalTok{, ]}
 \NormalTok{sponge.percentile_e <-}\StringTok{ }\NormalTok{sponge.percentile[sponge.trt }\OperatorTok{==}\StringTok{ 'E'}\NormalTok{, ] }
 
-\NormalTok{###### SVD}
+\CommentTok{# SVD}
 \NormalTok{sponge.svd_c <-}\StringTok{ }\NormalTok{sponge.svd[sponge.trt }\OperatorTok{==}\StringTok{ 'C'}\NormalTok{, ]}
 \NormalTok{sponge.svd_e <-}\StringTok{ }\NormalTok{sponge.svd[sponge.trt }\OperatorTok{==}\StringTok{ 'E'}\NormalTok{, ] }
 \end{Highlighting}
@@ -2278,7 +2126,7 @@ correction.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-56-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-64-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2318,7 +2166,7 @@ consistent after ComBat correction.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-57-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-65-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2329,31 +2177,35 @@ consistent after ComBat correction.
 In tissue ectosome of sponge data, batch effect is not easily detected,
 but percentile normalisation increased batch variation.
 
+In AD data, we group the samples according to the inital phenol
+concentration (0-0.5 g/L / 1-2 g/L) and generate two RLE plots
+respectively in all datasets before and after batch correction, as
+sponge data:
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# ad data}
-
-\NormalTok{###### BMC}
+\CommentTok{# BMC}
 \NormalTok{ad.bmc_}\DecValTok{05}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.bmc[ad.trt }\OperatorTok{==}\StringTok{ '0-0.5'}\NormalTok{, ]}
 \NormalTok{ad.bmc_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.bmc[ad.trt }\OperatorTok{==}\StringTok{ '1-2'}\NormalTok{, ]}
 
-\NormalTok{###### ComBat}
+\CommentTok{# ComBat}
 \NormalTok{ad.combat_}\DecValTok{05}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.combat[ad.trt }\OperatorTok{==}\StringTok{ '0-0.5'}\NormalTok{, ]}
 \NormalTok{ad.combat_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.combat[ad.trt }\OperatorTok{==}\StringTok{ '1-2'}\NormalTok{, ]}
 
-\NormalTok{###### rBE}
+\CommentTok{# rBE}
 \NormalTok{ad.limma_}\DecValTok{05}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.limma[ad.trt }\OperatorTok{==}\StringTok{ '0-0.5'}\NormalTok{, ]}
 \NormalTok{ad.limma_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.limma[ad.trt }\OperatorTok{==}\StringTok{ '1-2'}\NormalTok{, ]}
 
-\NormalTok{###### PN}
+\CommentTok{# PN}
 \NormalTok{ad.percentile_}\DecValTok{05}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.percentile[ad.trt }\OperatorTok{==}\StringTok{ '0-0.5'}\NormalTok{, ]}
 \NormalTok{ad.percentile_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.percentile[ad.trt }\OperatorTok{==}\StringTok{ '1-2'}\NormalTok{, ]}
 
-\NormalTok{###### SVD}
+\CommentTok{# SVD}
 \NormalTok{ad.svd_}\DecValTok{05}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.svd[ad.trt }\OperatorTok{==}\StringTok{ '0-0.5'}\NormalTok{, ]}
 \NormalTok{ad.svd_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.svd[ad.trt }\OperatorTok{==}\StringTok{ '1-2'}\NormalTok{, ]}
 
-\NormalTok{###### RUVIII}
+\CommentTok{# RUVIII}
 \NormalTok{ad.ruv_}\DecValTok{05}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.ruvIII[ad.trt }\OperatorTok{==}\StringTok{ '0-0.5'}\NormalTok{, ]}
 \NormalTok{ad.ruv_}\DecValTok{2}\NormalTok{ <-}\StringTok{ }\NormalTok{ad.ruvIII[ad.trt }\OperatorTok{==}\StringTok{ '1-2'}\NormalTok{, ]}
 \end{Highlighting}
@@ -2381,7 +2233,7 @@ but percentile normalisation increased batch variation.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-67-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2401,7 +2253,7 @@ but percentile normalisation increased batch variation.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-59-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-67-2.pdf}
 
 In AD data with initial phenol concentration between 0-0.5 g/L, batch
 effect is not easily detected, but percentile normalisation increased
@@ -2429,7 +2281,7 @@ batch variation.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-60-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-68-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2449,13 +2301,16 @@ batch variation.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-60-2.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-68-2.pdf}
 
 In AD data with initial phenol concentration between 1-2 g/L, batch
 effect is not easily detected, but percentile normalisation increased
 batch variation.
 
 \subsection{Heatmap}\label{heatmap-1}
+
+We use the heatmap to visualise data clusters. Samples clustered by
+batches instead of treatments indicate a batch effect.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2487,33 +2342,10 @@ batch variation.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-61-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-69-1.pdf}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# BMC }
-\NormalTok{sponge.bmc.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.bmc, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }
-\CommentTok{# scale on OTUs}
-\NormalTok{sponge.bmc.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.bmc.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }
-\CommentTok{# scale on samples}
-
-\KeywordTok{pheatmap}\NormalTok{(sponge.bmc.scale, }
-         \DataTypeTok{scale =} \StringTok{'none'}\NormalTok{, }
-         \DataTypeTok{cluster_rows =}\NormalTok{ F, }
-         \DataTypeTok{cluster_cols =}\NormalTok{ T, }
-         \DataTypeTok{fontsize_row =} \DecValTok{5}\NormalTok{, }\DataTypeTok{fontsize_col =} \DecValTok{8}\NormalTok{,}
-         \DataTypeTok{fontsize =} \DecValTok{8}\NormalTok{,}
-         \DataTypeTok{clustering_distance_rows =} \StringTok{'euclidean'}\NormalTok{,}
-         \DataTypeTok{clustering_method =} \StringTok{'ward.D'}\NormalTok{,}
-         \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ sponge.anno_col,}
-         \DataTypeTok{annotation_colors =}\NormalTok{ sponge.anno_metabo_colors,}
-         \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
-         \DataTypeTok{main =} \StringTok{'Sponge data - BMC'}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-61-2.pdf}
+Before correction, samples in sponge data are preferentially clustered
+by batch instead of tissue type, indicating a batch effect.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2539,10 +2371,36 @@ batch variation.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-61-3.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-70-1.pdf}
+
+After batch correction with ComBat, the data are clustered by tissues
+rather than batches, therefore, ComBat not only removed batch effects,
+but also disengaged the effect of interest. The results from batch
+correction with other methods are similar.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{# BMC }
+\NormalTok{sponge.bmc.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.bmc, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }
+\CommentTok{# scale on OTUs}
+\NormalTok{sponge.bmc.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(sponge.bmc.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }
+\CommentTok{# scale on samples}
+
+\KeywordTok{pheatmap}\NormalTok{(sponge.bmc.scale, }
+         \DataTypeTok{scale =} \StringTok{'none'}\NormalTok{, }
+         \DataTypeTok{cluster_rows =}\NormalTok{ F, }
+         \DataTypeTok{cluster_cols =}\NormalTok{ T, }
+         \DataTypeTok{fontsize_row =} \DecValTok{5}\NormalTok{, }\DataTypeTok{fontsize_col =} \DecValTok{8}\NormalTok{,}
+         \DataTypeTok{fontsize =} \DecValTok{8}\NormalTok{,}
+         \DataTypeTok{clustering_distance_rows =} \StringTok{'euclidean'}\NormalTok{,}
+         \DataTypeTok{clustering_method =} \StringTok{'ward.D'}\NormalTok{,}
+         \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
+         \DataTypeTok{annotation_col =}\NormalTok{ sponge.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ sponge.anno_metabo_colors,}
+         \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
+         \DataTypeTok{main =} \StringTok{'Sponge data - BMC'}\NormalTok{)}
+
+
 \CommentTok{# removeBatchEffect}
 \NormalTok{sponge.limma.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.limma, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }
 \CommentTok{# scale on OTUs}
@@ -2562,13 +2420,7 @@ batch variation.
          \DataTypeTok{annotation_colors =}\NormalTok{ sponge.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'Sponge data - removeBatchEffect'}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-61-4.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{# percentile normalisation}
 \NormalTok{sponge.percentile.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.percentile, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }
 \CommentTok{# scale on OTUs}
@@ -2588,13 +2440,8 @@ batch variation.
          \DataTypeTok{annotation_colors =}\NormalTok{ sponge.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'Sponge data - percentile norm'}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-61-5.pdf}
 
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{# SVD}
 \NormalTok{sponge.svd.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(sponge.svd, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }
 \CommentTok{# scale on OTUs}
@@ -2617,13 +2464,9 @@ batch variation.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-61-6.pdf}
-
-From heatmaps, the sponge data are clustered by batches instead of
-tissues indicating a batch effect. After batch correction with ComBat,
-the data are clustered by tissues rather than batches, therefore, ComBat
-not only removes batch effects, but also disengages the effect of
-interest.
+In the heatmap of AD data before batch correction, samples within batch
+14/04/2016 are clustered and distinct from other samples, indicating a
+batch effect.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2657,55 +2500,7 @@ interest.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# BMC}
-\NormalTok{ad.bmc.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.bmc, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
-\NormalTok{ad.bmc.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.bmc.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
-
-\KeywordTok{pheatmap}\NormalTok{(ad.bmc.scale, }
-         \DataTypeTok{scale =} \StringTok{'none'}\NormalTok{, }
-         \DataTypeTok{cluster_rows =}\NormalTok{ F, }
-         \DataTypeTok{cluster_cols =}\NormalTok{ T, }
-         \DataTypeTok{fontsize_row =} \DecValTok{4}\NormalTok{, }\DataTypeTok{fontsize_col =} \DecValTok{6}\NormalTok{,}
-         \DataTypeTok{fontsize =} \DecValTok{8}\NormalTok{,}
-         \DataTypeTok{clustering_distance_rows =} \StringTok{'euclidean'}\NormalTok{,}
-         \DataTypeTok{clustering_method =} \StringTok{'ward.D'}\NormalTok{,}
-         \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
-         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
-         \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
-         \DataTypeTok{main =} \StringTok{'AD data - BMC'}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-2.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# ComBat}
-\NormalTok{ad.combat.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.combat, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
-\NormalTok{ad.combat.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.combat.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
-
-\KeywordTok{pheatmap}\NormalTok{(ad.combat.scale, }
-         \DataTypeTok{scale =} \StringTok{'none'}\NormalTok{, }
-         \DataTypeTok{cluster_rows =}\NormalTok{ F, }
-         \DataTypeTok{cluster_cols =}\NormalTok{ T, }
-         \DataTypeTok{fontsize_row =} \DecValTok{4}\NormalTok{, }\DataTypeTok{fontsize_col =} \DecValTok{6}\NormalTok{,}
-         \DataTypeTok{fontsize =} \DecValTok{8}\NormalTok{,}
-         \DataTypeTok{clustering_distance_rows =} \StringTok{'euclidean'}\NormalTok{,}
-         \DataTypeTok{clustering_method =} \StringTok{'ward.D'}\NormalTok{,}
-         \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
-         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
-         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
-         \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
-         \DataTypeTok{main =} \StringTok{'AD data - ComBat'}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-3.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-72-1.pdf}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2729,10 +2524,54 @@ interest.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-4.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-73-1.pdf}
+
+After batch correction with removeBatchEffect, the data are almost
+clustered by treatments rather than batches, therefore,
+removeBatchEffect not only removed batch effects, but also disengaged
+the treatment effects. The results from batch correction with other
+methods are similar.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{# BMC}
+\NormalTok{ad.bmc.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.bmc, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
+\NormalTok{ad.bmc.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.bmc.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
+
+\KeywordTok{pheatmap}\NormalTok{(ad.bmc.scale, }
+         \DataTypeTok{scale =} \StringTok{'none'}\NormalTok{, }
+         \DataTypeTok{cluster_rows =}\NormalTok{ F, }
+         \DataTypeTok{cluster_cols =}\NormalTok{ T, }
+         \DataTypeTok{fontsize_row =} \DecValTok{4}\NormalTok{, }\DataTypeTok{fontsize_col =} \DecValTok{6}\NormalTok{,}
+         \DataTypeTok{fontsize =} \DecValTok{8}\NormalTok{,}
+         \DataTypeTok{clustering_distance_rows =} \StringTok{'euclidean'}\NormalTok{,}
+         \DataTypeTok{clustering_method =} \StringTok{'ward.D'}\NormalTok{,}
+         \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
+         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
+         \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
+         \DataTypeTok{main =} \StringTok{'AD data - BMC'}\NormalTok{)}
+
+\CommentTok{# ComBat}
+\NormalTok{ad.combat.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.combat, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
+\NormalTok{ad.combat.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.combat.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
+
+\KeywordTok{pheatmap}\NormalTok{(ad.combat.scale, }
+         \DataTypeTok{scale =} \StringTok{'none'}\NormalTok{, }
+         \DataTypeTok{cluster_rows =}\NormalTok{ F, }
+         \DataTypeTok{cluster_cols =}\NormalTok{ T, }
+         \DataTypeTok{fontsize_row =} \DecValTok{4}\NormalTok{, }\DataTypeTok{fontsize_col =} \DecValTok{6}\NormalTok{,}
+         \DataTypeTok{fontsize =} \DecValTok{8}\NormalTok{,}
+         \DataTypeTok{clustering_distance_rows =} \StringTok{'euclidean'}\NormalTok{,}
+         \DataTypeTok{clustering_method =} \StringTok{'ward.D'}\NormalTok{,}
+         \DataTypeTok{treeheight_row =} \DecValTok{30}\NormalTok{,}
+         \DataTypeTok{annotation_col =}\NormalTok{ ad.anno_col,}
+         \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
+         \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
+         \DataTypeTok{main =} \StringTok{'AD data - ComBat'}\NormalTok{)}
+
+
+
 \CommentTok{# percentile normalisation}
 \NormalTok{ad.percentile.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.percentile, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
 \NormalTok{ad.percentile.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.percentile.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
@@ -2750,13 +2589,7 @@ interest.
          \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'AD data - percentile norm'}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-5.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{# SVD}
 \NormalTok{ad.svd.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.svd, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
 \NormalTok{ad.svd.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.svd.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
@@ -2774,13 +2607,8 @@ interest.
          \DataTypeTok{annotation_colors =}\NormalTok{ ad.anno_metabo_colors,}
          \DataTypeTok{border_color =} \StringTok{'NA'}\NormalTok{,}
          \DataTypeTok{main =} \StringTok{'AD data - SVD'}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-6.pdf}
 
-\begin{Shaded}
-\begin{Highlighting}[]
 \CommentTok{# RUVIII}
 \NormalTok{ad.ruv.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(ad.ruvIII, }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on OTUs}
 \NormalTok{ad.ruv.scale <-}\StringTok{ }\KeywordTok{scale}\NormalTok{(}\KeywordTok{t}\NormalTok{(ad.ruv.scale), }\DataTypeTok{center =}\NormalTok{ T, }\DataTypeTok{scale =}\NormalTok{ T) }\CommentTok{# scale on samples}
@@ -2800,15 +2628,6 @@ interest.
          \DataTypeTok{main =} \StringTok{'AD data - RUVIII'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-62-7.pdf}
-
-In the heatmaps of AD data, samples within batch 14/04/2016 are
-clustered and distinct from other samples, indicating a batch effect.
-After batch correction with removeBatchEffect and percentile
-normalisation, the data are almost clustered by treatments rather than
-batches, therefore, removeBatchEffect and percentile normalisation not
-only remove batch effects, but also disengage the treatment effects.
 
 \section{Variance calculation}\label{variance-calculation}
 
@@ -2831,7 +2650,7 @@ the variance of batch and treatment per OTU.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{## Sponge data}
+\CommentTok{# Sponge data}
 \NormalTok{sponge.form <-}\StringTok{ }\ErrorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch}
 \NormalTok{sponge.info <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(sponge.tss.clr), sponge.trt, sponge.batch))}
 \KeywordTok{rownames}\NormalTok{(sponge.info) <-}\StringTok{ }\KeywordTok{rownames}\NormalTok{(sponge.tss.clr)}
@@ -2870,35 +2689,32 @@ the variance of batch and treatment per OTU.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# merge results}
-\NormalTok{sponge.variance <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.before}\OperatorTok{$}\NormalTok{sponge.batch,}
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.before}\OperatorTok{$}\NormalTok{sponge.trt,}
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.bmc}\OperatorTok{$}\NormalTok{sponge.batch, }
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.bmc}\OperatorTok{$}\NormalTok{sponge.trt,}
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.combat}\OperatorTok{$}\NormalTok{sponge.batch,}
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.combat}\OperatorTok{$}\NormalTok{sponge.trt,}
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.limma}\OperatorTok{$}\NormalTok{sponge.batch, }
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.limma}\OperatorTok{$}\NormalTok{sponge.trt, }
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.percentile}\OperatorTok{$}\NormalTok{sponge.batch, }
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.percentile}\OperatorTok{$}\NormalTok{sponge.trt, }
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.svd}\OperatorTok{$}\NormalTok{sponge.batch, }
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{, }\DecValTok{24}\NormalTok{)), }
-                         \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.varPart.svd}\OperatorTok{$}\NormalTok{sponge.trt, }
-                               \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{, }\DecValTok{24}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{, }\DecValTok{24}\NormalTok{)))}
+\CommentTok{# extract the variance of trt and batch}
+\CommentTok{# before}
+\NormalTok{sponge.varmat.before <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(sponge.varPart.before[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# BMC}
+\NormalTok{sponge.varmat.bmc <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(sponge.varPart.bmc[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# ComBat}
+\NormalTok{sponge.varmat.combat <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(sponge.varPart.combat[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# removeBatchEffect}
+\NormalTok{sponge.varmat.limma <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(sponge.varPart.limma[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# percentile normalisation}
+\NormalTok{sponge.varmat.percentile <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(sponge.varPart.percentile[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# SVD}
+\NormalTok{sponge.varmat.svd <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(sponge.varPart.svd[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
 
+\CommentTok{# merge results}
+\NormalTok{sponge.variance <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{as.vector}\NormalTok{(sponge.varmat.before), }\KeywordTok{as.vector}\NormalTok{(sponge.varmat.bmc),}
+                     \KeywordTok{as.vector}\NormalTok{(sponge.varmat.combat), }\KeywordTok{as.vector}\NormalTok{(sponge.varmat.limma),}
+                     \KeywordTok{as.vector}\NormalTok{(sponge.varmat.percentile), }\KeywordTok{as.vector}\NormalTok{(sponge.varmat.svd))}
+
+\CommentTok{# add batch, trt and methods info}
+\NormalTok{sponge.variance <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ sponge.variance, }
+                         \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Tissue'}\NormalTok{, }\StringTok{'Batch'}\NormalTok{), }\DataTypeTok{each =} \KeywordTok{ncol}\NormalTok{(sponge.tss.clr)),}
+                         \DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Before'}\NormalTok{, }\StringTok{'BMC'}\NormalTok{, }\StringTok{'ComBat'}\NormalTok{, }\StringTok{'rBE'}\NormalTok{, }
+                                        \StringTok{'PN'}\NormalTok{, }\StringTok{'SVD'}\NormalTok{), }\DataTypeTok{each =} \DecValTok{2}\OperatorTok{*}\KeywordTok{ncol}\NormalTok{(sponge.tss.clr)))}
+\CommentTok{# reorder levels  }
 \NormalTok{sponge.variance <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(sponge.variance)}
-\NormalTok{sponge.variance}\OperatorTok{$}\NormalTok{Type <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(sponge.variance}\OperatorTok{$}\NormalTok{Type, }
-                              \DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(sponge.variance}\OperatorTok{$}\NormalTok{Type))}
 \NormalTok{sponge.variance}\OperatorTok{$}\NormalTok{method <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(sponge.variance}\OperatorTok{$}\NormalTok{method, }
                                 \DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(sponge.variance}\OperatorTok{$}\NormalTok{method))}
 \NormalTok{sponge.variance}\OperatorTok{$}\NormalTok{variance <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(sponge.variance}\OperatorTok{$}\NormalTok{variance))}
@@ -2909,11 +2725,11 @@ the variance of batch and treatment per OTU.
         \DataTypeTok{strip.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =} \DecValTok{12}\NormalTok{), }\DataTypeTok{panel.grid =} \KeywordTok{element_blank}\NormalTok{(), }
         \DataTypeTok{axis.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =} \DecValTok{12}\NormalTok{), }\DataTypeTok{axis.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =} \DecValTok{15}\NormalTok{), }
         \DataTypeTok{legend.title =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =} \DecValTok{15}\NormalTok{), }\DataTypeTok{legend.text =} \KeywordTok{element_text}\NormalTok{(}\DataTypeTok{size =} \DecValTok{12}\NormalTok{)) }\OperatorTok{+}\StringTok{ }
-\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Type"}\NormalTok{, }\DataTypeTok{y =} \StringTok{"Proportion Variance"}\NormalTok{, }\DataTypeTok{name=}\StringTok{'Type'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{'Type'}\NormalTok{, }\DataTypeTok{y =} \StringTok{'Proportion Variance'}\NormalTok{, }\DataTypeTok{name =} \StringTok{'Type'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylim}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-64-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-76-1.pdf}
 
 BMC, ComBat and removeBatchEffect successfully removed batch variation
 while preserving treatment variation, but SVD performed poorly.
@@ -2971,39 +2787,36 @@ We also calculate the variance for AD data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# merge results}
-\NormalTok{ad.variance <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.before}\OperatorTok{$}\NormalTok{ad.batch, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.before}\OperatorTok{$}\NormalTok{ad.trt, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Before'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.bmc}\OperatorTok{$}\NormalTok{ad.batch, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.bmc}\OperatorTok{$}\NormalTok{ad.trt, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'BMC'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.combat}\OperatorTok{$}\NormalTok{ad.batch, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.combat}\OperatorTok{$}\NormalTok{ad.trt, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'ComBat'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.limma}\OperatorTok{$}\NormalTok{ad.batch, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.limma}\OperatorTok{$}\NormalTok{ad.trt, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'rBE'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.percentile}\OperatorTok{$}\NormalTok{ad.batch, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.percentile}\OperatorTok{$}\NormalTok{ad.trt, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'PN'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.svd}\OperatorTok{$}\NormalTok{ad.batch, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.svd}\OperatorTok{$}\NormalTok{ad.trt, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'SVD'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.ruv}\OperatorTok{$}\NormalTok{ad.batch, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'RUVIII'}\NormalTok{, }\DecValTok{231}\NormalTok{)), }
-                     \KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.varPart.ruv}\OperatorTok{$}\NormalTok{ad.trt, }
-                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\StringTok{'Treatment'}\NormalTok{, }\DecValTok{231}\NormalTok{), }\DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\StringTok{'RUVIII'}\NormalTok{, }\DecValTok{231}\NormalTok{)))}
+\CommentTok{# extract the variance of trt and batch}
+\CommentTok{# before}
+\NormalTok{ad.varmat.before <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(ad.varPart.before[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# BMC}
+\NormalTok{ad.varmat.bmc <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(ad.varPart.bmc[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# ComBat}
+\NormalTok{ad.varmat.combat <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(ad.varPart.combat[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# removeBatchEffect}
+\NormalTok{ad.varmat.limma <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(ad.varPart.limma[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# percentile normalisation}
+\NormalTok{ad.varmat.percentile <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(ad.varPart.percentile[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# SVD}
+\NormalTok{ad.varmat.svd <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(ad.varPart.svd[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
+\CommentTok{# RUVIII}
+\NormalTok{ad.varmat.ruv <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(ad.varPart.ruv[ ,}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{])}
 
+
+\CommentTok{# merge results}
+\NormalTok{ad.variance <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{as.vector}\NormalTok{(ad.varmat.before), }\KeywordTok{as.vector}\NormalTok{(ad.varmat.bmc),}
+                 \KeywordTok{as.vector}\NormalTok{(ad.varmat.combat), }\KeywordTok{as.vector}\NormalTok{(ad.varmat.limma),}
+                 \KeywordTok{as.vector}\NormalTok{(ad.varmat.percentile), }\KeywordTok{as.vector}\NormalTok{(ad.varmat.svd), }
+                 \KeywordTok{as.vector}\NormalTok{(ad.varmat.ruv))}
+
+\CommentTok{# add batch, trt and methods info}
+\NormalTok{ad.variance <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{variance =}\NormalTok{ ad.variance, }
+                     \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{( }\StringTok{'Treatment'}\NormalTok{, }\StringTok{'Batch'}\NormalTok{), }\DataTypeTok{each =} \KeywordTok{ncol}\NormalTok{(ad.tss.clr)),}
+                     \DataTypeTok{method =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Before'}\NormalTok{, }\StringTok{'BMC'}\NormalTok{, }\StringTok{'ComBat'}\NormalTok{, }\StringTok{'rBE'}\NormalTok{, }\StringTok{'PN'}\NormalTok{, }
+                                    \StringTok{'SVD'}\NormalTok{, }\StringTok{'RUVIII'}\NormalTok{), }\DataTypeTok{each =} \DecValTok{2}\OperatorTok{*}\KeywordTok{ncol}\NormalTok{(ad.tss.clr)))}
+\CommentTok{# reorder levels  }
 \NormalTok{ad.variance <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(ad.variance)}
-\NormalTok{ad.variance}\OperatorTok{$}\NormalTok{Type <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(ad.variance}\OperatorTok{$}\NormalTok{Type, }
-                          \DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(ad.variance}\OperatorTok{$}\NormalTok{Type))}
 \NormalTok{ad.variance}\OperatorTok{$}\NormalTok{method <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(ad.variance}\OperatorTok{$}\NormalTok{method, }
                             \DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(ad.variance}\OperatorTok{$}\NormalTok{method))}
 \NormalTok{ad.variance}\OperatorTok{$}\NormalTok{variance <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{as.character}\NormalTok{(ad.variance}\OperatorTok{$}\NormalTok{variance))}
@@ -3019,7 +2832,7 @@ We also calculate the variance for AD data.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-66-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-78-1.pdf}
 
 Similar results as in sponge data, BMC, ComBat and removeBatchEffect
 successfully removed batch variation while preserving treatment
@@ -3135,15 +2948,19 @@ estimated with pRDA:
 \NormalTok{sponge.rda.prop.svd <-}\StringTok{ }\KeywordTok{c}\NormalTok{(sponge.rda.bat_prop.svd, }
 \NormalTok{                        sponge.rda.trt_prop.svd)}
 
+\CommentTok{# merge results}
 \NormalTok{sponge.rda.prop.val <-}\StringTok{ }\KeywordTok{c}\NormalTok{(sponge.rda.prop.before, sponge.rda.prop.bmc, }
 \NormalTok{                        sponge.rda.prop.combat, sponge.rda.prop.limma, }
 \NormalTok{                        sponge.rda.prop.percentile, sponge.rda.prop.svd)}
+
+\CommentTok{# add batch, trt and method info}
 \NormalTok{sponge.rda.prop <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{prop =}\NormalTok{ sponge.rda.prop.val, }
                              \DataTypeTok{prop.r =} \KeywordTok{round}\NormalTok{(sponge.rda.prop.val, }\DecValTok{2}\NormalTok{), }
                              \DataTypeTok{Method =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Before'}\NormalTok{, }\StringTok{'BMC'}\NormalTok{, }\StringTok{'ComBat'}\NormalTok{, }
                                             \StringTok{'rBE'}\NormalTok{, }\StringTok{'PN'}\NormalTok{, }\StringTok{'SVD'}\NormalTok{), }\DataTypeTok{each =} \DecValTok{2}\NormalTok{), }
                              \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\StringTok{'Tissue'}\NormalTok{), }\DecValTok{6}\NormalTok{))}
 
+\CommentTok{# reorder levels}
 \NormalTok{sponge.rda.prop}\OperatorTok{$}\NormalTok{Method <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(sponge.rda.prop}\OperatorTok{$}\NormalTok{Method, }
                                 \DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(sponge.rda.prop}\OperatorTok{$}\NormalTok{Method))}
 
@@ -3159,7 +2976,7 @@ estimated with pRDA:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-68-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-80-1.pdf}
 
 In sponge data, pRDA shows that BMC, ComBat and removeBatchEffect were
 more efficient at removing batch variation while preserving treatment
@@ -3264,16 +3081,19 @@ We also apply pRDA on AD data.
 \NormalTok{ad.rda.prop.svd <-}\StringTok{ }\KeywordTok{c}\NormalTok{(ad.rda.bat_prop.svd, ad.rda.trt_prop.svd)}
 \NormalTok{ad.rda.prop.ruv <-}\StringTok{ }\KeywordTok{c}\NormalTok{(ad.rda.bat_prop.ruv, ad.rda.trt_prop.ruv)}
 
-\NormalTok{#############}
+\CommentTok{# merge results}
 \NormalTok{ad.rda.prop.val <-}\StringTok{ }\KeywordTok{c}\NormalTok{(ad.rda.prop.before, ad.rda.prop.bmc, }
 \NormalTok{                    ad.rda.prop.combat, ad.rda.prop.limma, }
 \NormalTok{                    ad.rda.prop.percentile, ad.rda.prop.svd, }
 \NormalTok{                    ad.rda.prop.ruv)}
+
+\CommentTok{# add batch, trt and method info}
 \NormalTok{ad.rda.prop <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{prop =}\NormalTok{ ad.rda.prop.val, }\DataTypeTok{prop.r =} \KeywordTok{round}\NormalTok{(ad.rda.prop.val, }\DecValTok{2}\NormalTok{), }
                          \DataTypeTok{Method =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Before'}\NormalTok{, }\StringTok{'BMC'}\NormalTok{, }\StringTok{'ComBat'}\NormalTok{, }\StringTok{'rBE'}\NormalTok{, }
                                         \StringTok{'PN'}\NormalTok{, }\StringTok{'SVD'}\NormalTok{, }\StringTok{'RUVIII'}\NormalTok{), }\DataTypeTok{each =} \DecValTok{2}\NormalTok{), }
                          \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\StringTok{'Treatment'}\NormalTok{), }\DecValTok{7}\NormalTok{))}
 
+\CommentTok{# reorder levels}
 \NormalTok{ad.rda.prop}\OperatorTok{$}\NormalTok{Method <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(ad.rda.prop}\OperatorTok{$}\NormalTok{Method, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(ad.rda.prop}\OperatorTok{$}\NormalTok{Method))}
 
 \KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.rda.prop, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ Method, }\DataTypeTok{y =}\NormalTok{ prop, }\DataTypeTok{fill =}\NormalTok{ Type)) }\OperatorTok{+}\StringTok{ }
@@ -3288,7 +3108,7 @@ We also apply pRDA on AD data.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-70-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-82-1.pdf}
 
 Similar as results from sponge data, BMC, ComBat and removeBatchEffect
 were more efficient at removing batch variation while preserving
@@ -3307,8 +3127,7 @@ originate from the batch x treatment design.
 \subsection{PVCA}\label{pvca}
 
 PVCA can be applied as a validation method that complements pRDA, but it
-does not work for dataset with only 24 samples, therefore it cannot be
-applied on sponge data.
+requires 42 OTUs minimum. Therefore, it did not apply on sponge data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3379,12 +3198,16 @@ applied on sponge data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{# merge results}
 \NormalTok{ad.pvca.prop.val <-}\StringTok{ }\KeywordTok{c}\NormalTok{(ad.PVCA.score}\OperatorTok{$}\NormalTok{Batch, ad.PVCA.score}\OperatorTok{$}\NormalTok{Treatment)}
+
+\CommentTok{# add batch, trt and method info}
 \NormalTok{ad.pvca.prop <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{prop =}\NormalTok{ ad.pvca.prop.val, }\DataTypeTok{prop.r =} \KeywordTok{round}\NormalTok{(ad.pvca.prop.val, }\DecValTok{2}\NormalTok{), }
                           \DataTypeTok{Method =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Before'}\NormalTok{, }\StringTok{'BMC'}\NormalTok{, }\StringTok{'ComBat'}\NormalTok{, }\StringTok{'rBE'}\NormalTok{, }
                                          \StringTok{'PN'}\NormalTok{, }\StringTok{'SVD'}\NormalTok{, }\StringTok{'RUVIII'}\NormalTok{), }\DecValTok{2}\NormalTok{), }
                           \DataTypeTok{Type =} \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Batch'}\NormalTok{, }\StringTok{'Treatment'}\NormalTok{), }\DataTypeTok{each =} \DecValTok{7}\NormalTok{))}
 
+\CommentTok{# reorder levels}
 \NormalTok{ad.pvca.prop}\OperatorTok{$}\NormalTok{Method <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(ad.pvca.prop}\OperatorTok{$}\NormalTok{Method, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(ad.pvca.prop}\OperatorTok{$}\NormalTok{Method))}
 
 \KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ ad.pvca.prop, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ Method, }\DataTypeTok{y =}\NormalTok{ prop, }\DataTypeTok{fill =}\NormalTok{ Type)) }\OperatorTok{+}\StringTok{ }
@@ -3399,7 +3222,7 @@ applied on sponge data.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-72-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-84-1.pdf}
 
 Proportionally, BMC, ComBat and removeBatchEffect removed more of the
 variance explained by batch and maintained more variance explained by
@@ -3421,7 +3244,6 @@ treatment effect.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{###################}
 \CommentTok{# Sponge data}
 \NormalTok{sponge.silh.before <-}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(sponge.pca.before}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X, }
                               \DataTypeTok{y1 =}\NormalTok{ sponge.batch, }\DataTypeTok{y2 =}\NormalTok{ sponge.trt, }
@@ -3471,7 +3293,7 @@ treatment effect.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-73-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-85-1.pdf}
 
 \(\bar{s}_{b}\) of different batches in sponge data decreased to \(0\)
 after correction with BMC, ComBat and removeBatchEffect, while
@@ -3482,7 +3304,6 @@ We also calculate the silhouette coefficients for AD data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{############}
 \CommentTok{# AD data}
 \NormalTok{ad.silh.before <-}\StringTok{ }\KeywordTok{calc.sil}\NormalTok{(ad.pca.before}\OperatorTok{$}\NormalTok{variates}\OperatorTok{$}\NormalTok{X, }\DataTypeTok{y1 =}\NormalTok{ ad.batch, }
                           \DataTypeTok{y2 =}\NormalTok{ ad.trt, }\DataTypeTok{name.y1 =} \StringTok{'Batch'}\NormalTok{, }\DataTypeTok{name.y2 =} \StringTok{'Treatment'}\NormalTok{)}
@@ -3526,7 +3347,7 @@ We also calculate the silhouette coefficients for AD data.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-74-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-86-1.pdf}
 
 In AD data that includes five batches, the interpretation of the results
 is challenging. After correction, BMC, ComBat, removeBatchEffect,
@@ -3535,10 +3356,12 @@ coefficients for the batch dated 14/04/2016, but increased the
 coefficients for the other batches. Therefore it is difficult to assess
 the efficiency of these methods in this particular case.
 
-\chapter{Simulations of systematic and non-systematic batch
-effects}\label{simu}
+\chapter{Assessment of the nature of batch effects}\label{simu}
 
-\section{Mean=5,unequal variance}\label{mean5unequal-variance}
+\section{Simulations}\label{simulations}
+
+\subsection{Mean = 5, and unequal
+variance}\label{mean-5-and-unequal-variance}
 
 `Systematic' refers to homogeneous change amongst all microbial
 variables (OTUs) due to having the same source of variation. We
@@ -3554,7 +3377,7 @@ where \(\beta_{j}\) is the batch regression coefficient of OTU\(_{j}\)
 with one batch predictor, but this formulation could be extended to a
 model with multiple batch predictors where the batch regression
 coefficients can represent more than two batch levels. In a univariate
-model that tests each OTU idividually, then the distribution of the
+model that tests each OTU individually, then the distribution of the
 batch coefficients of all OTUs is Gaussian with a mean \(\mu\), and
 standard deviation \(\sigma\). This indicates that the batch effect has
 a similar, though not necessarily identical, influence on all OTUs.
@@ -3593,7 +3416,7 @@ The dataset with a systematic batch effect:
 \NormalTok{beta[ ,ctl] <-}\StringTok{ }\DecValTok{0}
 \CommentTok{# batch effect}
 \NormalTok{W <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, m), m, k)}
-\NormalTok{W[}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{12}\NormalTok{,}\DecValTok{38}\OperatorTok{:}\DecValTok{50}\NormalTok{),}\DecValTok{1}\NormalTok{] <-}\StringTok{  }\DecValTok{1}
+\NormalTok{W[}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{12}\NormalTok{,}\DecValTok{38}\OperatorTok{:}\DecValTok{50}\NormalTok{), }\DecValTok{1}\NormalTok{] <-}\StringTok{  }\DecValTok{1}
 \NormalTok{alpha <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{rnorm}\NormalTok{(k}\OperatorTok{*}\NormalTok{n, }\DecValTok{5}\NormalTok{, }\DecValTok{1}\NormalTok{), k, n)}
 \NormalTok{Y_alpha <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(alpha, }\ControlFlowTok{function}\NormalTok{(alpha)\{}\KeywordTok{rnorm}\NormalTok{(m, }\DataTypeTok{mean =}\NormalTok{  alpha, }
                                               \KeywordTok{abs}\NormalTok{(}\KeywordTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DataTypeTok{mean =} \DecValTok{0}\NormalTok{, }\DataTypeTok{sd =} \DecValTok{2}\NormalTok{)))\})}
@@ -3620,12 +3443,16 @@ The dataset with a systematic batch effect:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-75-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-87-1.pdf}
 
-The histogram and density plots are plotted using estimated batch
-regression coefficients \(\hat{\beta}_{j}\) for each OTU \(j\).
+The histogram, density plot and quantile--quantile plot are plotted
+using estimated batch regression coefficients \(\hat{\beta}_{j}\) for
+each OTU \(j\). These plots display the distribution of batch
+coefficients is very close to normal, indicating a systematic batch
+effect.
 
-\section{Mean=0\&5,unequal variance}\label{mean05unequal-variance}
+\subsection{Mean = 0 or 5, and unequal
+variance}\label{mean-0-or-5-and-unequal-variance}
 
 Non-systematic batch effects have a heterogeneous influence on microbial
 variables. Using a linear model framework, as described previously, we
@@ -3673,7 +3500,7 @@ The dataset with non-systematic batch effect:
 \NormalTok{beta[ ,ctl] <-}\StringTok{ }\DecValTok{0}
 \CommentTok{# batch effect}
 \NormalTok{W <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, m), m, k)}
-\NormalTok{W[}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{12}\NormalTok{,}\DecValTok{38}\OperatorTok{:}\DecValTok{50}\NormalTok{),}\DecValTok{1}\NormalTok{] <-}\StringTok{  }\DecValTok{1}
+\NormalTok{W[}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{12}\NormalTok{,}\DecValTok{38}\OperatorTok{:}\DecValTok{50}\NormalTok{), }\DecValTok{1}\NormalTok{] <-}\StringTok{  }\DecValTok{1}
 \NormalTok{alpha2 <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{sample}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\KeywordTok{rnorm}\NormalTok{(k}\OperatorTok{*}\NormalTok{(}\DecValTok{3}\OperatorTok{*}\NormalTok{n}\OperatorTok{/}\DecValTok{4}\NormalTok{), }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{),}\KeywordTok{rnorm}\NormalTok{(k}\OperatorTok{*}\NormalTok{(n}\OperatorTok{/}\DecValTok{4}\NormalTok{), }\DecValTok{5}\NormalTok{, }\DecValTok{1}\NormalTok{)), n), k, n)}
 \NormalTok{Y_alpha2 <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(alpha2, }\ControlFlowTok{function}\NormalTok{(alpha)\{}\KeywordTok{rnorm}\NormalTok{(m, }\DataTypeTok{mean =}\NormalTok{  alpha, }
                                                 \DataTypeTok{sd =} \KeywordTok{abs}\NormalTok{(}\KeywordTok{rnorm}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DataTypeTok{mean =} \DecValTok{0}\NormalTok{, }\DataTypeTok{sd =} \DecValTok{2}\NormalTok{)))\})}
@@ -3701,60 +3528,76 @@ The dataset with non-systematic batch effect:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-76-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-88-1.pdf}
 
-The histogram and density plots are plotted using estimated batch
-regression coefficients \(\hat{\beta}_{j}\) for each OTU \(j\), showing
-a bi-modal distribution.
+The histogram, density plot and quantile--quantile plot are plotted
+using estimated batch regression coefficients \(\hat{\beta}_{j}\) for
+each OTU \(j\), showing a bi-modal distribution. This distribution
+indicates a non-systematic batch effect.
 
-We observed similar patterns in our real case studies, suggesting that
-the batch effects are mixed with multiple sources and are
-non-systematic.
+\textbf{We observed similar patterns in our real case studies,
+suggesting that the batch effects are mixed with multiple sources and
+are non-systematic (see the examples below).}
 
-\section{Sponge data}\label{sponge-data}
+\section{Real data}\label{real-data}
+
+We also estimate the batch regression coefficients for each OTU in real
+datasets to assess the nature of batch effects.
+
+\subsection{Sponge data}\label{sponge-data}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sponge.b.cof <-}\StringTok{ }\KeywordTok{c}\NormalTok{()}
+\NormalTok{sponge.b.coeff <-}\StringTok{ }\KeywordTok{c}\NormalTok{()}
 \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(sponge.tss.clr))\{}
 \NormalTok{  res <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(sponge.tss.clr[ ,i] }\OperatorTok{~}\StringTok{ }\NormalTok{sponge.trt }\OperatorTok{+}\StringTok{ }\NormalTok{sponge.batch)}
 \NormalTok{  sum.res <-}\StringTok{ }\KeywordTok{summary}\NormalTok{(res)}
-\NormalTok{  sponge.b.cof[i] <-}\StringTok{ }\NormalTok{sum.res}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{]}
+\NormalTok{  sponge.b.coeff[i] <-}\StringTok{ }\NormalTok{sum.res}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{]}
 \NormalTok{\}}
 
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
-\KeywordTok{hist}\NormalTok{(sponge.b.cof,}\DataTypeTok{col =} \StringTok{'gray'}\NormalTok{)}
-\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(sponge.b.cof))}
-\KeywordTok{qqnorm}\NormalTok{(sponge.b.cof)}
-\KeywordTok{qqline}\NormalTok{(sponge.b.cof, }\DataTypeTok{col=}\StringTok{'red'}\NormalTok{)}
+\KeywordTok{hist}\NormalTok{(sponge.b.coeff,}\DataTypeTok{col =} \StringTok{'gray'}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(sponge.b.coeff))}
+\KeywordTok{qqnorm}\NormalTok{(sponge.b.coeff)}
+\KeywordTok{qqline}\NormalTok{(sponge.b.coeff, }\DataTypeTok{col=}\StringTok{'red'}\NormalTok{)}
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-77-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-89-1.pdf}
 
-\section{AD data}\label{ad-data}
+In sponge data, the histogram, density plot and quantile--quantile plot
+are also plotted using estimated batch regression coefficients
+\(\hat{\beta}_{j}\) for each OTU \(j\). The bi-modal distribution
+indicates a non-systematic batch effect, which is similar as the results
+from simulation with non-systematic batch effects.
+
+\subsection{AD data}\label{ad-data}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{ad.b.cof <-}\StringTok{ }\KeywordTok{c}\NormalTok{()}
+\NormalTok{ad.b.coeff <-}\StringTok{ }\KeywordTok{c}\NormalTok{()}
 \NormalTok{ad.batch.relevel <-}\StringTok{ }\KeywordTok{relevel}\NormalTok{(ad.batch, }\StringTok{'01/07/2016'}\NormalTok{)}
 \ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(ad.tss.clr))\{}
 \NormalTok{  res <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(ad.tss.clr[,i] }\OperatorTok{~}\StringTok{ }\NormalTok{ad.trt }\OperatorTok{+}\StringTok{ }\NormalTok{ad.batch.relevel)}
 \NormalTok{  sum.res <-}\StringTok{ }\KeywordTok{summary}\NormalTok{(res)}
-\NormalTok{  ad.b.cof[i] <-}\StringTok{ }\NormalTok{sum.res}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{]}
+\NormalTok{  ad.b.coeff[i] <-}\StringTok{ }\NormalTok{sum.res}\OperatorTok{$}\NormalTok{coefficients[}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{]}
 \NormalTok{\}}
 
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
-\KeywordTok{hist}\NormalTok{(ad.b.cof,}\DataTypeTok{col =} \StringTok{'gray'}\NormalTok{)}
-\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(ad.b.cof))}
-\KeywordTok{qqnorm}\NormalTok{(ad.b.cof)}
-\KeywordTok{qqline}\NormalTok{(ad.b.cof, }\DataTypeTok{col=}\StringTok{'red'}\NormalTok{)}
+\KeywordTok{hist}\NormalTok{(ad.b.coeff,}\DataTypeTok{col =} \StringTok{'gray'}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(ad.b.coeff))}
+\KeywordTok{qqnorm}\NormalTok{(ad.b.coeff)}
+\KeywordTok{qqline}\NormalTok{(ad.b.coeff, }\DataTypeTok{col=}\StringTok{'red'}\NormalTok{)}
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{vignette_files/figure-latex/unnamed-chunk-78-1.pdf}
+\includegraphics{vignette_files/figure-latex/unnamed-chunk-90-1.pdf}
+
+We observe similar results in AD data. The distribution of estimated
+batch regression coefficients is not normal. The batch effects therefore
+are non-systematic.
 
 \bibliography{book.bib,packages.bib}
 

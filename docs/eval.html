@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang">
 
 
-<meta name="date" content="2019-06-21">
+<meta name="date" content="2019-06-25">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -134,7 +134,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2.2" data-path="adjust.html"><a href="adjust.html#combat"><i class="fa fa-check"></i><b>3.2.2</b> ComBat</a></li>
 <li class="chapter" data-level="3.2.3" data-path="adjust.html"><a href="adjust.html#removebatcheffect"><i class="fa fa-check"></i><b>3.2.3</b> removeBatchEffect</a></li>
 <li class="chapter" data-level="3.2.4" data-path="adjust.html"><a href="adjust.html#fabatch"><i class="fa fa-check"></i><b>3.2.4</b> FAbatch</a></li>
-<li class="chapter" data-level="3.2.5" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.2.5</b> percentile normalisation</a></li>
+<li class="chapter" data-level="3.2.5" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.2.5</b> Percentile normalisation</a></li>
 <li class="chapter" data-level="3.2.6" data-path="adjust.html"><a href="adjust.html#svd-based-method"><i class="fa fa-check"></i><b>3.2.6</b> SVD-based method</a></li>
 <li class="chapter" data-level="3.2.7" data-path="adjust.html"><a href="adjust.html#ruviii"><i class="fa fa-check"></i><b>3.2.7</b> RUVIII</a></li>
 </ul></li>
@@ -153,11 +153,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.2.4" data-path="eval.html"><a href="eval.html#silhouette-coefficient"><i class="fa fa-check"></i><b>4.2.4</b> Silhouette coefficient</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="simu.html"><a href="simu.html"><i class="fa fa-check"></i><b>5</b> Simulations of systematic and non-systematic batch effects</a><ul>
-<li class="chapter" data-level="5.1" data-path="simu.html"><a href="simu.html#mean5unequal-variance"><i class="fa fa-check"></i><b>5.1</b> Mean=5,unequal variance</a></li>
-<li class="chapter" data-level="5.2" data-path="simu.html"><a href="simu.html#mean05unequal-variance"><i class="fa fa-check"></i><b>5.2</b> Mean=0&amp;5,unequal variance</a></li>
-<li class="chapter" data-level="5.3" data-path="simu.html"><a href="simu.html#sponge-data"><i class="fa fa-check"></i><b>5.3</b> Sponge data</a></li>
-<li class="chapter" data-level="5.4" data-path="simu.html"><a href="simu.html#ad-data"><i class="fa fa-check"></i><b>5.4</b> AD data</a></li>
+<li class="chapter" data-level="5" data-path="simu.html"><a href="simu.html"><i class="fa fa-check"></i><b>5</b> Assessment of the nature of batch effects</a><ul>
+<li class="chapter" data-level="5.1" data-path="simu.html"><a href="simu.html#simulations"><i class="fa fa-check"></i><b>5.1</b> Simulations</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="simu.html"><a href="simu.html#mean-5-and-unequal-variance"><i class="fa fa-check"></i><b>5.1.1</b> Mean = 5, and unequal variance</a></li>
+<li class="chapter" data-level="5.1.2" data-path="simu.html"><a href="simu.html#mean-0-or-5-and-unequal-variance"><i class="fa fa-check"></i><b>5.1.2</b> Mean = 0 or 5, and unequal variance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="simu.html"><a href="simu.html#real-data"><i class="fa fa-check"></i><b>5.2</b> Real data</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="simu.html"><a href="simu.html#sponge-data"><i class="fa fa-check"></i><b>5.2.1</b> Sponge data</a></li>
+<li class="chapter" data-level="5.2.2" data-path="simu.html"><a href="simu.html#ad-data"><i class="fa fa-check"></i><b>5.2.2</b> AD data</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i>Bibliography</a></li>
 <li class="divider"></li>
@@ -209,17 +213,17 @@ ad.pca.ruv &lt;-<span class="st"> </span><span class="kw">pca</span>(ad.ruvIII, 
 <p><strong>Note:</strong> BMC: batch mean centering; PN: percentile normalisation; rBE: removeBatchEffect; SVD: singular value decomposition</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(sponge.pca.plot.before, sponge.pca.plot.bmc, 
              sponge.pca.plot.combat, sponge.pca.plot.limma, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-42-1.png" width="864" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-46-1.png" width="864" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(sponge.pca.plot.before, sponge.pca.plot.percentile, 
              sponge.pca.plot.svd, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-42-2.png" width="864" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-46-2.png" width="864" /></p>
 <p>In sponge data, SVD performed the worse, compared to BMC, removeBatchEffect and percentile normalisation, as it did not remove batch effects but removed tissue variation instead.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(ad.pca.plot.before, ad.pca.plot.bmc, 
              ad.pca.plot.combat, ad.pca.plot.limma, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-44-1.png" width="864" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-48-1.png" width="864" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(ad.pca.plot.before, ad.pca.plot.percentile, 
              ad.pca.plot.svd, ad.pca.plot.ruv, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-44-2.png" width="864" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-48-2.png" width="864" /></p>
 <p>In AD data, BMC, removeBatchEffect, percentile normalisation and RUVIII removed the batch effects, and maintained the treatment effects. SVD did not removed the batch effect but decreased the treatment effects.</p>
 </div>
 <div id="density-plot-and-box-plot-1" class="section level3">
@@ -270,12 +274,12 @@ sponge.boxplot.svd &lt;-<span class="st"> </span><span class="kw">box_plot_fun</
                                    <span class="dt">batch.legend.title =</span> <span class="st">&#39;Gel (batch)&#39;</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(sponge.boxplot.before, sponge.boxplot.bmc, 
              sponge.boxplot.combat, sponge.boxplot.limma, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-46-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-50-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(sponge.boxplot.before, sponge.boxplot.percentile, 
              sponge.boxplot.svd, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-46-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-50-2.png" width="672" /></p>
 <p>From the boxplots of OTU9 in sponge data, the difference between two batches are removed by BMC, ComBat, removeBatchEffect and percentile normalisation correction. Among these methods, percentile normalisation does not remove as much batch difference as the other methods.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## density plot
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># density plot</span>
 <span class="co"># before</span>
 sponge.dens.before &lt;-<span class="st"> </span><span class="kw">ggplot</span>(sponge.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_density</span>(<span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">color.mixo</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span>
@@ -323,10 +327,11 @@ sponge.dens.svd &lt;-<span class="st"> </span><span class="kw">ggplot</span>(spo
                      <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(sponge.dens.before, sponge.dens.bmc, 
              sponge.dens.combat, sponge.dens.limma, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-48-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-52-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(sponge.dens.before, sponge.dens.percentile, 
              sponge.dens.svd, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-48-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-52-2.png" width="672" /></p>
+<p>We can also assess the effect of batch in a linear model before and after batch correction.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># P-values</span>
 sponge.lm.before &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.tss.clr[ ,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
 <span class="kw">summary</span>(sponge.lm.before)</code></pre></div>
@@ -349,6 +354,7 @@ sponge.lm.before &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge
 ## Residual standard error: 0.489 on 29 degrees of freedom
 ## Multiple R-squared:  0.4236, Adjusted R-squared:  0.3839 
 ## F-statistic: 10.66 on 2 and 29 DF,  p-value: 0.0003391</code></pre>
+<p>Before correction, the batch effect is statistically significant (P <span class="math inline">\(&lt;\)</span> 0.001), as indicated in the <strong>sponge.batch2</strong> row.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.lm.bmc &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.bmc[ ,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
 <span class="kw">summary</span>(sponge.lm.bmc)</code></pre></div>
 <pre><code>## 
@@ -368,91 +374,20 @@ sponge.lm.before &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge
 ## Residual standard error: 0.489 on 29 degrees of freedom
 ## Multiple R-squared:  0.01291,    Adjusted R-squared:  -0.05517 
 ## F-statistic: 0.1896 on 2 and 29 DF,  p-value: 0.8283</code></pre>
+<p>After BMC correction, the batch effect is not statistically significant (P <span class="math inline">\(&gt;\)</span> 0.05), as indicated in the <strong>sponge.batch2</strong> row.</p>
+<p>The results from other batch correction methods are similar as BMC correction.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.lm.combat &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.combat[ ,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
-<span class="kw">summary</span>(sponge.lm.combat)</code></pre></div>
-<pre><code>## 
-## Call:
-## lm(formula = sponge.combat[, 9] ~ sponge.trt + sponge.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.64583 -0.22414  0.05092  0.24065  0.88585 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    1.46291    0.13491  10.844 1.02e-11 ***
-## sponge.trtE    0.09081    0.15578   0.583    0.564    
-## sponge.batch2 -0.16201    0.15578  -1.040    0.307    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.4406 on 29 degrees of freedom
-## Multiple R-squared:  0.04672,    Adjusted R-squared:  -0.01902 
-## F-statistic: 0.7107 on 2 and 29 DF,  p-value: 0.4996</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.lm.limma &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.limma[ ,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
-<span class="kw">summary</span>(sponge.lm.limma)</code></pre></div>
-<pre><code>## 
-## Call:
-## lm(formula = sponge.limma[, 9] ~ sponge.trt + sponge.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.87967 -0.24705  0.04588  0.24492  1.00757 
-## 
-## Coefficients:
-##                Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)   1.389e+00  1.497e-01   9.280 3.49e-10 ***
-## sponge.trtE   1.065e-01  1.729e-01   0.616    0.543    
-## sponge.batch2 2.355e-16  1.729e-01   0.000    1.000    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.489 on 29 degrees of freedom
-## Multiple R-squared:  0.01291,    Adjusted R-squared:  -0.05517 
-## F-statistic: 0.1896 on 2 and 29 DF,  p-value: 0.8283</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.lm.percentile &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.percentile[ ,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
-<span class="kw">summary</span>(sponge.lm.percentile)</code></pre></div>
-<pre><code>## 
-## Call:
-## lm(formula = sponge.percentile[, 9] ~ sponge.trt + sponge.batch)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -0.4531 -0.2070 -0.0625  0.1797  0.6562 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    0.48438    0.09515   5.090 1.97e-05 ***
-## sponge.trtE   -0.17187    0.10987  -1.564    0.129    
-## sponge.batch2  0.03125    0.10987   0.284    0.778    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.3108 on 29 degrees of freedom
-## Multiple R-squared:  0.08018,    Adjusted R-squared:  0.01674 
-## F-statistic: 1.264 on 2 and 29 DF,  p-value: 0.2976</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.lm.svd &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.svd[ ,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
+<span class="kw">summary</span>(sponge.lm.combat)
+
+sponge.lm.limma &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.limma[ ,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
+<span class="kw">summary</span>(sponge.lm.limma)
+
+sponge.lm.percentile &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.percentile[ ,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
+<span class="kw">summary</span>(sponge.lm.percentile)
+
+sponge.lm.svd &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.svd[ ,<span class="dv">9</span>] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
 <span class="kw">summary</span>(sponge.lm.svd)</code></pre></div>
-<pre><code>## 
-## Call:
-## lm(formula = sponge.svd[, 9] ~ sponge.trt + sponge.batch)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.82982 -0.27539  0.05228  0.28204  1.05932 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)     1.6433     0.1526  10.766 1.21e-11 ***
-## sponge.trtE     0.2817     0.1763   1.598  0.12085    
-## sponge.batch2  -0.6831     0.1763  -3.875  0.00056 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 0.4985 on 29 degrees of freedom
-## Multiple R-squared:  0.3773, Adjusted R-squared:  0.3344 
-## F-statistic: 8.787 on 2 and 29 DF,  p-value: 0.001039</code></pre>
-<p>The results of density plots and P-values of batch effects from linear models reach a consesus with boxplots, the difference between two batches are removed by BMC, ComBat, removeBatchEffect and percentile normalisation correction. But percentile normalisation changes a lot of the distribution of samples from two batches.</p>
+<p>In sponge data, the results of density plots and P-values of batch effects from linear models reach a consesus with boxplots, the difference between two batches are removed by BMC, ComBat, removeBatchEffect and percentile normalisation correction. We observe that percentile normalisation modifies the distribution of the samples from the two batches.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
 <span class="co"># boxplot</span>
 ad.before.df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">value =</span> ad.tss.clr[ ,<span class="dv">1</span>], <span class="dt">batch =</span> ad.batch)
@@ -508,11 +443,11 @@ ad.boxplot.ruv &lt;-<span class="st"> </span><span class="kw">box_plot_fun</span
                                <span class="dt">x.angle =</span> <span class="dv">45</span>, <span class="dt">x.hjust =</span> <span class="dv">1</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(ad.boxplot.before, ad.boxplot.bmc, 
              ad.boxplot.combat, ad.boxplot.limma, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-51-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-57-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(ad.boxplot.before, ad.boxplot.percentile, 
              ad.boxplot.svd, ad.boxplot.ruv, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-51-2.png" width="672" /></p>
-<p>From the boxplots of OTU9 in AD data, the difference between five batches are removed by BMC, ComBat, removeBatchEffect and RUVIII correction. Among these methods, RUVIII does not remove as much batch difference as the other methods.</p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-57-2.png" width="672" /></p>
+<p>From the boxplots of OTU9 in AD data, the difference between five batches are removed by BMC, ComBat, removeBatchEffect and RUVIII correction. Among these methods, RUVIII did not remove as much batch difference as the other methods.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># density plot</span>
 <span class="co"># before</span>
 ad.dens.before &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ad.before.df, <span class="kw">aes</span>(<span class="dt">x =</span> value, <span class="dt">fill =</span> batch)) <span class="op">+</span><span class="st"> </span>
@@ -569,10 +504,11 @@ ad.dens.ruv &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ad.ruv.
                      <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>())</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(ad.dens.before, ad.dens.bmc, 
              ad.dens.combat, ad.dens.limma, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-59-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(ad.dens.before, ad.dens.percentile, 
              ad.dens.svd, ad.dens.ruv, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-53-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-59-2.png" width="672" /></p>
+<p>Similar as sponge data, we can also assess the batch effect in AD data using linear model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#p-values</span>
 ad.lm.before &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[ ,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
 <span class="kw">anova</span>(ad.lm.before)</code></pre></div>
@@ -585,9 +521,9 @@ ad.lm.before &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr
 ## Residuals 69 32.506  0.4711                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summary(ad.lm.before)</span>
-
-ad.lm.bmc &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.bmc[ ,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summary(ad.lm.before)</span></code></pre></div>
+<p>Before correction, the batch effect is statistically significant (P <span class="math inline">\(&lt;\)</span> 0.001), as indicated in the <strong>ad.batch</strong> row.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.lm.bmc &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.bmc[ ,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
 <span class="kw">anova</span>(ad.lm.bmc)</code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -596,92 +532,51 @@ ad.lm.bmc &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.bmc[ ,<spa
 ## ad.trt     1  0.631 0.63084  1.3391 0.2512
 ## ad.batch   4  0.036 0.00893  0.0190 0.9993
 ## Residuals 69 32.506 0.47110</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summary(ad.lm.bmc)</span>
-
-ad.lm.combat &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.combat[ ,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
-<span class="kw">anova</span>(ad.lm.combat)</code></pre></div>
-<pre><code>## Analysis of Variance Table
-## 
-## Response: ad.combat[, 1]
-##           Df  Sum Sq Mean Sq F value Pr(&gt;F)
-## ad.trt     1  0.6695 0.66954  1.6980 0.1969
-## ad.batch   4  0.2373 0.05932  0.1504 0.9622
-## Residuals 69 27.2080 0.39432</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summary(ad.lm.combat)</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summary(ad.lm.bmc)</span></code></pre></div>
+<p>After BMC correction, the batch effect is not statistically significant (P <span class="math inline">\(&gt;\)</span> 0.05), as indicated in the <strong>ad.batch</strong> row.The results from other batch correction methods are similar as BMC correction.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.lm.combat &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.combat[ ,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
+<span class="kw">anova</span>(ad.lm.combat)
+<span class="co">#summary(ad.lm.combat)</span>
 
 ad.lm.limma &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.limma[ ,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
-<span class="kw">anova</span>(ad.lm.limma)</code></pre></div>
-<pre><code>## Analysis of Variance Table
-## 
-## Response: ad.limma[, 1]
-##           Df Sum Sq Mean Sq F value Pr(&gt;F)
-## ad.trt     1  0.704 0.70428   1.495 0.2256
-## ad.batch   4  0.000 0.00000   0.000 1.0000
-## Residuals 69 32.506 0.47110</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summary(ad.lm.limma)</span>
+<span class="kw">anova</span>(ad.lm.limma)
+<span class="co">#summary(ad.lm.limma)</span>
 
 ad.lm.percentile &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.percentile[ ,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
-<span class="kw">anova</span>(ad.lm.percentile)</code></pre></div>
-<pre><code>## Analysis of Variance Table
-## 
-## Response: ad.percentile[, 1]
-##           Df Sum Sq Mean Sq F value  Pr(&gt;F)  
-## ad.trt     1 0.4670 0.46705  3.8934 0.05248 .
-## ad.batch   4 1.7037 0.42592  3.5506 0.01081 *
-## Residuals 69 8.2772 0.11996                  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summary(ad.lm.percentile)</span>
+<span class="kw">anova</span>(ad.lm.percentile)
+<span class="co">#summary(ad.lm.percentile)</span>
 
 ad.lm.svd &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.svd[ ,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
-<span class="kw">anova</span>(ad.lm.svd)</code></pre></div>
-<pre><code>## Analysis of Variance Table
-## 
-## Response: ad.svd[, 1]
-##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    
-## ad.trt     1  0.222  0.2218  0.4841    0.4889    
-## ad.batch   4 33.914  8.4784 18.5081 2.256e-10 ***
-## Residuals 69 31.608  0.4581                      
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summary(ad.lm.svd)</span>
+<span class="kw">anova</span>(ad.lm.svd)
+<span class="co">#summary(ad.lm.svd)</span>
 
 
 ad.lm.ruv &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.ruvIII[ ,<span class="dv">1</span>] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
-<span class="kw">anova</span>(ad.lm.ruv)</code></pre></div>
-<pre><code>## Analysis of Variance Table
-## 
-## Response: ad.ruvIII[, 1]
-##           Df  Sum Sq Mean Sq F value  Pr(&gt;F)  
-## ad.trt     1  2.1333 2.13330  5.4144 0.02291 *
-## ad.batch   4  2.0222 0.50554  1.2831 0.28512  
-## Residuals 69 27.1862 0.39400                  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#summary(ad.lm.ruv)</span></code></pre></div>
+<span class="kw">anova</span>(ad.lm.ruv)
+<span class="co">#summary(ad.lm.ruv)</span></code></pre></div>
 <p>The results of density plots and P-values of batch effects from linear models reach a consesus with boxplots, the difference between two batches are removed by BMC, ComBat, removeBatchEffect and RUVIII correction.</p>
 </div>
 <div id="rle-plots-1" class="section level3">
 <h3><span class="header-section-number">4.1.3</span> RLE plots</h3>
+<p>In sponge data, we group the samples according to the tissue (choanosome / ectosome) and generate two RLE plots respectively in all datasets before and after batch correction with different methods:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
-
-###### BMC
+<span class="co"># BMC</span>
 sponge.bmc_c &lt;-<span class="st"> </span>sponge.bmc[sponge.trt <span class="op">==</span><span class="st"> &#39;C&#39;</span>, ]
 sponge.bmc_e &lt;-<span class="st"> </span>sponge.bmc[sponge.trt <span class="op">==</span><span class="st"> &#39;E&#39;</span>, ] 
 
-###### ComBat
+<span class="co"># ComBat</span>
 sponge.combat_c &lt;-<span class="st"> </span>sponge.combat[sponge.trt <span class="op">==</span><span class="st"> &#39;C&#39;</span>, ]
 sponge.combat_e &lt;-<span class="st"> </span>sponge.combat[sponge.trt <span class="op">==</span><span class="st"> &#39;E&#39;</span>, ] 
 
-###### rBE
+<span class="co"># rBE</span>
 sponge.limma_c &lt;-<span class="st"> </span>sponge.limma[sponge.trt <span class="op">==</span><span class="st"> &#39;C&#39;</span>, ]
 sponge.limma_e &lt;-<span class="st"> </span>sponge.limma[sponge.trt <span class="op">==</span><span class="st"> &#39;E&#39;</span>, ] 
 
-###### PN
+<span class="co"># PN</span>
 sponge.percentile_c &lt;-<span class="st"> </span>sponge.percentile[sponge.trt <span class="op">==</span><span class="st"> &#39;C&#39;</span>, ]
 sponge.percentile_e &lt;-<span class="st"> </span>sponge.percentile[sponge.trt <span class="op">==</span><span class="st"> &#39;E&#39;</span>, ] 
 
-###### SVD
+<span class="co"># SVD</span>
 sponge.svd_c &lt;-<span class="st"> </span>sponge.svd[sponge.trt <span class="op">==</span><span class="st"> &#39;C&#39;</span>, ]
 sponge.svd_e &lt;-<span class="st"> </span>sponge.svd[sponge.trt <span class="op">==</span><span class="st"> &#39;E&#39;</span>, ] </code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>), <span class="dt">mai =</span> <span class="kw">c</span>(<span class="fl">0.4</span>,<span class="fl">0.6</span>,<span class="fl">0.3</span>,<span class="fl">0.1</span>))
@@ -703,7 +598,7 @@ sponge.svd_e &lt;-<span class="st"> </span>sponge.svd[sponge.trt <span class="op
 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.svd_c), <span class="dt">batch =</span> sponge.batch_c, 
              <span class="dt">maintitle =</span> <span class="st">&#39;Sponge: SVD (choanosome)&#39;</span>, <span class="dt">title.cex =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
 <p>In tissue choanosome of sponge data, the batch effect before correction is not obvious as all medians of samples are close to zero, but Gel2 has a greater interquartile range (IQR) than the other samples. Percentile normalisation increased batch effects, as the samples after correction are deviated from zero and the IQR is increased. Among other methods, the IQR of all the box plots (samples) from different batches is consistent after ComBat correction.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>), <span class="dt">mai =</span> <span class="kw">c</span>(<span class="fl">0.4</span>,<span class="fl">0.6</span>,<span class="fl">0.3</span>,<span class="fl">0.1</span>))
@@ -725,32 +620,32 @@ sponge.svd_e &lt;-<span class="st"> </span>sponge.svd[sponge.trt <span class="op
 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(sponge.svd_e), <span class="dt">batch =</span> sponge.batch_e, 
              <span class="dt">maintitle =</span> <span class="st">&#39;Sponge: SVD (ectosome)&#39;</span>, <span class="dt">title.cex =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-57-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
 <p>In tissue ectosome of sponge data, batch effect is not easily detected, but percentile normalisation increased batch variation.</p>
+<p>In AD data, we group the samples according to the inital phenol concentration (0-0.5 g/L / 1-2 g/L) and generate two RLE plots respectively in all datasets before and after batch correction, as sponge data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
-
-###### BMC
+<span class="co"># BMC</span>
 ad.bmc_<span class="dv">05</span> &lt;-<span class="st"> </span>ad.bmc[ad.trt <span class="op">==</span><span class="st"> &#39;0-0.5&#39;</span>, ]
 ad.bmc_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.bmc[ad.trt <span class="op">==</span><span class="st"> &#39;1-2&#39;</span>, ]
 
-###### ComBat
+<span class="co"># ComBat</span>
 ad.combat_<span class="dv">05</span> &lt;-<span class="st"> </span>ad.combat[ad.trt <span class="op">==</span><span class="st"> &#39;0-0.5&#39;</span>, ]
 ad.combat_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.combat[ad.trt <span class="op">==</span><span class="st"> &#39;1-2&#39;</span>, ]
 
-###### rBE
+<span class="co"># rBE</span>
 ad.limma_<span class="dv">05</span> &lt;-<span class="st"> </span>ad.limma[ad.trt <span class="op">==</span><span class="st"> &#39;0-0.5&#39;</span>, ]
 ad.limma_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.limma[ad.trt <span class="op">==</span><span class="st"> &#39;1-2&#39;</span>, ]
 
-###### PN
+<span class="co"># PN</span>
 ad.percentile_<span class="dv">05</span> &lt;-<span class="st"> </span>ad.percentile[ad.trt <span class="op">==</span><span class="st"> &#39;0-0.5&#39;</span>, ]
 ad.percentile_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.percentile[ad.trt <span class="op">==</span><span class="st"> &#39;1-2&#39;</span>, ]
 
-###### SVD
+<span class="co"># SVD</span>
 ad.svd_<span class="dv">05</span> &lt;-<span class="st"> </span>ad.svd[ad.trt <span class="op">==</span><span class="st"> &#39;0-0.5&#39;</span>, ]
 ad.svd_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.svd[ad.trt <span class="op">==</span><span class="st"> &#39;1-2&#39;</span>, ]
 
-###### RUVIII
+<span class="co"># RUVIII</span>
 ad.ruv_<span class="dv">05</span> &lt;-<span class="st"> </span>ad.ruvIII[ad.trt <span class="op">==</span><span class="st"> &#39;0-0.5&#39;</span>, ]
 ad.ruv_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.ruvIII[ad.trt <span class="op">==</span><span class="st"> &#39;1-2&#39;</span>, ]</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">mai =</span> <span class="kw">c</span>(<span class="fl">0.5</span>,<span class="fl">0.8</span>,<span class="fl">0.3</span>,<span class="fl">0.1</span>))
@@ -770,7 +665,7 @@ ad.ruv_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.ruvIII[ad.trt 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.limma_<span class="dv">05</span>), <span class="dt">batch =</span> ad.batch_<span class="dv">05</span>, 
              <span class="dt">maintitle =</span> <span class="st">&#39;AD: rBE (0-0.5 g/L)&#39;</span>, <span class="dt">legend.cex =</span> <span class="fl">0.4</span>, 
              <span class="dt">cex.xaxis =</span> <span class="fl">0.5</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-59-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.percentile_<span class="dv">05</span>), <span class="dt">batch =</span> ad.batch_<span class="dv">05</span>, 
              <span class="dt">maintitle =</span> <span class="st">&#39;AD: PN (0-0.5 g/L)&#39;</span>, <span class="dt">legend.cex =</span> <span class="fl">0.4</span>, 
              <span class="dt">cex.xaxis =</span> <span class="fl">0.5</span>)
@@ -784,7 +679,7 @@ ad.ruv_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.ruvIII[ad.trt 
              <span class="dt">cex.xaxis =</span> <span class="fl">0.5</span>)
 
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-59-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-67-2.png" width="672" /></p>
 <p>In AD data with initial phenol concentration between 0-0.5 g/L, batch effect is not easily detected, but percentile normalisation increased batch variation.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">mai =</span> <span class="kw">c</span>(<span class="fl">0.35</span>,<span class="fl">0.8</span>,<span class="fl">0.3</span>,<span class="fl">0.1</span>))
 
@@ -803,7 +698,7 @@ ad.ruv_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.ruvIII[ad.trt 
 <span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.limma_<span class="dv">2</span>), <span class="dt">batch =</span> ad.batch_<span class="dv">2</span>, 
              <span class="dt">maintitle =</span> <span class="st">&#39;AD: rBE (1-2 g/L)&#39;</span>, <span class="dt">legend.cex =</span> <span class="fl">0.4</span>, 
              <span class="dt">cex.xaxis =</span> <span class="fl">0.3</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-60-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">RleMicroRna2</span>(<span class="dt">object =</span> <span class="kw">t</span>(ad.percentile_<span class="dv">2</span>), <span class="dt">batch =</span> ad.batch_<span class="dv">2</span>, 
              <span class="dt">maintitle =</span> <span class="st">&#39;AD: PN (1-2 g/L)&#39;</span>, <span class="dt">legend.cex =</span> <span class="fl">0.4</span>, 
              <span class="dt">cex.xaxis =</span> <span class="fl">0.3</span>)
@@ -817,11 +712,12 @@ ad.ruv_<span class="dv">2</span> &lt;-<span class="st"> </span>ad.ruvIII[ad.trt 
              <span class="dt">cex.xaxis =</span> <span class="fl">0.3</span>)
 
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-60-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-68-2.png" width="672" /></p>
 <p>In AD data with initial phenol concentration between 1-2 g/L, batch effect is not easily detected, but percentile normalisation increased batch variation.</p>
 </div>
 <div id="heatmap-1" class="section level3">
 <h3><span class="header-section-number">4.1.4</span> Heatmap</h3>
+<p>We use the heatmap to visualise data clusters. Samples clustered by batches instead of treatments indicate a batch effect.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
 <span class="co"># before </span>
 sponge.tss.clr.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.tss.clr, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
@@ -847,27 +743,8 @@ sponge.anno_metabo_colors &lt;-<span class="st"> </span><span class="kw">list</s
          <span class="dt">annotation_colors =</span> sponge.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - before&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-61-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># BMC </span>
-sponge.bmc.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.bmc, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
-<span class="co"># scale on OTUs</span>
-sponge.bmc.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.bmc.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
-<span class="co"># scale on samples</span>
-
-<span class="kw">pheatmap</span>(sponge.bmc.scale, 
-         <span class="dt">scale =</span> <span class="st">&#39;none&#39;</span>, 
-         <span class="dt">cluster_rows =</span> F, 
-         <span class="dt">cluster_cols =</span> T, 
-         <span class="dt">fontsize_row =</span> <span class="dv">5</span>, <span class="dt">fontsize_col =</span> <span class="dv">8</span>,
-         <span class="dt">fontsize =</span> <span class="dv">8</span>,
-         <span class="dt">clustering_distance_rows =</span> <span class="st">&#39;euclidean&#39;</span>,
-         <span class="dt">clustering_method =</span> <span class="st">&#39;ward.D&#39;</span>,
-         <span class="dt">treeheight_row =</span> <span class="dv">30</span>,
-         <span class="dt">annotation_col =</span> sponge.anno_col,
-         <span class="dt">annotation_colors =</span> sponge.anno_metabo_colors,
-         <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
-         <span class="dt">main =</span> <span class="st">&#39;Sponge data - BMC&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-61-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+<p>Before correction, samples in sponge data are preferentially clustered by batch instead of tissue type, indicating a batch effect.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ComBat </span>
 sponge.combat.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.combat, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
 <span class="co"># scale on OTUs</span>
@@ -887,8 +764,30 @@ sponge.combat.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(
          <span class="dt">annotation_colors =</span> sponge.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - ComBat&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-61-3.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># removeBatchEffect</span>
+<p><img src="vignette_files/figure-html/unnamed-chunk-70-1.png" width="672" /></p>
+<p>After batch correction with ComBat, the data are clustered by tissues rather than batches, therefore, ComBat not only removed batch effects, but also disengaged the effect of interest. The results from batch correction with other methods are similar.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># BMC </span>
+sponge.bmc.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.bmc, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
+<span class="co"># scale on OTUs</span>
+sponge.bmc.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.bmc.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
+<span class="co"># scale on samples</span>
+
+<span class="kw">pheatmap</span>(sponge.bmc.scale, 
+         <span class="dt">scale =</span> <span class="st">&#39;none&#39;</span>, 
+         <span class="dt">cluster_rows =</span> F, 
+         <span class="dt">cluster_cols =</span> T, 
+         <span class="dt">fontsize_row =</span> <span class="dv">5</span>, <span class="dt">fontsize_col =</span> <span class="dv">8</span>,
+         <span class="dt">fontsize =</span> <span class="dv">8</span>,
+         <span class="dt">clustering_distance_rows =</span> <span class="st">&#39;euclidean&#39;</span>,
+         <span class="dt">clustering_method =</span> <span class="st">&#39;ward.D&#39;</span>,
+         <span class="dt">treeheight_row =</span> <span class="dv">30</span>,
+         <span class="dt">annotation_col =</span> sponge.anno_col,
+         <span class="dt">annotation_colors =</span> sponge.anno_metabo_colors,
+         <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
+         <span class="dt">main =</span> <span class="st">&#39;Sponge data - BMC&#39;</span>)
+
+
+<span class="co"># removeBatchEffect</span>
 sponge.limma.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.limma, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
 <span class="co"># scale on OTUs</span>
 sponge.limma.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.limma.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
@@ -906,9 +805,9 @@ sponge.limma.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<
          <span class="dt">annotation_col =</span> sponge.anno_col,
          <span class="dt">annotation_colors =</span> sponge.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
-         <span class="dt">main =</span> <span class="st">&#39;Sponge data - removeBatchEffect&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-61-4.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># percentile normalisation</span>
+         <span class="dt">main =</span> <span class="st">&#39;Sponge data - removeBatchEffect&#39;</span>)
+
+<span class="co"># percentile normalisation</span>
 sponge.percentile.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.percentile, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
 <span class="co"># scale on OTUs</span>
 sponge.percentile.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.percentile.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
@@ -926,9 +825,10 @@ sponge.percentile.scale &lt;-<span class="st"> </span><span class="kw">scale</sp
          <span class="dt">annotation_col =</span> sponge.anno_col,
          <span class="dt">annotation_colors =</span> sponge.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
-         <span class="dt">main =</span> <span class="st">&#39;Sponge data - percentile norm&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-61-5.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SVD</span>
+         <span class="dt">main =</span> <span class="st">&#39;Sponge data - percentile norm&#39;</span>)
+
+
+<span class="co"># SVD</span>
 sponge.svd.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.svd, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
 <span class="co"># scale on OTUs</span>
 sponge.svd.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(sponge.svd.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) 
@@ -947,8 +847,7 @@ sponge.svd.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<sp
          <span class="dt">annotation_colors =</span> sponge.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;Sponge data - SVD&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-61-6.png" width="672" /></p>
-<p>From heatmaps, the sponge data are clustered by batches instead of tissues indicating a batch effect. After batch correction with ComBat, the data are clustered by tissues rather than batches, therefore, ComBat not only removes batch effects, but also disengages the effect of interest.</p>
+<p>In the heatmap of AD data before batch correction, samples within batch 14/04/2016 are clustered and distinct from other samples, indicating a batch effect.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># AD data</span>
 <span class="co"># before </span>
 ad.tss.clr.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
@@ -976,43 +875,7 @@ ad.anno_metabo_colors &lt;-<span class="st"> </span><span class="kw">list</span>
          <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - before&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-62-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># BMC</span>
-ad.bmc.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.bmc, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
-ad.bmc.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.bmc.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
-
-<span class="kw">pheatmap</span>(ad.bmc.scale, 
-         <span class="dt">scale =</span> <span class="st">&#39;none&#39;</span>, 
-         <span class="dt">cluster_rows =</span> F, 
-         <span class="dt">cluster_cols =</span> T, 
-         <span class="dt">fontsize_row =</span> <span class="dv">4</span>, <span class="dt">fontsize_col =</span> <span class="dv">6</span>,
-         <span class="dt">fontsize =</span> <span class="dv">8</span>,
-         <span class="dt">clustering_distance_rows =</span> <span class="st">&#39;euclidean&#39;</span>,
-         <span class="dt">clustering_method =</span> <span class="st">&#39;ward.D&#39;</span>,
-         <span class="dt">treeheight_row =</span> <span class="dv">30</span>,
-         <span class="dt">annotation_col =</span> ad.anno_col,
-         <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
-         <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
-         <span class="dt">main =</span> <span class="st">&#39;AD data - BMC&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-62-2.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ComBat</span>
-ad.combat.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.combat, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
-ad.combat.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.combat.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
-
-<span class="kw">pheatmap</span>(ad.combat.scale, 
-         <span class="dt">scale =</span> <span class="st">&#39;none&#39;</span>, 
-         <span class="dt">cluster_rows =</span> F, 
-         <span class="dt">cluster_cols =</span> T, 
-         <span class="dt">fontsize_row =</span> <span class="dv">4</span>, <span class="dt">fontsize_col =</span> <span class="dv">6</span>,
-         <span class="dt">fontsize =</span> <span class="dv">8</span>,
-         <span class="dt">clustering_distance_rows =</span> <span class="st">&#39;euclidean&#39;</span>,
-         <span class="dt">clustering_method =</span> <span class="st">&#39;ward.D&#39;</span>,
-         <span class="dt">treeheight_row =</span> <span class="dv">30</span>,
-         <span class="dt">annotation_col =</span> ad.anno_col,
-         <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
-         <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
-         <span class="dt">main =</span> <span class="st">&#39;AD data - ComBat&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-62-3.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-72-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># removeBatchEffect</span>
 ad.limma.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.limma, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.limma.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.limma.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
@@ -1030,8 +893,47 @@ ad.limma.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span
          <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - removeBatchEffect&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-62-4.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># percentile normalisation</span>
+<p><img src="vignette_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
+<p>After batch correction with removeBatchEffect, the data are almost clustered by treatments rather than batches, therefore, removeBatchEffect not only removed batch effects, but also disengaged the treatment effects. The results from batch correction with other methods are similar.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># BMC</span>
+ad.bmc.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.bmc, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
+ad.bmc.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.bmc.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
+
+<span class="kw">pheatmap</span>(ad.bmc.scale, 
+         <span class="dt">scale =</span> <span class="st">&#39;none&#39;</span>, 
+         <span class="dt">cluster_rows =</span> F, 
+         <span class="dt">cluster_cols =</span> T, 
+         <span class="dt">fontsize_row =</span> <span class="dv">4</span>, <span class="dt">fontsize_col =</span> <span class="dv">6</span>,
+         <span class="dt">fontsize =</span> <span class="dv">8</span>,
+         <span class="dt">clustering_distance_rows =</span> <span class="st">&#39;euclidean&#39;</span>,
+         <span class="dt">clustering_method =</span> <span class="st">&#39;ward.D&#39;</span>,
+         <span class="dt">treeheight_row =</span> <span class="dv">30</span>,
+         <span class="dt">annotation_col =</span> ad.anno_col,
+         <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
+         <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
+         <span class="dt">main =</span> <span class="st">&#39;AD data - BMC&#39;</span>)
+
+<span class="co"># ComBat</span>
+ad.combat.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.combat, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
+ad.combat.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.combat.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
+
+<span class="kw">pheatmap</span>(ad.combat.scale, 
+         <span class="dt">scale =</span> <span class="st">&#39;none&#39;</span>, 
+         <span class="dt">cluster_rows =</span> F, 
+         <span class="dt">cluster_cols =</span> T, 
+         <span class="dt">fontsize_row =</span> <span class="dv">4</span>, <span class="dt">fontsize_col =</span> <span class="dv">6</span>,
+         <span class="dt">fontsize =</span> <span class="dv">8</span>,
+         <span class="dt">clustering_distance_rows =</span> <span class="st">&#39;euclidean&#39;</span>,
+         <span class="dt">clustering_method =</span> <span class="st">&#39;ward.D&#39;</span>,
+         <span class="dt">treeheight_row =</span> <span class="dv">30</span>,
+         <span class="dt">annotation_col =</span> ad.anno_col,
+         <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
+         <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
+         <span class="dt">main =</span> <span class="st">&#39;AD data - ComBat&#39;</span>)
+
+
+
+<span class="co"># percentile normalisation</span>
 ad.percentile.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.percentile, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.percentile.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.percentile.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
 
@@ -1047,9 +949,9 @@ ad.percentile.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(
          <span class="dt">annotation_col =</span> ad.anno_col,
          <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
-         <span class="dt">main =</span> <span class="st">&#39;AD data - percentile norm&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-62-5.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># SVD</span>
+         <span class="dt">main =</span> <span class="st">&#39;AD data - percentile norm&#39;</span>)
+
+<span class="co"># SVD</span>
 ad.svd.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.svd, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.svd.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.svd.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
 
@@ -1065,9 +967,10 @@ ad.svd.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span c
          <span class="dt">annotation_col =</span> ad.anno_col,
          <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
-         <span class="dt">main =</span> <span class="st">&#39;AD data - SVD&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-62-6.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># RUVIII</span>
+         <span class="dt">main =</span> <span class="st">&#39;AD data - SVD&#39;</span>)
+
+
+<span class="co"># RUVIII</span>
 ad.ruv.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.ruvIII, <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on OTUs</span>
 ad.ruv.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span class="kw">t</span>(ad.ruv.scale), <span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># scale on samples</span>
 
@@ -1084,8 +987,6 @@ ad.ruv.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span c
          <span class="dt">annotation_colors =</span> ad.anno_metabo_colors,
          <span class="dt">border_color =</span> <span class="st">&#39;NA&#39;</span>,
          <span class="dt">main =</span> <span class="st">&#39;AD data - RUVIII&#39;</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-62-7.png" width="672" /></p>
-<p>In the heatmaps of AD data, samples within batch 14/04/2016 are clustered and distinct from other samples, indicating a batch effect. After batch correction with removeBatchEffect and percentile normalisation, the data are almost clustered by treatments rather than batches, therefore, removeBatchEffect and percentile normalisation not only remove batch effects, but also disengage the treatment effects.</p>
 </div>
 </div>
 <div id="variance-calculation" class="section level2">
@@ -1095,7 +996,7 @@ ad.ruv.scale &lt;-<span class="st"> </span><span class="kw">scale</span>(<span c
 <h3><span class="header-section-number">4.2.1</span> Linear model per variable</h3>
 <p>The variance explained by batch or treatment per OTU can be calculated by a linear model. Box plots can then be used to visualise the variance calculated from each OTU. Following batch effect correction, the percentage of variance explained by the treatment should be greater than the batch.</p>
 <p>We use a function <em>fitExtractVarPartModel</em> to calculate and extract the variance of batch and treatment per OTU.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Sponge data
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
 sponge.form &lt;-<span class="st"> </span><span class="er">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch
 sponge.info &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">cbind</span>(<span class="kw">rownames</span>(sponge.tss.clr), sponge.trt, sponge.batch))
 <span class="kw">rownames</span>(sponge.info) &lt;-<span class="st"> </span><span class="kw">rownames</span>(sponge.tss.clr)
@@ -1129,35 +1030,32 @@ sponge.varPart.percentile &lt;-<span class="st"> </span><span class="kw">fitExtr
 sponge.varPart.svd &lt;-<span class="st"> </span><span class="kw">fitExtractVarPartModel</span>(<span class="dt">exprObj =</span> <span class="kw">t</span>(sponge.svd), 
                                              <span class="dt">formula =</span> sponge.form, 
                                              <span class="dt">data =</span> sponge.info)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># merge results</span>
-sponge.variance &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.before<span class="op">$</span>sponge.batch,
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;Before&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.before<span class="op">$</span>sponge.trt,
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Tissue&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;Before&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.bmc<span class="op">$</span>sponge.batch, 
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;BMC&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.bmc<span class="op">$</span>sponge.trt,
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Tissue&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;BMC&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.combat<span class="op">$</span>sponge.batch,
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;ComBat&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.combat<span class="op">$</span>sponge.trt,
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Tissue&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;ComBat&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.limma<span class="op">$</span>sponge.batch, 
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;rBE&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.limma<span class="op">$</span>sponge.trt, 
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Tissue&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;rBE&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.percentile<span class="op">$</span>sponge.batch, 
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;PN&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.percentile<span class="op">$</span>sponge.trt, 
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Tissue&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;PN&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.svd<span class="op">$</span>sponge.batch, 
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;SVD&#39;</span>, <span class="dv">24</span>)), 
-                         <span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.varPart.svd<span class="op">$</span>sponge.trt, 
-                               <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Tissue&#39;</span>, <span class="dv">24</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;SVD&#39;</span>, <span class="dv">24</span>)))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># extract the variance of trt and batch</span>
+<span class="co"># before</span>
+sponge.varmat.before &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(sponge.varPart.before[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># BMC</span>
+sponge.varmat.bmc &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(sponge.varPart.bmc[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># ComBat</span>
+sponge.varmat.combat &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(sponge.varPart.combat[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># removeBatchEffect</span>
+sponge.varmat.limma &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(sponge.varPart.limma[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># percentile normalisation</span>
+sponge.varmat.percentile &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(sponge.varPart.percentile[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># SVD</span>
+sponge.varmat.svd &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(sponge.varPart.svd[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
 
+<span class="co"># merge results</span>
+sponge.variance &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">as.vector</span>(sponge.varmat.before), <span class="kw">as.vector</span>(sponge.varmat.bmc),
+                     <span class="kw">as.vector</span>(sponge.varmat.combat), <span class="kw">as.vector</span>(sponge.varmat.limma),
+                     <span class="kw">as.vector</span>(sponge.varmat.percentile), <span class="kw">as.vector</span>(sponge.varmat.svd))
+
+<span class="co"># add batch, trt and methods info</span>
+sponge.variance &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dt">variance =</span> sponge.variance, 
+                         <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&#39;Tissue&#39;</span>, <span class="st">&#39;Batch&#39;</span>), <span class="dt">each =</span> <span class="kw">ncol</span>(sponge.tss.clr)),
+                         <span class="dt">method =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&#39;Before&#39;</span>, <span class="st">&#39;BMC&#39;</span>, <span class="st">&#39;ComBat&#39;</span>, <span class="st">&#39;rBE&#39;</span>, 
+                                        <span class="st">&#39;PN&#39;</span>, <span class="st">&#39;SVD&#39;</span>), <span class="dt">each =</span> <span class="dv">2</span><span class="op">*</span><span class="kw">ncol</span>(sponge.tss.clr)))
+<span class="co"># reorder levels  </span>
 sponge.variance &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(sponge.variance)
-sponge.variance<span class="op">$</span>Type &lt;-<span class="st"> </span><span class="kw">factor</span>(sponge.variance<span class="op">$</span>Type, 
-                              <span class="dt">levels =</span> <span class="kw">unique</span>(sponge.variance<span class="op">$</span>Type))
 sponge.variance<span class="op">$</span>method &lt;-<span class="st"> </span><span class="kw">factor</span>(sponge.variance<span class="op">$</span>method, 
                                 <span class="dt">levels =</span> <span class="kw">unique</span>(sponge.variance<span class="op">$</span>method))
 sponge.variance<span class="op">$</span>variance &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(sponge.variance<span class="op">$</span>variance))
@@ -1168,8 +1066,8 @@ sponge.variance<span class="op">$</span>variance &lt;-<span class="st"> </span><
         <span class="dt">strip.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>), <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), 
         <span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>), <span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>), 
         <span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>), <span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Type&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Proportion Variance&quot;</span>, <span class="dt">name=</span><span class="st">&#39;Type&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&#39;Type&#39;</span>, <span class="dt">y =</span> <span class="st">&#39;Proportion Variance&#39;</span>, <span class="dt">name =</span> <span class="st">&#39;Type&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre></div>
+<p><img src="vignette_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
 <p>BMC, ComBat and removeBatchEffect successfully removed batch variation while preserving treatment variation, but SVD performed poorly. Percentile normalisation preserved sufficient treatment variation, but removed less batch effect variation than BMC, ComBat and removeBatchEffect. Percentile normalisation used percentiles instead of actual values. This leads to information loss. Moreover, it was designed for case-control microbiome studies, which differ from our example studies. This method would therefore be more effective with control samples in each batch. SVD was inefficient at targeting batch effects, as it assumes that batch effects cause the largest variation in the data and should therefore appear as the first component. However, in sponge data the batch effect is mainly present on the second component as was shown in PCA sample plots with density, which results in a miscorrection of batch effects.</p>
 <p>We also calculate the variance for AD data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># AD data</span>
@@ -1204,39 +1102,36 @@ ad.varPart.svd &lt;-<span class="st"> </span><span class="kw">fitExtractVarPartM
 <span class="co"># ruv</span>
 ad.varPart.ruv &lt;-<span class="st"> </span><span class="kw">fitExtractVarPartModel</span>(<span class="dt">exprObj =</span> <span class="kw">t</span>(ad.ruvIII), 
                                          <span class="dt">formula =</span> ad.form, <span class="dt">data =</span> ad.info)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># merge results</span>
-ad.variance &lt;-<span class="st"> </span><span class="kw">rbind</span>(<span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.before<span class="op">$</span>ad.batch, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;Before&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.before<span class="op">$</span>ad.trt, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Treatment&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;Before&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.bmc<span class="op">$</span>ad.batch, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;BMC&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.bmc<span class="op">$</span>ad.trt, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Treatment&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;BMC&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.combat<span class="op">$</span>ad.batch, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;ComBat&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.combat<span class="op">$</span>ad.trt, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Treatment&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;ComBat&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.limma<span class="op">$</span>ad.batch, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;rBE&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.limma<span class="op">$</span>ad.trt, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Treatment&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;rBE&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.percentile<span class="op">$</span>ad.batch, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;PN&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.percentile<span class="op">$</span>ad.trt, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Treatment&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;PN&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.svd<span class="op">$</span>ad.batch, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;SVD&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.svd<span class="op">$</span>ad.trt, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Treatment&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;SVD&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.ruv<span class="op">$</span>ad.batch, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Batch&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;RUVIII&#39;</span>, <span class="dv">231</span>)), 
-                     <span class="kw">cbind</span>(<span class="dt">variance =</span> ad.varPart.ruv<span class="op">$</span>ad.trt, 
-                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="st">&#39;Treatment&#39;</span>, <span class="dv">231</span>), <span class="dt">method =</span> <span class="kw">rep</span>(<span class="st">&#39;RUVIII&#39;</span>, <span class="dv">231</span>)))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># extract the variance of trt and batch</span>
+<span class="co"># before</span>
+ad.varmat.before &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(ad.varPart.before[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># BMC</span>
+ad.varmat.bmc &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(ad.varPart.bmc[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># ComBat</span>
+ad.varmat.combat &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(ad.varPart.combat[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># removeBatchEffect</span>
+ad.varmat.limma &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(ad.varPart.limma[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># percentile normalisation</span>
+ad.varmat.percentile &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(ad.varPart.percentile[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># SVD</span>
+ad.varmat.svd &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(ad.varPart.svd[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
+<span class="co"># RUVIII</span>
+ad.varmat.ruv &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(ad.varPart.ruv[ ,<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])
 
+
+<span class="co"># merge results</span>
+ad.variance &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">as.vector</span>(ad.varmat.before), <span class="kw">as.vector</span>(ad.varmat.bmc),
+                 <span class="kw">as.vector</span>(ad.varmat.combat), <span class="kw">as.vector</span>(ad.varmat.limma),
+                 <span class="kw">as.vector</span>(ad.varmat.percentile), <span class="kw">as.vector</span>(ad.varmat.svd), 
+                 <span class="kw">as.vector</span>(ad.varmat.ruv))
+
+<span class="co"># add batch, trt and methods info</span>
+ad.variance &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dt">variance =</span> ad.variance, 
+                     <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="kw">c</span>( <span class="st">&#39;Treatment&#39;</span>, <span class="st">&#39;Batch&#39;</span>), <span class="dt">each =</span> <span class="kw">ncol</span>(ad.tss.clr)),
+                     <span class="dt">method =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&#39;Before&#39;</span>, <span class="st">&#39;BMC&#39;</span>, <span class="st">&#39;ComBat&#39;</span>, <span class="st">&#39;rBE&#39;</span>, <span class="st">&#39;PN&#39;</span>, 
+                                    <span class="st">&#39;SVD&#39;</span>, <span class="st">&#39;RUVIII&#39;</span>), <span class="dt">each =</span> <span class="dv">2</span><span class="op">*</span><span class="kw">ncol</span>(ad.tss.clr)))
+<span class="co"># reorder levels  </span>
 ad.variance &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(ad.variance)
-ad.variance<span class="op">$</span>Type &lt;-<span class="st"> </span><span class="kw">factor</span>(ad.variance<span class="op">$</span>Type, 
-                          <span class="dt">levels =</span> <span class="kw">unique</span>(ad.variance<span class="op">$</span>Type))
 ad.variance<span class="op">$</span>method &lt;-<span class="st"> </span><span class="kw">factor</span>(ad.variance<span class="op">$</span>method, 
                             <span class="dt">levels =</span> <span class="kw">unique</span>(ad.variance<span class="op">$</span>method))
 ad.variance<span class="op">$</span>variance &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.character</span>(ad.variance<span class="op">$</span>variance))
@@ -1249,7 +1144,7 @@ ad.variance<span class="op">$</span>variance &lt;-<span class="st"> </span><span
         <span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>), <span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Type&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Proportion Variance&quot;</span>, <span class="dt">name =</span> <span class="st">&#39;Type&#39;</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">scale_fill_hue</span>(<span class="dt">l =</span> <span class="dv">40</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-78-1.png" width="672" /></p>
 <p>Similar results as in sponge data, BMC, ComBat and removeBatchEffect successfully removed batch variation while preserving treatment variation, but SVD performed poorly. Percentile normalisation and RUVIII preserved sufficient treatment variation, but removed less batch effect variation than BMC, ComBat and removeBatchEffect. It is possible the negative control variables or technical replicate samples did not entirely capture the batch effects. SVD was also inefficient at targeting batch effects, as in AD data the batch effect is present on both first and second components, which results in a miscorrection of batch effects.</p>
 </div>
 <div id="rda" class="section level3">
@@ -1344,15 +1239,19 @@ sponge.rda.prop.percentile &lt;-<span class="st"> </span><span class="kw">c</spa
 sponge.rda.prop.svd &lt;-<span class="st"> </span><span class="kw">c</span>(sponge.rda.bat_prop.svd, 
                         sponge.rda.trt_prop.svd)
 
+<span class="co"># merge results</span>
 sponge.rda.prop.val &lt;-<span class="st"> </span><span class="kw">c</span>(sponge.rda.prop.before, sponge.rda.prop.bmc, 
                         sponge.rda.prop.combat, sponge.rda.prop.limma, 
                         sponge.rda.prop.percentile, sponge.rda.prop.svd)
+
+<span class="co"># add batch, trt and method info</span>
 sponge.rda.prop &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">prop =</span> sponge.rda.prop.val, 
                              <span class="dt">prop.r =</span> <span class="kw">round</span>(sponge.rda.prop.val, <span class="dv">2</span>), 
                              <span class="dt">Method =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&#39;Before&#39;</span>, <span class="st">&#39;BMC&#39;</span>, <span class="st">&#39;ComBat&#39;</span>, 
                                             <span class="st">&#39;rBE&#39;</span>, <span class="st">&#39;PN&#39;</span>, <span class="st">&#39;SVD&#39;</span>), <span class="dt">each =</span> <span class="dv">2</span>), 
                              <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&#39;Batch&#39;</span>, <span class="st">&#39;Tissue&#39;</span>), <span class="dv">6</span>))
 
+<span class="co"># reorder levels</span>
 sponge.rda.prop<span class="op">$</span>Method &lt;-<span class="st"> </span><span class="kw">factor</span>(sponge.rda.prop<span class="op">$</span>Method, 
                                 <span class="dt">levels =</span> <span class="kw">unique</span>(sponge.rda.prop<span class="op">$</span>Method))
 
@@ -1365,7 +1264,7 @@ sponge.rda.prop<span class="op">$</span>Method &lt;-<span class="st"> </span><sp
         <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>), 
         <span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>), <span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>),
         <span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">100</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-80-1.png" width="672" /></p>
 <p>In sponge data, pRDA shows that BMC, ComBat and removeBatchEffect were more efficient at removing batch variation while preserving treatment variation. This result is in agreement with the proportional variance calculated using a linear model in the previous section ‘linear model per variable’. ComBat removed relatively less batch variation compared with the other two methods, which implies that the batch effect is not purely systematic. The low efficiency of percentile normalisation is more obvious in the variance calculated with pRDA. It did not remove enough batch variation, nor preserve enough treatment variation in sponge data.</p>
 <p>We also apply pRDA on AD data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># AD data</span>
@@ -1451,16 +1350,19 @@ ad.rda.prop.percentile &lt;-<span class="st"> </span><span class="kw">c</span>(a
 ad.rda.prop.svd &lt;-<span class="st"> </span><span class="kw">c</span>(ad.rda.bat_prop.svd, ad.rda.trt_prop.svd)
 ad.rda.prop.ruv &lt;-<span class="st"> </span><span class="kw">c</span>(ad.rda.bat_prop.ruv, ad.rda.trt_prop.ruv)
 
-#############
+<span class="co"># merge results</span>
 ad.rda.prop.val &lt;-<span class="st"> </span><span class="kw">c</span>(ad.rda.prop.before, ad.rda.prop.bmc, 
                     ad.rda.prop.combat, ad.rda.prop.limma, 
                     ad.rda.prop.percentile, ad.rda.prop.svd, 
                     ad.rda.prop.ruv)
+
+<span class="co"># add batch, trt and method info</span>
 ad.rda.prop &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">prop =</span> ad.rda.prop.val, <span class="dt">prop.r =</span> <span class="kw">round</span>(ad.rda.prop.val, <span class="dv">2</span>), 
                          <span class="dt">Method =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&#39;Before&#39;</span>, <span class="st">&#39;BMC&#39;</span>, <span class="st">&#39;ComBat&#39;</span>, <span class="st">&#39;rBE&#39;</span>, 
                                         <span class="st">&#39;PN&#39;</span>, <span class="st">&#39;SVD&#39;</span>, <span class="st">&#39;RUVIII&#39;</span>), <span class="dt">each =</span> <span class="dv">2</span>), 
                          <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&#39;Batch&#39;</span>, <span class="st">&#39;Treatment&#39;</span>), <span class="dv">7</span>))
 
+<span class="co"># reorder levels</span>
 ad.rda.prop<span class="op">$</span>Method &lt;-<span class="st"> </span><span class="kw">factor</span>(ad.rda.prop<span class="op">$</span>Method, <span class="dt">levels =</span> <span class="kw">unique</span>(ad.rda.prop<span class="op">$</span>Method))
 
 <span class="kw">ggplot</span>(<span class="dt">data =</span> ad.rda.prop, <span class="kw">aes</span>(<span class="dt">x =</span> Method, <span class="dt">y =</span> prop, <span class="dt">fill =</span> Type)) <span class="op">+</span><span class="st"> </span>
@@ -1472,13 +1374,13 @@ ad.rda.prop<span class="op">$</span>Method &lt;-<span class="st"> </span><span c
         <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>), 
         <span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>), <span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>), 
         <span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_hue</span>(<span class="dt">l =</span> <span class="dv">40</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">100</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-70-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-82-1.png" width="672" /></p>
 <p>Similar as results from sponge data, BMC, ComBat and removeBatchEffect were more efficient at removing batch variation while preserving treatment variation. ComBat removed relatively less batch variation compared with the other two methods. Percentile normalisation did not remove enough batch variation, nor preserve enough treatment variation in AD data. RUVIII preserved enough treatment variation but did not remove enough batch variation.</p>
 <p>In sponge data, the results of BMC and removeBatchEffect are the same, while in AD data, removeBatchEffect removed less batch variation but preserved more treatment variation. This indicates some linear correlation exists between the batch and treatment effects, which might originate from the batch x treatment design.</p>
 </div>
 <div id="pvca" class="section level3">
 <h3><span class="header-section-number">4.2.3</span> PVCA</h3>
-<p>PVCA can be applied as a validation method that complements pRDA, but it does not work for dataset with only 24 samples, therefore it cannot be applied on sponge data.</p>
+<p>PVCA can be applied as a validation method that complements pRDA, but it requires 42 OTUs minimum. Therefore, it did not apply on sponge data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># AD data</span>
 ad.PVCA.score &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Interaction =</span> <span class="ot">NA</span>, <span class="dt">Batch =</span> <span class="ot">NA</span>, 
                            <span class="dt">Treatment =</span> <span class="ot">NA</span>, <span class="dt">Residuals =</span> <span class="ot">NA</span>)
@@ -1541,12 +1443,16 @@ ad.values.ruv &lt;-<span class="st"> </span>ad.pvcaObj.ruv<span class="op">$</sp
 ad.PVCA.score[<span class="dv">7</span>, ] &lt;-<span class="st"> </span>ad.values.ruv
 
 <span class="kw">rownames</span>(ad.PVCA.score) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Before&#39;</span>, <span class="st">&#39;BMC&#39;</span>, <span class="st">&#39;ComBat&#39;</span>, <span class="st">&#39;rBE&#39;</span>, <span class="st">&#39;PN&#39;</span>, <span class="st">&#39;SVD&#39;</span>, <span class="st">&#39;RUVIII&#39;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.pvca.prop.val &lt;-<span class="st"> </span><span class="kw">c</span>(ad.PVCA.score<span class="op">$</span>Batch, ad.PVCA.score<span class="op">$</span>Treatment)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># merge results</span>
+ad.pvca.prop.val &lt;-<span class="st"> </span><span class="kw">c</span>(ad.PVCA.score<span class="op">$</span>Batch, ad.PVCA.score<span class="op">$</span>Treatment)
+
+<span class="co"># add batch, trt and method info</span>
 ad.pvca.prop &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">prop =</span> ad.pvca.prop.val, <span class="dt">prop.r =</span> <span class="kw">round</span>(ad.pvca.prop.val, <span class="dv">2</span>), 
                           <span class="dt">Method =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&#39;Before&#39;</span>, <span class="st">&#39;BMC&#39;</span>, <span class="st">&#39;ComBat&#39;</span>, <span class="st">&#39;rBE&#39;</span>, 
                                          <span class="st">&#39;PN&#39;</span>, <span class="st">&#39;SVD&#39;</span>, <span class="st">&#39;RUVIII&#39;</span>), <span class="dv">2</span>), 
                           <span class="dt">Type =</span> <span class="kw">rep</span>(<span class="kw">c</span>(<span class="st">&#39;Batch&#39;</span>, <span class="st">&#39;Treatment&#39;</span>), <span class="dt">each =</span> <span class="dv">7</span>))
 
+<span class="co"># reorder levels</span>
 ad.pvca.prop<span class="op">$</span>Method &lt;-<span class="st"> </span><span class="kw">factor</span>(ad.pvca.prop<span class="op">$</span>Method, <span class="dt">levels =</span> <span class="kw">unique</span>(ad.pvca.prop<span class="op">$</span>Method))
 
 <span class="kw">ggplot</span>(<span class="dt">data =</span> ad.pvca.prop, <span class="kw">aes</span>(<span class="dt">x =</span> Method, <span class="dt">y =</span> prop, <span class="dt">fill =</span> Type)) <span class="op">+</span><span class="st"> </span>
@@ -1558,15 +1464,14 @@ ad.pvca.prop<span class="op">$</span>Method &lt;-<span class="st"> </span><span 
         <span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(),<span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>), 
         <span class="dt">axis.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>), <span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>), 
         <span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">scale_fill_hue</span>(<span class="dt">l =</span> <span class="dv">40</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-72-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-84-1.png" width="672" /></p>
 <p>Proportionally, BMC, ComBat and removeBatchEffect removed more of the variance explained by batch and maintained more variance explained by treatment than other methods in AD data.</p>
 </div>
 <div id="silhouette-coefficient" class="section level3">
 <h3><span class="header-section-number">4.2.4</span> Silhouette coefficient</h3>
 <p>Finally we assess the quality of the clusters, based on either batch or treatment information using the silhouette coefficient and the PC components. This coefficient measures how cohesive a sample is to its own cluster compared to other clusters. It has been adapted to assess the consistency of sample groups based on treatment or batch effects.</p>
 <p>The average silhouette coefficient width across all samples in one group (batch <span class="math inline">\(\bar{s}_{b}\)</span> or treatment <span class="math inline">\(\bar{s}_{t}\)</span>) is calculated and plotted here. If <span class="math inline">\(\bar{s}_{b}\)</span> is close to <span class="math inline">\(0\)</span> there is no batch effect, and if <span class="math inline">\(\bar{s}_{t}\)</span> is close to <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span> there is a treatment effect.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">###################
-<span class="co"># Sponge data</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
 sponge.silh.before &lt;-<span class="st"> </span><span class="kw">calc.sil</span>(sponge.pca.before<span class="op">$</span>variates<span class="op">$</span>X, 
                               <span class="dt">y1 =</span> sponge.batch, <span class="dt">y2 =</span> sponge.trt, 
                               <span class="dt">name.y1 =</span> <span class="st">&#39;Batch&#39;</span>, <span class="dt">name.y2 =</span> <span class="st">&#39;Tissue&#39;</span>)
@@ -1612,11 +1517,10 @@ sponge.silh.plot<span class="op">$</span>Type &lt;-<span class="st"> </span><spa
         <span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">15</span>), <span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&#39;#388ECC&#39;</span>,<span class="st">&#39;#F68B33&#39;</span>,<span class="st">&#39;#F0E442&#39;</span>,<span class="st">&#39;#D55E00&#39;</span>)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&#39;Type&#39;</span>, <span class="dt">y =</span> <span class="st">&#39;Silhouette Coefficient&#39;</span>, <span class="dt">name =</span> <span class="st">&#39;Type&#39;</span>) </code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-85-1.png" width="672" /></p>
 <p><span class="math inline">\(\bar{s}_{b}\)</span> of different batches in sponge data decreased to <span class="math inline">\(0\)</span> after correction with BMC, ComBat and removeBatchEffect, while <span class="math inline">\(\bar{s}_{t}\)</span> of different tissues increased or maintained at the same level as before correction.</p>
 <p>We also calculate the silhouette coefficients for AD data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">############
-<span class="co"># AD data</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># AD data</span>
 ad.silh.before &lt;-<span class="st"> </span><span class="kw">calc.sil</span>(ad.pca.before<span class="op">$</span>variates<span class="op">$</span>X, <span class="dt">y1 =</span> ad.batch, 
                           <span class="dt">y2 =</span> ad.trt, <span class="dt">name.y1 =</span> <span class="st">&#39;Batch&#39;</span>, <span class="dt">name.y2 =</span> <span class="st">&#39;Treatment&#39;</span>)
 ad.silh.bmc &lt;-<span class="st"> </span><span class="kw">calc.sil</span>(ad.pca.bmc<span class="op">$</span>variates<span class="op">$</span>X, <span class="dt">y1 =</span> ad.batch, 
@@ -1656,7 +1560,7 @@ ad.silh.plot<span class="op">$</span>Type &lt;-<span class="st"> </span><span cl
 <span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&#39;#388ECC&#39;</span>, <span class="st">&#39;#F68B33&#39;</span>, <span class="st">&#39;#C2C2C2&#39;</span>, <span class="st">&#39;#009E73&#39;</span>, 
                                 <span class="st">&#39;#CC79A7&#39;</span>, <span class="st">&#39;#0072B2&#39;</span>, <span class="st">&#39;#999999&#39;</span>)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&#39;Type&#39;</span>, <span class="dt">y =</span> <span class="st">&#39;Silhouette Coefficient&#39;</span>, <span class="dt">name =</span> <span class="st">&#39;Type&#39;</span>) </code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-74-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-86-1.png" width="672" /></p>
 <p>In AD data that includes five batches, the interpretation of the results is challenging. After correction, BMC, ComBat, removeBatchEffect, percentile normalisation and RUVIII decreased the batch silhouette coefficients for the batch dated 14/04/2016, but increased the coefficients for the other batches. Therefore it is difficult to assess the efficiency of these methods in this particular case.</p>
 
 </div>

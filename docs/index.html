@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang">
 
 
-<meta name="date" content="2019-06-21">
+<meta name="date" content="2019-06-25">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -134,7 +134,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2.2" data-path="adjust.html"><a href="adjust.html#combat"><i class="fa fa-check"></i><b>3.2.2</b> ComBat</a></li>
 <li class="chapter" data-level="3.2.3" data-path="adjust.html"><a href="adjust.html#removebatcheffect"><i class="fa fa-check"></i><b>3.2.3</b> removeBatchEffect</a></li>
 <li class="chapter" data-level="3.2.4" data-path="adjust.html"><a href="adjust.html#fabatch"><i class="fa fa-check"></i><b>3.2.4</b> FAbatch</a></li>
-<li class="chapter" data-level="3.2.5" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.2.5</b> percentile normalisation</a></li>
+<li class="chapter" data-level="3.2.5" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.2.5</b> Percentile normalisation</a></li>
 <li class="chapter" data-level="3.2.6" data-path="adjust.html"><a href="adjust.html#svd-based-method"><i class="fa fa-check"></i><b>3.2.6</b> SVD-based method</a></li>
 <li class="chapter" data-level="3.2.7" data-path="adjust.html"><a href="adjust.html#ruviii"><i class="fa fa-check"></i><b>3.2.7</b> RUVIII</a></li>
 </ul></li>
@@ -153,11 +153,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.2.4" data-path="eval.html"><a href="eval.html#silhouette-coefficient"><i class="fa fa-check"></i><b>4.2.4</b> Silhouette coefficient</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="simu.html"><a href="simu.html"><i class="fa fa-check"></i><b>5</b> Simulations of systematic and non-systematic batch effects</a><ul>
-<li class="chapter" data-level="5.1" data-path="simu.html"><a href="simu.html#mean5unequal-variance"><i class="fa fa-check"></i><b>5.1</b> Mean=5,unequal variance</a></li>
-<li class="chapter" data-level="5.2" data-path="simu.html"><a href="simu.html#mean05unequal-variance"><i class="fa fa-check"></i><b>5.2</b> Mean=0&amp;5,unequal variance</a></li>
-<li class="chapter" data-level="5.3" data-path="simu.html"><a href="simu.html#sponge-data"><i class="fa fa-check"></i><b>5.3</b> Sponge data</a></li>
-<li class="chapter" data-level="5.4" data-path="simu.html"><a href="simu.html#ad-data"><i class="fa fa-check"></i><b>5.4</b> AD data</a></li>
+<li class="chapter" data-level="5" data-path="simu.html"><a href="simu.html"><i class="fa fa-check"></i><b>5</b> Assessment of the nature of batch effects</a><ul>
+<li class="chapter" data-level="5.1" data-path="simu.html"><a href="simu.html#simulations"><i class="fa fa-check"></i><b>5.1</b> Simulations</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="simu.html"><a href="simu.html#mean-5-and-unequal-variance"><i class="fa fa-check"></i><b>5.1.1</b> Mean = 5, and unequal variance</a></li>
+<li class="chapter" data-level="5.1.2" data-path="simu.html"><a href="simu.html#mean-0-or-5-and-unequal-variance"><i class="fa fa-check"></i><b>5.1.2</b> Mean = 0 or 5, and unequal variance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="simu.html"><a href="simu.html#real-data"><i class="fa fa-check"></i><b>5.2</b> Real data</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="simu.html"><a href="simu.html#sponge-data"><i class="fa fa-check"></i><b>5.2.1</b> Sponge data</a></li>
+<li class="chapter" data-level="5.2.2" data-path="simu.html"><a href="simu.html#ad-data"><i class="fa fa-check"></i><b>5.2.2</b> AD data</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i>Bibliography</a></li>
 <li class="divider"></li>
@@ -183,13 +187,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="header">
 <h1 class="title">Managing Batch Effects in Microbiome Data</h1>
 <p class="author"><em>Yiwen Wang</em></p>
-<p class="date"><em>2019-06-21</em></p>
+<p class="date"><em>2019-06-25</em></p>
 </div>
 <div id="examples-of-microbiome-studies-with-batch-effects" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Examples of microbiome studies with batch effects</h1>
-<p>This vignette provides all the analyses performed in the paper ‘Managing Batch Effects in Microbiome Data’.</p>
+<p>This vignette provides all the analyses performed in the paper ‘Managing Batch Effects in Microbiome Data’ by Yiwen Wang and Kim-Anh Lê Cao.</p>
 <p><strong>Packages installation and loading</strong></p>
-<p>First, you will need to install then load the following packages:</p>
+<p>First, you will need to install then load the following packages from the CRAN and Bioconductor:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># cran.packages &lt;- c(&#39;knitr&#39;, &#39;mixOmics&#39;, &#39;xtable&#39;, &#39;ggplot2&#39;, &#39;vegan&#39;, &#39;cluster&#39;,</span>
 <span class="co">#                   &#39;gridExtra&#39;, &#39;pheatmap&#39;, &#39;ruv&#39;, &#39;lmerTest&#39;, &#39;bapred&#39;)</span>
 <span class="co"># install.packages(cran.packages)</span>
@@ -219,7 +223,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">1.1</span> Study description</h2>
 <div id="sponge-aplysina-aerophoba-study" class="section level3">
 <h3><span class="header-section-number">1.1.1</span> Sponge <em>Aplysina aerophoba</em> study</h3>
-<p>Sacristán-Soriano <em>et al.</em> studied the potential involvement of bacterial communities from the sponge species <em>A. aerophoba</em> in the biosynthesis of brominated alkaloids (BAs) <span class="citation">(Sacristán-Soriano et al. <a href="#ref-sacristan2011exploring">2011</a>)</span>. They compared the microbial composition and BA concentration in two different tissues (ectosome and choanosome) to investigate the relationship between bacterial composition and BA concentration. The authors concluded that differences in bacterial profiles were not only due to tissue variation (the main effect of interest), but also because the samples were run on two separate denaturing gradient gels during processing. Gel thus acted as a technical batch effect as described in Table 1.</p>
+<p>Sacristán-Soriano <em>et al.</em> studied the potential involvement of bacterial communities from the sponge species <em>A. aerophoba</em> in the biosynthesis of brominated alkaloids (BAs) <span class="citation">(Sacristán-Soriano et al. <a href="#ref-sacristan2011exploring">2011</a>)</span>. They compared the microbial composition and BA concentration in two different tissues (ectosome and choanosome) to investigate the relationship between bacterial composition and BA concentration. The authors concluded that differences in bacterial profiles were not only due to tissue variation (the main effect of interest), but also because the samples were run on two separate denaturing gradient gels during processing. Gel thus acted as a technical batch effect as described in Table 1 below.</p>
+<p><strong>Table 1. Overview of exemplar datasets with batch effects.</strong> We considered microbiome studies from sponge <em>Aplysina aerophoba</em>; organic matter in anaerobic digestion (AD) and mice models with Huntington’s disease (HD).</p>
+<p><img src="figures/table.png" style="display: block; margin: auto;" /></p>
 </div>
 <div id="anaerobic-digestion-study" class="section level3">
 <h3><span class="header-section-number">1.1.2</span> Anaerobic digestion study</h3>
@@ -245,35 +251,34 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="data-processing" class="section level2">
 <h2><span class="header-section-number">1.2</span> Data processing</h2>
-<p><strong>Data processing steps for microbiome data</strong>:</p>
+<p>Here are the processing steps for the <strong>raw count</strong> microbiome data:</p>
 <ol style="list-style-type: decimal">
 <li>Prefilter the count data to remove features with excess zeroes across all samples<br />
 </li>
-<li>Add an offset of 1 to the whole data matrix<br />
+<li>Add an offset of 1 to the whole data matrix — note that this is not ideal but provides a pracitical way to handle zero counts.<br />
 </li>
 <li>Total Sum Scaling transformation<br />
 </li>
-<li>Log-ratio transformation</li>
+<li>Log-ratio transformation with Centered Log Ratio (CLR)</li>
 </ol>
 <div id="prefiltering" class="section level3">
 <h3><span class="header-section-number">1.2.1</span> Prefiltering</h3>
-<p>We use a prefiltering step to remove OTUs for which the sum of counts are below a set threshold (0.01%) compared to the total sum of all counts from <span class="citation">(Arumugam et al. <a href="#ref-arumugam2011enterotypes">2011</a>)</span>.</p>
+<p>We use a prefiltering step to remove OTUs for which the sum of counts are below a set threshold (0.01%) compared to the total sum of all counts <span class="citation">(Arumugam et al. <a href="#ref-arumugam2011enterotypes">2011</a>)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
 ad.index.keep &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">colSums</span>(ad.count)<span class="op">*</span><span class="dv">100</span><span class="op">/</span>(<span class="kw">sum</span>(<span class="kw">colSums</span>(ad.count))) <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.01</span>)
 ad.count.keep &lt;-<span class="st"> </span>ad.count[, ad.index.keep]
 <span class="kw">dim</span>(ad.count.keep)</code></pre></div>
 <pre><code>## [1]  75 231</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data</span>
-<span class="co">#hd.index.keep &lt;- which(colSums(hd.count)*100/(sum(colSums(hd.count))) &gt; 0.001)</span>
 hd.count.keep &lt;-<span class="st"> </span>hd.count
 <span class="kw">dim</span>(hd.count.keep)</code></pre></div>
 <pre><code>## [1]  13 368</code></pre>
-<p>Compared with the raw counts, many OTUs below the threshold are removed. As HD data are small part of a big dataset and only have 13 samples, it is too strict to use the threshold 0.01% to filter the OTUs. We then maintained all the OTUs in HD data.</p>
+<p><strong>Note:</strong> The HD data only include 13 samples, which are a small part of a big dataset that has already been prefiltered. We retained all the OTUs in the data and did not redo the prefiltering again.</p>
 </div>
 <div id="total-sum-scaling" class="section level3">
 <h3><span class="header-section-number">1.2.2</span> Total sum scaling</h3>
 <p>Now, let’s apply a TSS scaling on the filtered data:</p>
-<p><strong>Note:</strong> We need to add an offset of 1 to all count data (i.e. count data = count.keep + 1). Although sponge data are already TSS data, a ‘tiny’ offset is added and then TSS is redone. Because the presence of zeroes will make the next step (log-ratio transformation) impossible.</p>
+<p><strong>Note:</strong> We need to add an offset of 1 to all count data to handle zeroes for the CLR transformation. As the sponge data were already TSS scaled, a small offset is added in this specific case. However, we recommend starting from the raw count (not TSS) for those analyses.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
 sponge.tss &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(sponge.tss <span class="op">+</span><span class="st"> </span><span class="fl">0.01</span>, <span class="dv">1</span>, TSS.divide))
 
@@ -282,23 +287,19 @@ ad.tss &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">
 
 <span class="co"># hd data</span>
 hd.tss &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(hd.count.keep <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>, TSS.divide))</code></pre></div>
-<p>We then check the library size that sums to 1 for each sample. We now have compositional data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
-sponge.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(sponge.tss, <span class="dv">1</span>, sum)
-<span class="kw">barplot</span>(sponge.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;Sponge data&#39;</span>, <span class="dt">las =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>We then check the library size that sums to 1 for each sample for the AD and HD data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
 ad.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss, <span class="dv">1</span>, sum)
 <span class="kw">barplot</span>(ad.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;AD data&#39;</span>, <span class="dt">las =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data</span>
 hd.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(hd.tss, <span class="dv">1</span>, sum)
 <span class="kw">barplot</span>(hd.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;HD data&#39;</span>, <span class="dt">las =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 </div>
 <div id="centered-log-ratio-transformation" class="section level3">
 <h3><span class="header-section-number">1.2.3</span> Centered log-ratio transformation</h3>
-<p>TSS results in compositional data (or proportions) that are restricted to a space where the sum of all OTU proportions for a given sample sums to 1. Using standard statistical methods on such data may lead to spurious results and therefore the data must be further transformed. The CLR is the transformation of choice.</p>
+<p>Microbiome data are compostional, and not only because of the TSS transformation. The data are restricted to a space where the sum of all OTU proportions for a given sample sums to 1. Using standard statistical methods on such data may lead to spurious results and therefore the data must be further transformed. The CLR is the transformation of choice.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
 sponge.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(sponge.tss, <span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
 <span class="kw">class</span>(sponge.tss.clr) &lt;-<span class="st"> &#39;matrix&#39;</span> 
@@ -311,8 +312,6 @@ ad.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span
 hd.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(hd.tss, <span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
 <span class="kw">class</span>(hd.tss.clr) &lt;-<span class="st"> &#39;matrix&#39;</span></code></pre></div>
 <p>The final TSS-CLR data of sponge study, AD study and HD study contain 32 samples and 24 OTUs, 75 samples and 231 OTUs, 13 samples and 368 OTUs, respectively as described in Table 1.</p>
-<p><strong>Table 1. Overview of exemplar datasets with batch effects.</strong> We considered microbiome studies from sponge <em>Aplysina aerophoba</em>; organic matter in anaerobic digestion (AD) and mice models with Huntington’s disease (HD).</p>
-<p><img src="figures/table.png" style="display: block; margin: auto;" /></p>
 
 </div>
 </div>

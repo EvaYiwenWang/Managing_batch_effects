@@ -1,0 +1,7 @@
+"0","# hd data"
+"0","hd.batch_h <- hd.batch[hd.trt == 'HD']"
+"0","hd.batch_w <- hd.batch[hd.trt == 'WT'] "
+"0","hd.before_h <- hd.tss.clr[hd.trt == 'HD', ]"
+"0","hd.before_w <- hd.tss.clr[hd.trt == 'WT', ]"
+"0","RleMicroRna2(object = t(hd.before_h), batch = hd.batch_h, "
+"0","             maintitle = 'HD (genotype: HD)')"

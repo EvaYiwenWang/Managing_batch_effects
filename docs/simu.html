@@ -5,11 +5,11 @@
 
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Chapter 5 Simulations of systematic and non-systematic batch effects | Managing Batch Effects in Microbiome Data</title>
+  <title>Chapter 5 Assessment of the nature of batch effects | Managing Batch Effects in Microbiome Data</title>
   <meta name="description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’">
   <meta name="generator" content="bookdown  and GitBook 2.6.7">
 
-  <meta property="og:title" content="Chapter 5 Simulations of systematic and non-systematic batch effects | Managing Batch Effects in Microbiome Data" />
+  <meta property="og:title" content="Chapter 5 Assessment of the nature of batch effects | Managing Batch Effects in Microbiome Data" />
   <meta property="og:type" content="book" />
   
   
@@ -17,7 +17,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 5 Simulations of systematic and non-systematic batch effects | Managing Batch Effects in Microbiome Data" />
+  <meta name="twitter:title" content="Chapter 5 Assessment of the nature of batch effects | Managing Batch Effects in Microbiome Data" />
   
   <meta name="twitter:description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’" />
   
@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang">
 
 
-<meta name="date" content="2019-06-21">
+<meta name="date" content="2019-06-25">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -134,7 +134,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2.2" data-path="adjust.html"><a href="adjust.html#combat"><i class="fa fa-check"></i><b>3.2.2</b> ComBat</a></li>
 <li class="chapter" data-level="3.2.3" data-path="adjust.html"><a href="adjust.html#removebatcheffect"><i class="fa fa-check"></i><b>3.2.3</b> removeBatchEffect</a></li>
 <li class="chapter" data-level="3.2.4" data-path="adjust.html"><a href="adjust.html#fabatch"><i class="fa fa-check"></i><b>3.2.4</b> FAbatch</a></li>
-<li class="chapter" data-level="3.2.5" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.2.5</b> percentile normalisation</a></li>
+<li class="chapter" data-level="3.2.5" data-path="adjust.html"><a href="adjust.html#percentile-normalisation"><i class="fa fa-check"></i><b>3.2.5</b> Percentile normalisation</a></li>
 <li class="chapter" data-level="3.2.6" data-path="adjust.html"><a href="adjust.html#svd-based-method"><i class="fa fa-check"></i><b>3.2.6</b> SVD-based method</a></li>
 <li class="chapter" data-level="3.2.7" data-path="adjust.html"><a href="adjust.html#ruviii"><i class="fa fa-check"></i><b>3.2.7</b> RUVIII</a></li>
 </ul></li>
@@ -153,11 +153,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.2.4" data-path="eval.html"><a href="eval.html#silhouette-coefficient"><i class="fa fa-check"></i><b>4.2.4</b> Silhouette coefficient</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="simu.html"><a href="simu.html"><i class="fa fa-check"></i><b>5</b> Simulations of systematic and non-systematic batch effects</a><ul>
-<li class="chapter" data-level="5.1" data-path="simu.html"><a href="simu.html#mean5unequal-variance"><i class="fa fa-check"></i><b>5.1</b> Mean=5,unequal variance</a></li>
-<li class="chapter" data-level="5.2" data-path="simu.html"><a href="simu.html#mean05unequal-variance"><i class="fa fa-check"></i><b>5.2</b> Mean=0&amp;5,unequal variance</a></li>
-<li class="chapter" data-level="5.3" data-path="simu.html"><a href="simu.html#sponge-data"><i class="fa fa-check"></i><b>5.3</b> Sponge data</a></li>
-<li class="chapter" data-level="5.4" data-path="simu.html"><a href="simu.html#ad-data"><i class="fa fa-check"></i><b>5.4</b> AD data</a></li>
+<li class="chapter" data-level="5" data-path="simu.html"><a href="simu.html"><i class="fa fa-check"></i><b>5</b> Assessment of the nature of batch effects</a><ul>
+<li class="chapter" data-level="5.1" data-path="simu.html"><a href="simu.html#simulations"><i class="fa fa-check"></i><b>5.1</b> Simulations</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="simu.html"><a href="simu.html#mean-5-and-unequal-variance"><i class="fa fa-check"></i><b>5.1.1</b> Mean = 5, and unequal variance</a></li>
+<li class="chapter" data-level="5.1.2" data-path="simu.html"><a href="simu.html#mean-0-or-5-and-unequal-variance"><i class="fa fa-check"></i><b>5.1.2</b> Mean = 0 or 5, and unequal variance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="simu.html"><a href="simu.html#real-data"><i class="fa fa-check"></i><b>5.2</b> Real data</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="simu.html"><a href="simu.html#sponge-data"><i class="fa fa-check"></i><b>5.2.1</b> Sponge data</a></li>
+<li class="chapter" data-level="5.2.2" data-path="simu.html"><a href="simu.html#ad-data"><i class="fa fa-check"></i><b>5.2.2</b> AD data</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i>Bibliography</a></li>
 <li class="divider"></li>
@@ -181,12 +185,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
             <section class="normal" id="section-">
 <div id="simu" class="section level1">
-<h1><span class="header-section-number">Chapter 5</span> Simulations of systematic and non-systematic batch effects</h1>
-<div id="mean5unequal-variance" class="section level2">
-<h2><span class="header-section-number">5.1</span> Mean=5,unequal variance</h2>
+<h1><span class="header-section-number">Chapter 5</span> Assessment of the nature of batch effects</h1>
+<div id="simulations" class="section level2">
+<h2><span class="header-section-number">5.1</span> Simulations</h2>
+<div id="mean-5-and-unequal-variance" class="section level3">
+<h3><span class="header-section-number">5.1.1</span> Mean = 5, and unequal variance</h3>
 <p>‘Systematic’ refers to homogeneous change amongst all microbial variables (OTUs) due to having the same source of variation. We illustrate this concept in a linear model framework where batch and treatment regression coefficients are estimated simultaneously on each OTU. For a given batch effect and a given OTU, we can formulate the systematic assumption as:</p>
 <p><span class="math display">\[\beta_{j} \sim N(\mu,\sigma^{2})\]</span></p>
-<p>where <span class="math inline">\(\beta_{j}\)</span> is the batch regression coefficient of OTU<span class="math inline">\(_{j}\)</span> (<span class="math inline">\(j = 1,...,p\)</span>). Here we consider the simplest case of a linear model with one batch predictor, but this formulation could be extended to a model with multiple batch predictors where the batch regression coefficients can represent more than two batch levels. In a univariate model that tests each OTU idividually, then the distribution of the batch coefficients of all OTUs is Gaussian with a mean <span class="math inline">\(\mu\)</span>, and standard deviation <span class="math inline">\(\sigma\)</span>. This indicates that the batch effect has a similar, though not necessarily identical, influence on all OTUs.</p>
+<p>where <span class="math inline">\(\beta_{j}\)</span> is the batch regression coefficient of OTU<span class="math inline">\(_{j}\)</span> (<span class="math inline">\(j = 1,...,p\)</span>). Here we consider the simplest case of a linear model with one batch predictor, but this formulation could be extended to a model with multiple batch predictors where the batch regression coefficients can represent more than two batch levels. In a univariate model that tests each OTU individually, then the distribution of the batch coefficients of all OTUs is Gaussian with a mean <span class="math inline">\(\mu\)</span>, and standard deviation <span class="math inline">\(\sigma\)</span>. This indicates that the batch effect has a similar, though not necessarily identical, influence on all OTUs.</p>
 <p>To illustrate the type of batch effects, we simulated a set of data with 50 samples and 10,000 OTUs each, based on the simulation approach from <span class="citation">(Gagnon-Bartsch, Jacob, and Speed <a href="#ref-gagnon2013removing">2013</a>)</span>.</p>
 <p>The dataset with a systematic batch effect:</p>
 <ul>
@@ -210,7 +216,7 @@ beta &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="k
 beta[ ,ctl] &lt;-<span class="st"> </span><span class="dv">0</span>
 <span class="co"># batch effect</span>
 W &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>, m), m, k)
-W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>),<span class="dv">1</span>] &lt;-<span class="st">  </span><span class="dv">1</span>
+W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>), <span class="dv">1</span>] &lt;-<span class="st">  </span><span class="dv">1</span>
 alpha &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(k<span class="op">*</span>n, <span class="dv">5</span>, <span class="dv">1</span>), k, n)
 Y_alpha &lt;-<span class="st"> </span><span class="kw">sapply</span>(alpha, <span class="cf">function</span>(alpha){<span class="kw">rnorm</span>(m, <span class="dt">mean =</span>  alpha, 
                                               <span class="kw">abs</span>(<span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">2</span>)))})
@@ -234,11 +240,11 @@ w.cof &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(w.cof)
 <span class="kw">qqline</span>(w.cof, <span class="dt">col =</span> <span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
-<p>The histogram and density plots are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>.</p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-87-1.png" width="672" /></p>
+<p>The histogram, density plot and quantile–quantile plot are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>. These plots display the distribution of batch coefficients is very close to normal, indicating a systematic batch effect.</p>
 </div>
-<div id="mean05unequal-variance" class="section level2">
-<h2><span class="header-section-number">5.2</span> Mean=0&amp;5,unequal variance</h2>
+<div id="mean-0-or-5-and-unequal-variance" class="section level3">
+<h3><span class="header-section-number">5.1.2</span> Mean = 0 or 5, and unequal variance</h3>
 <p>Non-systematic batch effects have a heterogeneous influence on microbial variables. Using a linear model framework, as described previously, we can formulate this non-systematic assumption as:</p>
 <p><span class="math display">\[
 \beta&#39;_{j} \sim 
@@ -270,7 +276,7 @@ beta &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="k
 beta[ ,ctl] &lt;-<span class="st"> </span><span class="dv">0</span>
 <span class="co"># batch effect</span>
 W &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>, m), m, k)
-W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>),<span class="dv">1</span>] &lt;-<span class="st">  </span><span class="dv">1</span>
+W[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>,<span class="dv">38</span><span class="op">:</span><span class="dv">50</span>), <span class="dv">1</span>] &lt;-<span class="st">  </span><span class="dv">1</span>
 alpha2 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="kw">c</span>(<span class="kw">rnorm</span>(k<span class="op">*</span>(<span class="dv">3</span><span class="op">*</span>n<span class="op">/</span><span class="dv">4</span>), <span class="dv">0</span>, <span class="dv">1</span>),<span class="kw">rnorm</span>(k<span class="op">*</span>(n<span class="op">/</span><span class="dv">4</span>), <span class="dv">5</span>, <span class="dv">1</span>)), n), k, n)
 Y_alpha2 &lt;-<span class="st"> </span><span class="kw">sapply</span>(alpha2, <span class="cf">function</span>(alpha){<span class="kw">rnorm</span>(m, <span class="dt">mean =</span>  alpha, 
                                                 <span class="dt">sd =</span> <span class="kw">abs</span>(<span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">2</span>)))})
@@ -295,45 +301,52 @@ w.cof2 &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(w.cof2)
 <span class="kw">qqline</span>(w.cof2, <span class="dt">col =</span> <span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
-<p>The histogram and density plots are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>, showing a bi-modal distribution.</p>
-<p>We observed similar patterns in our real case studies, suggesting that the batch effects are mixed with multiple sources and are non-systematic.</p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-88-1.png" width="672" /></p>
+<p>The histogram, density plot and quantile–quantile plot are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>, showing a bi-modal distribution. This distribution indicates a non-systematic batch effect.</p>
+<p><strong>We observed similar patterns in our real case studies, suggesting that the batch effects are mixed with multiple sources and are non-systematic (see the examples below).</strong></p>
 </div>
-<div id="sponge-data" class="section level2">
-<h2><span class="header-section-number">5.3</span> Sponge data</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.b.cof &lt;-<span class="st"> </span><span class="kw">c</span>()
+</div>
+<div id="real-data" class="section level2">
+<h2><span class="header-section-number">5.2</span> Real data</h2>
+<p>We also estimate the batch regression coefficients for each OTU in real datasets to assess the nature of batch effects.</p>
+<div id="sponge-data" class="section level3">
+<h3><span class="header-section-number">5.2.1</span> Sponge data</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.b.coeff &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(sponge.tss.clr)){
   res &lt;-<span class="st"> </span><span class="kw">lm</span>(sponge.tss.clr[ ,i] <span class="op">~</span><span class="st"> </span>sponge.trt <span class="op">+</span><span class="st"> </span>sponge.batch)
   sum.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res)
-  sponge.b.cof[i] &lt;-<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
+  sponge.b.coeff[i] &lt;-<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">3</span>,<span class="dv">1</span>]
 }
 
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
-<span class="kw">hist</span>(sponge.b.cof,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
-<span class="kw">plot</span>(<span class="kw">density</span>(sponge.b.cof))
-<span class="kw">qqnorm</span>(sponge.b.cof)
-<span class="kw">qqline</span>(sponge.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
+<span class="kw">hist</span>(sponge.b.coeff,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
+<span class="kw">plot</span>(<span class="kw">density</span>(sponge.b.coeff))
+<span class="kw">qqnorm</span>(sponge.b.coeff)
+<span class="kw">qqline</span>(sponge.b.coeff, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-89-1.png" width="672" /></p>
+<p>In sponge data, the histogram, density plot and quantile–quantile plot are also plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>. The bi-modal distribution indicates a non-systematic batch effect, which is similar as the results from simulation with non-systematic batch effects.</p>
 </div>
-<div id="ad-data" class="section level2">
-<h2><span class="header-section-number">5.4</span> AD data</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.b.cof &lt;-<span class="st"> </span><span class="kw">c</span>()
+<div id="ad-data" class="section level3">
+<h3><span class="header-section-number">5.2.2</span> AD data</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.b.coeff &lt;-<span class="st"> </span><span class="kw">c</span>()
 ad.batch.relevel &lt;-<span class="st"> </span><span class="kw">relevel</span>(ad.batch, <span class="st">&#39;01/07/2016&#39;</span>)
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.tss.clr)){
   res &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[,i] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch.relevel)
   sum.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res)
-  ad.b.cof[i] &lt;-<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">4</span>,<span class="dv">1</span>]
+  ad.b.coeff[i] &lt;-<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">4</span>,<span class="dv">1</span>]
 }
 
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
-<span class="kw">hist</span>(ad.b.cof,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
-<span class="kw">plot</span>(<span class="kw">density</span>(ad.b.cof))
-<span class="kw">qqnorm</span>(ad.b.cof)
-<span class="kw">qqline</span>(ad.b.cof, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
+<span class="kw">hist</span>(ad.b.coeff,<span class="dt">col =</span> <span class="st">&#39;gray&#39;</span>)
+<span class="kw">plot</span>(<span class="kw">density</span>(ad.b.coeff))
+<span class="kw">qqnorm</span>(ad.b.coeff)
+<span class="kw">qqline</span>(ad.b.coeff, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-78-1.png" width="672" /></p>
+<p><img src="vignette_files/figure-html/unnamed-chunk-90-1.png" width="672" /></p>
+<p>We observe similar results in AD data. The distribution of estimated batch regression coefficients is not normal. The batch effects therefore are non-systematic.</p>
 
+</div>
 </div>
 </div>
 <h3>Bibliography</h3>

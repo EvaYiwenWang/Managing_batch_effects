@@ -1,4 +1,4 @@
-"0","ad.lm = lm(ad.tss.clr[,1] ~ ad.trt + ad.batch)"
+"0","ad.lm <- lm(ad.tss.clr[,1] ~ ad.trt + ad.batch)"
 "0","anova(ad.lm)"
 "1","Analysis of Variance Table
 "

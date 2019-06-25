@@ -1,0 +1,3 @@
+"0","# Sponge data"
+"0","sponge.limma <- t(removeBatchEffect(t(sponge.tss.clr), batch = sponge.batch, "
+"0","                                    design = sponge.mod))"

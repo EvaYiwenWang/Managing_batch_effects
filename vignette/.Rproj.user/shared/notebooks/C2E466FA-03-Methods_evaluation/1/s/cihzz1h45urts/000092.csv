@@ -1,0 +1,1 @@
+"0","ad.pca.plot.limma = Scatter_Density(data = ad.pca.limma$variates$X, batch = ad.batch, trt = ad.trt, expl.var = ad.pca.limma$explained_variance, xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with rBE (AD)',title.cex = 1,legend.cex = 0.4,legend.title.cex = 0.6)"

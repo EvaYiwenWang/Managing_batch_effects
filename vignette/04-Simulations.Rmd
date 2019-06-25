@@ -1,12 +1,14 @@
-# Simulations of systematic and non-systematic batch effects {#simu}
+# Assessment of the nature of batch effects {#simu}
 
-## Mean=5,unequal variance
+## Simulations
+
+### Mean = 5, and unequal variance
 
 'Systematic' refers to homogeneous change amongst all microbial variables (OTUs) due to having the same source of variation. We illustrate this concept in a linear model framework where batch and treatment regression coefficients are estimated simultaneously on each OTU. For a given batch effect and a given OTU, we can formulate the systematic assumption as:
 
 $$\beta_{j} \sim N(\mu,\sigma^{2})$$
 
-where $\beta_{j}$ is the batch regression coefficient of OTU$_{j}$ ($j = 1,...,p$). Here we consider the simplest case of a linear model with one batch predictor, but this formulation could be extended to a model with multiple batch predictors where the batch regression coefficients can represent more than two batch levels. In a univariate model that tests each OTU idividually, then the distribution of the batch coefficients of all OTUs is Gaussian with a mean $\mu$, and standard deviation $\sigma$. This indicates that the batch effect has a similar, though not necessarily identical, influence on all OTUs. 
+where $\beta_{j}$ is the batch regression coefficient of OTU$_{j}$ ($j = 1,...,p$). Here we consider the simplest case of a linear model with one batch predictor, but this formulation could be extended to a model with multiple batch predictors where the batch regression coefficients can represent more than two batch levels. In a univariate model that tests each OTU individually, then the distribution of the batch coefficients of all OTUs is Gaussian with a mean $\mu$, and standard deviation $\sigma$. This indicates that the batch effect has a similar, though not necessarily identical, influence on all OTUs. 
 
 To illustrate the type of batch effects, we simulated a set of data with 50 samples and 10,000 OTUs each, based on the simulation approach from [@gagnon2013removing].
 
@@ -32,7 +34,7 @@ beta <- matrix(rnorm(p*n, 5, 1), p, n) #treatment coefficients
 beta[ ,ctl] <- 0
 # batch effect
 W <- as.matrix(rep(0, m), m, k)
-W[c(1:12,38:50),1] <-  1
+W[c(1:12,38:50), 1] <-  1
 alpha <- matrix(rnorm(k*n, 5, 1), k, n)
 Y_alpha <- sapply(alpha, function(alpha){rnorm(m, mean =  alpha, 
                                               abs(rnorm(1, mean = 0, sd = 2)))})
@@ -58,9 +60,9 @@ qqline(w.cof, col = 'red')
 par(mfrow = c(1,1))
 ```
 
-The histogram and density plots are plotted using estimated batch regression coefficients $\hat{\beta}_{j}$ for each OTU $j$. 
+The histogram, density plot and quantile–quantile plot are plotted using estimated batch regression coefficients $\hat{\beta}_{j}$ for each OTU $j$. These plots display the distribution of batch coefficients is very close to normal, indicating a systematic batch effect.
 
-## Mean=0&5,unequal variance
+### Mean = 0 or 5, and unequal variance
 
 Non-systematic batch effects have a heterogeneous influence on microbial variables. Using a linear model framework, as described previously, we can formulate this non-systematic assumption as:
 
@@ -95,7 +97,7 @@ beta <- matrix(rnorm(p*n, 5, 1), p, n) #treatment coefficients
 beta[ ,ctl] <- 0
 # batch effect
 W <- as.matrix(rep(0, m), m, k)
-W[c(1:12,38:50),1] <-  1
+W[c(1:12,38:50), 1] <-  1
 alpha2 <- matrix(sample(c(rnorm(k*(3*n/4), 0, 1),rnorm(k*(n/4), 5, 1)), n), k, n)
 Y_alpha2 <- sapply(alpha2, function(alpha){rnorm(m, mean =  alpha, 
                                                 sd = abs(rnorm(1, mean = 0, sd = 2)))})
@@ -122,45 +124,51 @@ qqline(w.cof2, col = 'red')
 par(mfrow = c(1,1))
 ```
 
-The histogram and density plots are plotted using estimated batch regression coefficients $\hat{\beta}_{j}$ for each OTU $j$, showing a bi-modal distribution.
+The histogram, density plot and quantile–quantile plot are plotted using estimated batch regression coefficients $\hat{\beta}_{j}$ for each OTU $j$, showing a bi-modal distribution. This distribution indicates a non-systematic batch effect. 
 
-We observed similar patterns in our real case studies, suggesting that the batch effects are mixed with multiple sources and are non-systematic.
+**We observed similar patterns in our real case studies, suggesting that the batch effects are mixed with multiple sources and are non-systematic (see the examples below).**
 
-## Sponge data
+## Real data
+
+We also estimate the batch regression coefficients for each OTU in real datasets to assess the nature of batch effects.
+
+### Sponge data
 
 ```{r}
-sponge.b.cof <- c()
+sponge.b.coeff <- c()
 for(i in 1:ncol(sponge.tss.clr)){
   res <- lm(sponge.tss.clr[ ,i] ~ sponge.trt + sponge.batch)
   sum.res <- summary(res)
-  sponge.b.cof[i] <- sum.res$coefficients[3,1]
+  sponge.b.coeff[i] <- sum.res$coefficients[3,1]
 }
 
 par(mfrow = c(2,2))
-hist(sponge.b.cof,col = 'gray')
-plot(density(sponge.b.cof))
-qqnorm(sponge.b.cof)
-qqline(sponge.b.cof, col='red')
+hist(sponge.b.coeff,col = 'gray')
+plot(density(sponge.b.coeff))
+qqnorm(sponge.b.coeff)
+qqline(sponge.b.coeff, col='red')
 par(mfrow = c(1,1))
 ```
 
+In sponge data, the histogram, density plot and quantile–quantile plot are also plotted using estimated batch regression coefficients $\hat{\beta}_{j}$ for each OTU $j$. The bi-modal distribution indicates a non-systematic batch effect, which is similar as the results from simulation with non-systematic batch effects. 
 
-
-## AD data
+### AD data
 
 ```{r}
-ad.b.cof <- c()
+ad.b.coeff <- c()
 ad.batch.relevel <- relevel(ad.batch, '01/07/2016')
 for(i in 1:ncol(ad.tss.clr)){
   res <- lm(ad.tss.clr[,i] ~ ad.trt + ad.batch.relevel)
   sum.res <- summary(res)
-  ad.b.cof[i] <- sum.res$coefficients[4,1]
+  ad.b.coeff[i] <- sum.res$coefficients[4,1]
 }
 
 par(mfrow = c(2,2))
-hist(ad.b.cof,col = 'gray')
-plot(density(ad.b.cof))
-qqnorm(ad.b.cof)
-qqline(ad.b.cof, col='red')
+hist(ad.b.coeff,col = 'gray')
+plot(density(ad.b.coeff))
+qqnorm(ad.b.coeff)
+qqline(ad.b.coeff, col='red')
 par(mfrow = c(1,1))
 ```
+ 
+We observe similar results in AD data. The distribution of estimated batch regression coefficients is not normal. The batch effects therefore are non-systematic.

@@ -1,0 +1,6 @@
+"0","# sponge data"
+"0","sponge.percentile <- percentile_norm(data = sponge.tss, batch = sponge.batch, "
+"0","                                    trt = sponge.trt)"
+"0","# ad data"
+"0","ad.percentile <- percentile_norm(data = ad.tss, batch = ad.batch, "
+"0","                                trt = ad.trt)"

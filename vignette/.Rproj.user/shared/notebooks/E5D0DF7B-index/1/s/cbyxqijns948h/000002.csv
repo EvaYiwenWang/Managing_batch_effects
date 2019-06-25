@@ -1,0 +1,20 @@
+"0","title: ""Managing Batch Effects in Microbiome Data""
+author: ""Yiwen Wang""
+date: ""`r Sys.Date()`""
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+description: ""Vignette for paper 'Managing Batch Effects in Microbiome Data'""
+---
+
+# Examples of microbiome studies with batch effects 
+
+This vignette provides all the analyses performed in the paper 'Managing Batch Effects in Microbiome Data'.
+
+**Packages installation and loading**
+
+First, you will need to install then load the following packages:"
+"2","/bin/sh: ---: command not found
+"
