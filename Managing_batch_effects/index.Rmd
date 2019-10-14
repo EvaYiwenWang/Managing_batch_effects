@@ -1,0 +1,162 @@
+--- 
+title: "Managing Batch Effects in Microbiome Data"
+author: "Yiwen Wang, Kim-Anh Lê Cao"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+description: "Vignette for paper 'Managing Batch Effects in Microbiome Data'"
+---
+
+# Examples of microbiome studies with batch effects 
+
+This vignette provides all the analyses performed in the paper 'Managing Batch Effects in Microbiome Data' by Yiwen Wang and Kim-Anh Lê Cao.
+
+**Packages installation and loading**
+
+First, you will need to install then load the following packages from the CRAN and Bioconductor:
+
+```{r, message = FALSE, warning = FALSE}
+# cran.packages <- c('knitr', 'mixOmics', 'xtable', 'ggplot2', 'vegan', 'cluster',
+#                   'gridExtra', 'pheatmap', 'ruv', 'lmerTest', 'bapred')
+# install.packages(cran.packages)
+# bioconductor.packages <- c('sva', 'limma', 'AgiMicroRna', 
+#                           'variancePartition', 'pvca')
+# if (!requireNamespace('BiocManager', quietly = TRUE))
+#     install.packages('BiocManager')
+# BiocManager::install(bioconductor.packages, version = '3.8')
+
+library(knitr)
+library(xtable) # table
+library(mixOmics)
+library(sva) # ComBat
+library(ggplot2) # PCA sample plot with density
+library(gridExtra) # PCA sample plot with density
+library(limma) # removeBatchEffect (LIMMA)
+library(vegan) # RDA
+library(AgiMicroRna) # RLE plot
+library(cluster) # silhouette coefficient
+library(variancePartition) # variance calculation
+library(pvca) # PVCA
+library(pheatmap) # heatmap
+library(ruv) # RUVIII
+library(lmerTest) # lmer
+library(bapred) # FAbatch
+```
+
+## Study description          
+
+### Sponge *Aplysina aerophoba* study
+
+Sacristán-Soriano *et al.* studied the potential involvement of bacterial communities from the sponge species *A. aerophoba* in the biosynthesis of brominated alkaloids (BAs) [@sacristan2011exploring]. They compared the microbial composition and BA concentration in two different tissues (ectosome and choanosome) to investigate the relationship between bacterial composition and BA concentration. The authors concluded that differences in bacterial profiles were not only due to tissue variation (the main effect of interest), but also because the samples were run on two separate denaturing gradient gels during processing. Gel thus acted as a technical batch effect as described in Table 1 below. 
+
+**Table 1. Overview of exemplar datasets with batch effects.** We considered microbiome studies from sponge *Aplysina aerophoba*; organic matter in anaerobic
+digestion (AD) and mice models with Huntington’s disease (HD).
+
+```{r cases,echo=F,fig.align='center'}
+knitr::include_graphics('figures/table.png')
+```
+
+
+
+### Anaerobic digestion study
+
+Anaerobic Digestion (AD) is a microbiological process of organic matter degradation that produces a biogas used in electrical and thermal energy production. However, the AD bioprocess undergoes inhibition during its developmental stage that is not well characterised: Chapleur *et al.* explored microbial indicators that could improve the AD bioprocess's efficacy and prevent its failure [@chapleur2016increasing]. They profiled the microbiota of 75 AD samples in various conditions. Here we consider two different ranges of phenol concentration as treatments. The experiment was conducted at different dates (5), which constitutes a technical source of unwanted variation (Table 1).
+
+### Huntington's disease study
+
+In their study, Kong *et al.* reported differences in microbial composition between Huntington's disease (HD) and wild-type (WT) mice [@kong2018microbiome]. However, the establishment of microbial communities was also driven by biological batch effects: the cage environment and sex. Here we consider only female mice to illustrate a special case of a batch $\times$ treatment unbalanced design. The HD data include 13 faecal mice samples hosted across 4 cages (Table 1).
+
+We load the data and functions that are provided *outside* the packages. 
+
+```{r}
+# load the data
+load(file = './datasets/microbiome_datasets.RData')
+
+# load the extra functions
+source(file = './Functions.R')
+dim(sponge.tss)
+dim(ad.count)
+dim(hd.count)
+```
+
+**Note:** the AD data and HD data loaded are raw counts, while sponge data are total sum scaling (TSS) scaled data calculated on raw counts, with no offset. 
+
+## Data processing
+
+Here are the processing steps for the **raw count** microbiome data:   
+
+1. Prefilter the count data to remove features with excess zeroes across all samples        
+2. Add an offset of 1 to the whole data matrix --- note that this is not ideal but provides a pracitical way to handle zero counts.       
+3. Total Sum Scaling transformation         
+4. Log-ratio transformation with Centered Log Ratio (CLR)          
+
+### Prefiltering
+
+We use a prefiltering step to remove OTUs for which the sum of counts are below a set threshold (0.01%) compared to the total sum of all counts [@arumugam2011enterotypes].
+
+```{r}
+# ad data
+ad.index.keep <- which(colSums(ad.count)*100/(sum(colSums(ad.count))) > 0.01)
+ad.count.keep <- ad.count[, ad.index.keep]
+dim(ad.count.keep)
+
+# hd data
+hd.count.keep <- hd.count
+dim(hd.count.keep)
+```
+**Note:** The HD data only include 13 samples, which are a small part of a big dataset that has already been prefiltered. We retained all the OTUs in the data and did not redo the prefiltering again.
+
+
+### Total sum scaling
+
+Now, let’s apply a TSS scaling on the filtered data:
+
+**Note:** We need to add an offset of 1 to all count data to handle zeroes for the CLR transformation. As the sponge data were already TSS scaled, a small offset is added in this specific case. However, we recommend starting from the raw count (not TSS) for those analyses. 
+
+```{r}
+# sponge data
+sponge.tss <- t(apply(sponge.tss + 0.01, 1, TSS.divide))
+
+# ad data
+ad.tss <- t(apply(ad.count.keep + 1, 1, TSS.divide))
+
+# hd data
+hd.tss <- t(apply(hd.count.keep + 1, 1, TSS.divide))
+```
+
+We then check the library size that sums to 1 for each sample for the AD and HD data. 
+      
+```{r}
+# ad data
+ad.lib.size.tss <- apply(ad.tss, 1, sum)
+barplot(ad.lib.size.tss, main =  'AD data', las = 2)
+
+
+# hd data
+hd.lib.size.tss <- apply(hd.tss, 1, sum)
+barplot(hd.lib.size.tss, main =  'HD data', las = 2)
+```
+
+### Centered log-ratio transformation
+
+Microbiome data are compostional, and not only because of the TSS transformation. The data are restricted to a space where the sum of all OTU proportions for a given sample sums to 1. Using standard statistical methods on such data may lead to spurious results and therefore the data must be further transformed. The CLR is the transformation of choice.
+
+```{r}
+# sponge data
+sponge.tss.clr <- logratio.transfo(sponge.tss, logratio = 'CLR')
+class(sponge.tss.clr) <- 'matrix' 
+
+# ad data
+ad.tss.clr <- logratio.transfo(ad.tss, logratio = 'CLR')
+class(ad.tss.clr) <- 'matrix' 
+
+# hd data
+hd.tss.clr <- logratio.transfo(hd.tss, logratio = 'CLR')
+class(hd.tss.clr) <- 'matrix'
+```
+
+The final TSS-CLR data of sponge study, AD study and HD study contain 32 samples and 24 OTUs, 75 samples and 231 OTUs, 13 samples and 368 OTUs, respectively as described in Table 1.
+

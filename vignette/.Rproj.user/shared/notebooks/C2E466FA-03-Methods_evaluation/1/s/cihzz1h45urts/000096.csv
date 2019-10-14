@@ -1,1 +1,0 @@
-"0","ad.pca.plot.svd = Scatter_Density(data = ad.pca.svd$variates$X,batch = ad.batch, trt = ad.trt, expl.var = ad.pca.svd$explained_variance,xlim = c(-15,14), ylim = c(-13,14), batch.legend.title = 'Date (batch)', trt.legend.title = 'Conc (trt)',title = 'Batch correction with SVD (AD)',title.cex = 1,legend.cex = 0.4,legend.title.cex = 0.6)"

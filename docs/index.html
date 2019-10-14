@@ -22,10 +22,10 @@
   <meta name="twitter:description" content="Vignette for paper ‘Managing Batch Effects in Microbiome Data’" />
   
 
-<meta name="author" content="Yiwen Wang">
+<meta name="author" content="Yiwen Wang, Kim-Anh Lê Cao">
 
 
-<meta name="date" content="2019-06-25">
+<meta name="date" content="2019-10-14">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -101,7 +101,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
       <nav role="navigation">
 
 <ul class="summary">
-<li><a href="./">Batch Effects Management</a></li>
+<li><a href="./">Managing batch effects</a></li>
 
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Examples of microbiome studies with batch effects</a><ul>
@@ -165,7 +165,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="" data-path="bibliography.html"><a href="bibliography.html"><i class="fa fa-check"></i>Bibliography</a></li>
 <li class="divider"></li>
-<li><a href="https://github.com/EvaYiwenWang/vignette" target="blank">Source codes on github</a></li>
+<li><a href="https://github.com/EvaYiwenWang/Managing_batch_effects" target="blank">Source codes on github</a></li>
 
 </ul>
 
@@ -186,8 +186,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="header">
 <h1 class="title">Managing Batch Effects in Microbiome Data</h1>
-<p class="author"><em>Yiwen Wang</em></p>
-<p class="date"><em>2019-06-25</em></p>
+<p class="author"><em>Yiwen Wang, Kim-Anh Lê Cao</em></p>
+<p class="date"><em>2019-10-14</em></p>
 </div>
 <div id="examples-of-microbiome-studies-with-batch-effects" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Examples of microbiome studies with batch effects</h1>
@@ -291,11 +291,11 @@ hd.tss &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
 ad.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss, <span class="dv">1</span>, sum)
 <span class="kw">barplot</span>(ad.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;AD data&#39;</span>, <span class="dt">las =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data</span>
 hd.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(hd.tss, <span class="dv">1</span>, sum)
 <span class="kw">barplot</span>(hd.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;HD data&#39;</span>, <span class="dt">las =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="vignette_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 </div>
 <div id="centered-log-ratio-transformation" class="section level3">
 <h3><span class="header-section-number">1.2.3</span> Centered log-ratio transformation</h3>
@@ -374,10 +374,10 @@ gitbook.start({
 "link": null,
 "text": null
 },
-"download": ["vignette.pdf"],
+"download": ["Managing_batch_effects.pdf"],
 "toc": {
 "collapse": "subsection",
-"edit": "https://github.com/EvaYiwenWang/vignette"
+"edit": "https://github.com/EvaYiwenWang/Managing_batch_effects"
 }
 });
 });

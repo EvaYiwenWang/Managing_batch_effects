@@ -1,2 +1,0 @@
-"0","ad.limma <- t(removeBatchEffect(t(ad.tss.clr), batch = ad.batch, "
-"0","                                design = ad.mod))"

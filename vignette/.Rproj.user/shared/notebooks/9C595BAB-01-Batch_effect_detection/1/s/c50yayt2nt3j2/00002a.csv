@@ -1,5 +1,0 @@
-"0","# hd data"
-"0","hd.before.df <- data.frame(value = hd.tss.clr[,1], batch = hd.batch)"
-"0","box_plot_fun(data = hd.before.df, x = hd.before.df$batch,"
-"0","             y = hd.before.df$value,title = 'OTU1 (HD)',"
-"0","             batch.legend.title = 'Cage (batch)')"

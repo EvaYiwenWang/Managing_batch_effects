@@ -1,6 +1,0 @@
-"0","# sponge data"
-"0","sponge.pca.before <- pca(sponge.tss.clr, ncomp = 3)"
-"0","# ad data"
-"0","ad.pca.before <- pca(ad.tss.clr, ncomp = 3)"
-"0","# hd data"
-"0","hd.pca.before <- pca(hd.tss.clr, ncomp = 3)"

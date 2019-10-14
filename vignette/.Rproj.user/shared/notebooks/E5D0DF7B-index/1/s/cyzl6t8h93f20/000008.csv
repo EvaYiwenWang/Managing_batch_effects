@@ -1,3 +1,0 @@
-"0","# ad data"
-"0","ad.lib.size.tss <- apply(ad.tss, 1, sum)"
-"0","barplot(ad.lib.size.tss, main =  'AD data', las = 2)"

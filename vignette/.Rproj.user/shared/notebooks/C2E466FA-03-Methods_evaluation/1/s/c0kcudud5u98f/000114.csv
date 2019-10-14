@@ -1,1 +1,0 @@
-"0","RleMicroRna2(t(ad.bmc1),colorfill = color.mixo(time.batch.reorder1),maintitle = 'AD data BMC (0-0.5 g/L)',xlab=NA,legend=unique(time.batch.reorder1),cex.lab = 1,cex.xaxis = 0.5,cex.yaxis = 1,abline.lwd=0.5,xaxis.dist = 0.15, point_size = 0.5)"

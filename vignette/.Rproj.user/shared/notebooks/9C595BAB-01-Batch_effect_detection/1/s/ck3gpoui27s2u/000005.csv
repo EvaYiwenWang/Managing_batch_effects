@@ -1,1 +1,0 @@
-"0","Scatter_Density(data = hd.pca.before$variates$X, batch = hd.batch, trt = hd.trt, expl.var = hd.pca.before$explained_variance, xlim = c(-20,20), ylim = c(-25,15), batch.legend.title = 'Cage (batch)', trt.legend.title = 'Genotype (trt)', title = 'Before batch effect correction (HD)')"
