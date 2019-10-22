@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang, Kim-Anh Lê Cao">
 
 
-<meta name="date" content="2019-10-14">
+<meta name="date" content="2019-10-22">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -112,7 +112,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#data-processing"><i class="fa fa-check"></i><b>1.2</b> Data processing</a><ul>
 <li class="chapter" data-level="1.2.1" data-path="index.html"><a href="index.html#prefiltering"><i class="fa fa-check"></i><b>1.2.1</b> Prefiltering</a></li>
-<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#total-sum-scaling"><i class="fa fa-check"></i><b>1.2.2</b> Total sum scaling</a></li>
+<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#adding-offset"><i class="fa fa-check"></i><b>1.2.2</b> Adding offset</a></li>
 <li class="chapter" data-level="1.2.3" data-path="index.html"><a href="index.html#centered-log-ratio-transformation"><i class="fa fa-check"></i><b>1.2.3</b> Centered log-ratio transformation</a></li>
 </ul></li>
 </ul></li>
@@ -203,7 +203,7 @@ sponge.trt_p &lt;-<span class="st"> </span><span class="kw">apply</span>(sponge.
 sponge.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(sponge.trt_p, <span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)
 
 <span class="co"># AD data</span>
-ad.trt_p &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr, <span class="dv">2</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(x){
+ad.trt_p &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.clr, <span class="dv">2</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(x){
   res.lm &lt;-<span class="st"> </span><span class="kw">lm</span>(x <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch)
   summary.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res.lm)
   p &lt;-<span class="st"> </span>summary.res<span class="op">$</span>coefficients[<span class="dv">2</span>,<span class="dv">4</span>]
@@ -212,7 +212,7 @@ ad.trt_p &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr,
 ad.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.trt_p, <span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)</code></pre></div>
 <p>As the batch x treatment design of HD data is unbalaced, we fit a linear mixed model considering batch (cage) as random effects.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># HD data</span>
-hd.trt_p &lt;-<span class="st"> </span><span class="kw">apply</span>(hd.tss.clr, <span class="dv">2</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(x){
+hd.trt_p &lt;-<span class="st"> </span><span class="kw">apply</span>(hd.clr, <span class="dv">2</span>, <span class="dt">FUN =</span> <span class="cf">function</span>(x){
   res.lmm &lt;-<span class="st"> </span><span class="kw">lmer</span>(x <span class="op">~</span><span class="st"> </span>hd.trt <span class="op">+</span><span class="st"> </span>(<span class="dv">1</span><span class="op">|</span>hd.batch))
   summary.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res.lmm)
   p &lt;-<span class="st"> </span>summary.res<span class="op">$</span>coefficients[<span class="dv">2</span>,<span class="dv">5</span>]
@@ -232,7 +232,7 @@ sponge.sva.n &lt;-<span class="st"> </span><span class="kw">num.sv</span>(<span 
 <p>Next we apply the <em>sva</em> function to estimate the surrogate variables with both full and null models:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.sva &lt;-<span class="st"> </span><span class="kw">sva</span>(<span class="dt">dat =</span> <span class="kw">t</span>(sponge.tss.clr), <span class="dt">mod =</span> sponge.mod, 
                  <span class="dt">mod0 =</span> sponge.mod0, <span class="dt">n.sv =</span> sponge.sva.n)</code></pre></div>
-<pre><code>## Number of significant surrogate variables is:  3 
+<pre><code>## Number of significant surrogate variables is:  1 
 ## Iteration (out of 5 ):1  2  3  4  5</code></pre>
 <p>We then include the estimated surrogate variables in both the null and full models. The reason is that we want to adjust for the surrogate variables, so we treat them as adjustment variables that must be included in both models. The <em>f.pvalue</em> function is then used to calculate parametric F-test P-values and Q-values (adjusted P-values) for each OTU of sponge data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sponge.mod.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(sponge.mod, sponge.sva<span class="op">$</span>sv)
@@ -245,25 +245,25 @@ sponge.sva.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
 ad.mod &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span>ad.trt)
 ad.mod0 &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> ad.trt)
-ad.sva.n &lt;-<span class="st"> </span><span class="kw">num.sv</span>(<span class="dt">dat =</span> <span class="kw">t</span>(ad.tss.clr), <span class="dt">mod =</span> ad.mod)
-ad.sva &lt;-<span class="st"> </span><span class="kw">sva</span>(<span class="kw">t</span>(ad.tss.clr), ad.mod, ad.mod0, <span class="dt">n.sv =</span> ad.sva.n)</code></pre></div>
+ad.sva.n &lt;-<span class="st"> </span><span class="kw">num.sv</span>(<span class="dt">dat =</span> <span class="kw">t</span>(ad.clr), <span class="dt">mod =</span> ad.mod)
+ad.sva &lt;-<span class="st"> </span><span class="kw">sva</span>(<span class="kw">t</span>(ad.clr), ad.mod, ad.mod0, <span class="dt">n.sv =</span> ad.sva.n)</code></pre></div>
 <pre><code>## Number of significant surrogate variables is:  6 
 ## Iteration (out of 5 ):1  2  3  4  5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.mod.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(ad.mod, ad.sva<span class="op">$</span>sv)
 ad.mod0.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(ad.mod0, ad.sva<span class="op">$</span>sv)
-ad.sva.trt_p &lt;-<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(ad.tss.clr), ad.mod.bat, ad.mod0.bat)
+ad.sva.trt_p &lt;-<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(ad.clr), ad.mod.bat, ad.mod0.bat)
 ad.sva.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.sva.trt_p, <span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)
 
 <span class="co"># hd data</span>
 hd.mod &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span>hd.trt)
 hd.mod0 &lt;-<span class="st"> </span><span class="kw">model.matrix</span>( <span class="op">~</span><span class="st"> </span><span class="dv">1</span>,<span class="dt">data =</span> hd.trt)
-hd.sva.n &lt;-<span class="st"> </span><span class="kw">num.sv</span>(<span class="dt">dat =</span> <span class="kw">t</span>(hd.tss.clr), <span class="dt">mod =</span> hd.mod)
-hd.sva &lt;-<span class="st"> </span><span class="kw">sva</span>(<span class="kw">t</span>(hd.tss.clr), hd.mod, hd.mod0, <span class="dt">n.sv =</span> hd.sva.n)</code></pre></div>
+hd.sva.n &lt;-<span class="st"> </span><span class="kw">num.sv</span>(<span class="dt">dat =</span> <span class="kw">t</span>(hd.clr), <span class="dt">mod =</span> hd.mod)
+hd.sva &lt;-<span class="st"> </span><span class="kw">sva</span>(<span class="kw">t</span>(hd.clr), hd.mod, hd.mod0, <span class="dt">n.sv =</span> hd.sva.n)</code></pre></div>
 <pre><code>## Number of significant surrogate variables is:  3 
 ## Iteration (out of 5 ):1  2  3  4  5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hd.mod.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(hd.mod, hd.sva<span class="op">$</span>sv)
 hd.mod0.bat &lt;-<span class="st"> </span><span class="kw">cbind</span>(hd.mod0, hd.sva<span class="op">$</span>sv)
-hd.sva.trt_p &lt;-<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(hd.tss.clr), hd.mod.bat, hd.mod0.bat)
+hd.sva.trt_p &lt;-<span class="st"> </span><span class="kw">f.pvalue</span>(<span class="kw">t</span>(hd.clr), hd.mod.bat, hd.mod0.bat)
 hd.sva.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(hd.sva.trt_p, <span class="dt">method =</span> <span class="st">&#39;fdr&#39;</span>)</code></pre></div>
 </div>
 <div id="ruv2" class="section level3">
@@ -289,13 +289,13 @@ sponge.ruv2.trt_p &lt;-<span class="st"> </span>sponge.ruv2<span class="op">$</s
 sponge.ruv2.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(sponge.ruv2.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
 
 <span class="co"># AD data</span>
-ad.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">X =</span> ad.trt, 
+ad.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> ad.clr, <span class="dt">X =</span> ad.trt, 
                 <span class="dt">ctl =</span> ad.nc, <span class="dt">k =</span> <span class="dv">3</span>) <span class="co"># k is subjective</span>
 ad.ruv2.trt_p &lt;-<span class="st"> </span>ad.ruv2<span class="op">$</span>p
 ad.ruv2.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.ruv2.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
 
 <span class="co"># HD data</span>
-hd.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> hd.tss.clr, <span class="dt">X =</span> hd.trt, 
+hd.ruv2 &lt;-<span class="st"> </span><span class="kw">RUV2</span>(<span class="dt">Y =</span> hd.clr, <span class="dt">X =</span> hd.trt, 
                 <span class="dt">ctl =</span> hd.nc, <span class="dt">k =</span> <span class="dv">3</span>) <span class="co"># k is subjective</span>
 hd.ruv2.trt_p &lt;-<span class="st"> </span>hd.ruv2<span class="op">$</span>p
 hd.ruv2.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(hd.ruv2.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)</code></pre></div>
@@ -313,18 +313,18 @@ sponge.ruv4.trt_p &lt;-<span class="st"> </span>sponge.ruv4<span class="op">$</s
 sponge.ruv4.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(sponge.ruv4.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
 
 <span class="co"># AD data</span>
-ad.k.obj &lt;-<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">X =</span> ad.trt, <span class="dt">ctl =</span> ad.nc)
+ad.k.obj &lt;-<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> ad.clr, <span class="dt">X =</span> ad.trt, <span class="dt">ctl =</span> ad.nc)
 ad.k &lt;-<span class="st"> </span>ad.k.obj<span class="op">$</span>k
 ad.k &lt;-<span class="st"> </span><span class="kw">ifelse</span>(ad.k <span class="op">!=</span><span class="dv">0</span>, ad.k, <span class="dv">1</span>)
-ad.ruv4 &lt;-<span class="st"> </span><span class="kw">RUV4</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">X =</span> ad.trt, <span class="dt">ctl =</span> ad.nc, <span class="dt">k =</span> ad.k) 
+ad.ruv4 &lt;-<span class="st"> </span><span class="kw">RUV4</span>(<span class="dt">Y =</span> ad.clr, <span class="dt">X =</span> ad.trt, <span class="dt">ctl =</span> ad.nc, <span class="dt">k =</span> ad.k) 
 ad.ruv4.trt_p &lt;-<span class="st"> </span>ad.ruv4<span class="op">$</span>p
 ad.ruv4.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(ad.ruv4.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)
 
 <span class="co"># HD data</span>
-hd.k.obj &lt;-<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> hd.tss.clr, <span class="dt">X =</span> hd.trt, <span class="dt">ctl =</span> hd.nc)
+hd.k.obj &lt;-<span class="st"> </span><span class="kw">getK</span>(<span class="dt">Y =</span> hd.clr, <span class="dt">X =</span> hd.trt, <span class="dt">ctl =</span> hd.nc)
 hd.k &lt;-<span class="st"> </span>hd.k.obj<span class="op">$</span>k
 hd.k &lt;-<span class="st"> </span><span class="kw">ifelse</span>(hd.k <span class="op">!=</span><span class="dv">0</span>, hd.k, <span class="dv">1</span>)
-hd.ruv4 &lt;-<span class="st"> </span><span class="kw">RUV4</span>(<span class="dt">Y =</span> hd.tss.clr, <span class="dt">X =</span> hd.trt, <span class="dt">ctl =</span> hd.nc, <span class="dt">k =</span> hd.k) 
+hd.ruv4 &lt;-<span class="st"> </span><span class="kw">RUV4</span>(<span class="dt">Y =</span> hd.clr, <span class="dt">X =</span> hd.trt, <span class="dt">ctl =</span> hd.nc, <span class="dt">k =</span> hd.k) 
 hd.ruv4.trt_p &lt;-<span class="st"> </span>hd.ruv4<span class="op">$</span>p
 hd.ruv4.trt_adjp &lt;-<span class="st"> </span><span class="kw">p.adjust</span>(hd.ruv4.trt_p, <span class="dt">method=</span><span class="st">&quot;fdr&quot;</span>)</code></pre></div>
 </div>
@@ -341,13 +341,13 @@ sponge.b2 &lt;-<span class="st"> </span><span class="kw">scale</span>(sponge.tss
 sponge.bmc &lt;-<span class="st"> </span><span class="kw">rbind</span>(sponge.b1, sponge.b2)
 sponge.bmc &lt;-<span class="st"> </span>sponge.bmc[<span class="kw">rownames</span>(sponge.tss.clr), ]</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># AD data</span>
-ad.b1 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;09/04/2015&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-ad.b2 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;14/04/2016&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-ad.b3 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;14/11/2016&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-ad.b4 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;01/07/2016&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-ad.b5 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr[ad.batch <span class="op">==</span><span class="st"> &#39;21/09/2017&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b1 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.clr[ad.batch <span class="op">==</span><span class="st"> &#39;09/04/2015&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b2 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.clr[ad.batch <span class="op">==</span><span class="st"> &#39;14/04/2016&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b3 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.clr[ad.batch <span class="op">==</span><span class="st"> &#39;14/11/2016&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b4 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.clr[ad.batch <span class="op">==</span><span class="st"> &#39;01/07/2016&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+ad.b5 &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.clr[ad.batch <span class="op">==</span><span class="st"> &#39;21/09/2017&#39;</span>, ], <span class="dt">center =</span> <span class="ot">TRUE</span>, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
 ad.bmc &lt;-<span class="st"> </span><span class="kw">rbind</span>(ad.b1, ad.b2, ad.b3, ad.b4, ad.b5)
-ad.bmc &lt;-<span class="st"> </span>ad.bmc[<span class="kw">rownames</span>(ad.tss.clr), ]</code></pre></div>
+ad.bmc &lt;-<span class="st"> </span>ad.bmc[<span class="kw">rownames</span>(ad.clr), ]</code></pre></div>
 </div>
 <div id="combat" class="section level3">
 <h3><span class="header-section-number">3.2.2</span> ComBat</h3>
@@ -362,7 +362,7 @@ sponge.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span clas
 <pre><code>## Finding nonparametric adjustments</code></pre>
 <pre><code>## Adjusting the Data</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># AD data</span>
-ad.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">ComBat</span>(<span class="kw">t</span>(ad.tss.clr), <span class="dt">batch =</span> ad.batch, 
+ad.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">ComBat</span>(<span class="kw">t</span>(ad.clr), <span class="dt">batch =</span> ad.batch, 
                       <span class="dt">mod =</span> ad.mod, <span class="dt">par.prior =</span> F, <span class="dt">prior.plots =</span> F))</code></pre></div>
 <pre><code>## Found5batches</code></pre>
 <pre><code>## Adjusting for1covariate(s) or covariate level(s)</code></pre>
@@ -377,7 +377,7 @@ ad.combat &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="k
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Sponge data</span>
 sponge.limma &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">removeBatchEffect</span>(<span class="kw">t</span>(sponge.tss.clr), <span class="dt">batch =</span> sponge.batch, 
                                     <span class="dt">design =</span> sponge.mod))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.limma &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">removeBatchEffect</span>(<span class="kw">t</span>(ad.tss.clr), <span class="dt">batch =</span> ad.batch, 
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.limma &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">removeBatchEffect</span>(<span class="kw">t</span>(ad.clr), <span class="dt">batch =</span> ad.batch, 
                                 <span class="dt">design =</span> ad.mod))</code></pre></div>
 </div>
 <div id="fabatch" class="section level3">
@@ -390,7 +390,7 @@ sponge.fabatch.obj &lt;-<span class="st"> </span><span class="kw">fabatch</span>
 sponge.fabatch &lt;-<span class="st"> </span>sponge.fabatch.obj<span class="op">$</span>xadj
 
 <span class="co"># ad data</span>
-ad.fabatch.obj &lt;-<span class="st"> </span><span class="kw">fabatch</span>(<span class="dt">x =</span> ad.tss.clr, 
+ad.fabatch.obj &lt;-<span class="st"> </span><span class="kw">fabatch</span>(<span class="dt">x =</span> ad.clr, 
                          <span class="dt">y =</span> <span class="kw">as.factor</span>(<span class="kw">as.numeric</span>(ad.trt)), 
                          <span class="dt">batch =</span> <span class="kw">as.factor</span>(<span class="kw">as.numeric</span>(ad.batch)))
 ad.fabatch &lt;-<span class="st"> </span>ad.fabatch.obj<span class="op">$</span>xadj</code></pre></div>
@@ -398,11 +398,16 @@ ad.fabatch &lt;-<span class="st"> </span>ad.fabatch.obj<span class="op">$</span>
 <div id="percentile-normalisation" class="section level3">
 <h3><span class="header-section-number">3.2.5</span> Percentile normalisation</h3>
 <p>Percentile normalisation (PN) was developed for microbiome data integration. For each batch, it transforms the relative abundance of control samples to their own percentiles while converting the relative abundance of case samples into the percentiles of their corresponding control distribution. The method thus only applies to case-control studies, and may lose a large amount of information as it uses percentiles rather than the original values.</p>
+<p><strong>Note:</strong> PN applies on TSS scaled data <span class="citation">(Gibbons, Duvallet, and Alm <a href="#ref-gibbons2018correcting">2018</a>)</span>. As we added an offset on sponge TSS scaled data, we re-applied the TSS.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
+sponge.tss &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(sponge.tss, <span class="dv">1</span>, <span class="cf">function</span>(x){x<span class="op">/</span><span class="kw">sum</span>(x)}))
 sponge.percentile &lt;-<span class="st"> </span><span class="kw">percentile_norm</span>(<span class="dt">data =</span> sponge.tss, <span class="dt">batch =</span> sponge.batch, 
                                     <span class="dt">trt =</span> sponge.trt)
 
+
 <span class="co"># ad data</span>
+<span class="co"># TSS</span>
+ad.tss &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(ad.count.keep, <span class="dv">1</span>, <span class="cf">function</span>(x){x<span class="op">/</span><span class="kw">sum</span>(x)}))
 ad.percentile &lt;-<span class="st"> </span><span class="kw">percentile_norm</span>(<span class="dt">data =</span> ad.tss, <span class="dt">batch =</span> ad.batch, 
                                 <span class="dt">trt =</span> ad.trt)</code></pre></div>
 </div>
@@ -436,9 +441,9 @@ sponge.svd[<span class="dv">1</span><span class="op">:</span><span class="kw">nr
   }
 }</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
-ad.sd &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr, <span class="dv">2</span>, sd) <span class="co"># calculate standard deviation</span>
-ad.mean &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss.clr, <span class="dv">2</span>, mean) <span class="co"># calculate mean</span>
-ad.X &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.tss.clr,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># center and scale</span>
+ad.sd &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.clr, <span class="dv">2</span>, sd) <span class="co"># calculate standard deviation</span>
+ad.mean &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.clr, <span class="dv">2</span>, mean) <span class="co"># calculate mean</span>
+ad.X &lt;-<span class="st"> </span><span class="kw">scale</span>(ad.clr,<span class="dt">center =</span> T, <span class="dt">scale =</span> T) <span class="co"># center and scale</span>
 
 ad.m &lt;-<span class="st"> </span><span class="kw">crossprod</span>(ad.X) <span class="co"># generate a square matrix</span>
 ad.m.svd &lt;-<span class="st"> </span><span class="kw">svd</span>(ad.m) <span class="co"># SVD </span>
@@ -471,10 +476,16 @@ ad.svd[<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</
 ad.replicates &lt;-<span class="st"> </span>ad.metadata<span class="op">$</span>sample_name.data.extraction
 ad.replicates.matrix &lt;-<span class="st"> </span><span class="kw">replicate.matrix</span>(ad.replicates)
 
-ad.ruvIII &lt;-<span class="st"> </span><span class="kw">RUVIII</span>(<span class="dt">Y =</span> ad.tss.clr, <span class="dt">M =</span> ad.replicates.matrix, <span class="dt">ctl =</span> ad.nc)
-<span class="kw">rownames</span>(ad.ruvIII) &lt;-<span class="st"> </span><span class="kw">rownames</span>(ad.tss.clr)</code></pre></div>
+ad.ruvIII &lt;-<span class="st"> </span><span class="kw">RUVIII</span>(<span class="dt">Y =</span> ad.clr, <span class="dt">M =</span> ad.replicates.matrix, <span class="dt">ctl =</span> ad.nc)
+<span class="kw">rownames</span>(ad.ruvIII) &lt;-<span class="st"> </span><span class="kw">rownames</span>(ad.clr)</code></pre></div>
 
 </div>
+</div>
+</div>
+<h3>Bibliography</h3>
+<div id="refs" class="references">
+<div id="ref-gibbons2018correcting">
+<p>Gibbons, Sean M, Claire Duvallet, and Eric J Alm. 2018. “Correcting for Batch Effects in Case-Control Microbiome Studies.” <em>PLoS Computational Biology</em> 14 (4). Public Library of Science: e1006102.</p>
 </div>
 </div>
             </section>

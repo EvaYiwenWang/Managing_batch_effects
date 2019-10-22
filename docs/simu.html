@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang, Kim-Anh Lê Cao">
 
 
-<meta name="date" content="2019-10-14">
+<meta name="date" content="2019-10-22">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -112,7 +112,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#data-processing"><i class="fa fa-check"></i><b>1.2</b> Data processing</a><ul>
 <li class="chapter" data-level="1.2.1" data-path="index.html"><a href="index.html#prefiltering"><i class="fa fa-check"></i><b>1.2.1</b> Prefiltering</a></li>
-<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#total-sum-scaling"><i class="fa fa-check"></i><b>1.2.2</b> Total sum scaling</a></li>
+<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#adding-offset"><i class="fa fa-check"></i><b>1.2.2</b> Adding offset</a></li>
 <li class="chapter" data-level="1.2.3" data-path="index.html"><a href="index.html#centered-log-ratio-transformation"><i class="fa fa-check"></i><b>1.2.3</b> Centered log-ratio transformation</a></li>
 </ul></li>
 </ul></li>
@@ -240,7 +240,7 @@ w.cof &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(w.cof)
 <span class="kw">qqline</span>(w.cof, <span class="dt">col =</span> <span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-87-1.png" width="672" /></p>
+<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-86-1.png" width="672" /></p>
 <p>The histogram, density plot and quantile–quantile plot are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>. These plots display the distribution of batch coefficients is very close to normal, indicating a systematic batch effect.</p>
 </div>
 <div id="mean-0-or-5-and-unequal-variance" class="section level3">
@@ -301,7 +301,7 @@ w.cof2 &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(w.cof2)
 <span class="kw">qqline</span>(w.cof2, <span class="dt">col =</span> <span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-88-1.png" width="672" /></p>
+<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-87-1.png" width="672" /></p>
 <p>The histogram, density plot and quantile–quantile plot are plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>, showing a bi-modal distribution. This distribution indicates a non-systematic batch effect.</p>
 <p><strong>We observed similar patterns in our real case studies, suggesting that the batch effects are mixed with multiple sources and are non-systematic (see the examples below).</strong></p>
 </div>
@@ -324,15 +324,15 @@ w.cof2 &lt;-<span class="st"> </span><span class="kw">c</span>()
 <span class="kw">qqnorm</span>(sponge.b.coeff)
 <span class="kw">qqline</span>(sponge.b.coeff, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-89-1.png" width="672" /></p>
+<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-88-1.png" width="672" /></p>
 <p>In sponge data, the histogram, density plot and quantile–quantile plot are also plotted using estimated batch regression coefficients <span class="math inline">\(\hat{\beta}_{j}\)</span> for each OTU <span class="math inline">\(j\)</span>. The bi-modal distribution indicates a non-systematic batch effect, which is similar as the results from simulation with non-systematic batch effects.</p>
 </div>
 <div id="ad-data" class="section level3">
 <h3><span class="header-section-number">5.2.2</span> AD data</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ad.b.coeff &lt;-<span class="st"> </span><span class="kw">c</span>()
 ad.batch.relevel &lt;-<span class="st"> </span><span class="kw">relevel</span>(ad.batch, <span class="st">&#39;01/07/2016&#39;</span>)
-<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.tss.clr)){
-  res &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.tss.clr[,i] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch.relevel)
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(ad.clr)){
+  res &lt;-<span class="st"> </span><span class="kw">lm</span>(ad.clr[,i] <span class="op">~</span><span class="st"> </span>ad.trt <span class="op">+</span><span class="st"> </span>ad.batch.relevel)
   sum.res &lt;-<span class="st"> </span><span class="kw">summary</span>(res)
   ad.b.coeff[i] &lt;-<span class="st"> </span>sum.res<span class="op">$</span>coefficients[<span class="dv">4</span>,<span class="dv">1</span>]
 }
@@ -343,7 +343,7 @@ ad.batch.relevel &lt;-<span class="st"> </span><span class="kw">relevel</span>(a
 <span class="kw">qqnorm</span>(ad.b.coeff)
 <span class="kw">qqline</span>(ad.b.coeff, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</code></pre></div>
-<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-90-1.png" width="672" /></p>
+<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-89-1.png" width="672" /></p>
 <p>We observe similar results in AD data. The distribution of estimated batch regression coefficients is not normal. The batch effects therefore are non-systematic.</p>
 
 </div>

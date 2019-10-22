@@ -25,7 +25,7 @@
 <meta name="author" content="Yiwen Wang, Kim-Anh Lê Cao">
 
 
-<meta name="date" content="2019-10-14">
+<meta name="date" content="2019-10-22">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -112,7 +112,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#data-processing"><i class="fa fa-check"></i><b>1.2</b> Data processing</a><ul>
 <li class="chapter" data-level="1.2.1" data-path="index.html"><a href="index.html#prefiltering"><i class="fa fa-check"></i><b>1.2.1</b> Prefiltering</a></li>
-<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#total-sum-scaling"><i class="fa fa-check"></i><b>1.2.2</b> Total sum scaling</a></li>
+<li class="chapter" data-level="1.2.2" data-path="index.html"><a href="index.html#adding-offset"><i class="fa fa-check"></i><b>1.2.2</b> Adding offset</a></li>
 <li class="chapter" data-level="1.2.3" data-path="index.html"><a href="index.html#centered-log-ratio-transformation"><i class="fa fa-check"></i><b>1.2.3</b> Centered log-ratio transformation</a></li>
 </ul></li>
 </ul></li>
@@ -187,7 +187,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="header">
 <h1 class="title">Managing Batch Effects in Microbiome Data</h1>
 <p class="author"><em>Yiwen Wang, Kim-Anh Lê Cao</em></p>
-<p class="date"><em>2019-10-14</em></p>
+<p class="date"><em>2019-10-22</em></p>
 </div>
 <div id="examples-of-microbiome-studies-with-batch-effects" class="section level1">
 <h1><span class="header-section-number">Chapter 1</span> Examples of microbiome studies with batch effects</h1>
@@ -257,8 +257,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </li>
 <li>Add an offset of 1 to the whole data matrix — note that this is not ideal but provides a pracitical way to handle zero counts.<br />
 </li>
-<li>Total Sum Scaling transformation<br />
-</li>
 <li>Log-ratio transformation with Centered Log Ratio (CLR)</li>
 </ol>
 <div id="prefiltering" class="section level3">
@@ -275,43 +273,33 @@ hd.count.keep &lt;-<span class="st"> </span>hd.count
 <pre><code>## [1]  13 368</code></pre>
 <p><strong>Note:</strong> The HD data only include 13 samples, which are a small part of a big dataset that has already been prefiltered. We retained all the OTUs in the data and did not redo the prefiltering again.</p>
 </div>
-<div id="total-sum-scaling" class="section level3">
-<h3><span class="header-section-number">1.2.2</span> Total sum scaling</h3>
-<p>Now, let’s apply a TSS scaling on the filtered data:</p>
-<p><strong>Note:</strong> We need to add an offset of 1 to all count data to handle zeroes for the CLR transformation. As the sponge data were already TSS scaled, a small offset is added in this specific case. However, we recommend starting from the raw count (not TSS) for those analyses.</p>
+<div id="adding-offset" class="section level3">
+<h3><span class="header-section-number">1.2.2</span> Adding offset</h3>
+<p>We need to add an offset of 1 to all count data to handle zeroes for the CLR transformation. As the sponge data were TSS scaled, a small offset is added in this specific case. According to scale invariance principle <span class="citation">(Aitchison <a href="#ref-aitchison1986statistical">1986</a>)</span>, it returns the same results with CLR transformation on raw counts or TSS data. However, we recommend starting from the raw counts (not TSS) for those analyses.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
-sponge.tss &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(sponge.tss <span class="op">+</span><span class="st"> </span><span class="fl">0.01</span>, <span class="dv">1</span>, TSS.divide))
+sponge.tss &lt;-<span class="st"> </span>sponge.tss <span class="op">+</span><span class="st"> </span><span class="fl">0.01</span>
 
 <span class="co"># ad data</span>
-ad.tss &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(ad.count.keep <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>, TSS.divide))
+ad.count.keep &lt;-<span class="st"> </span>ad.count.keep <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
 
 <span class="co"># hd data</span>
-hd.tss &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">apply</span>(hd.count.keep <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, <span class="dv">1</span>, TSS.divide))</code></pre></div>
-<p>We then check the library size that sums to 1 for each sample for the AD and HD data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># ad data</span>
-ad.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(ad.tss, <span class="dv">1</span>, sum)
-<span class="kw">barplot</span>(ad.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;AD data&#39;</span>, <span class="dt">las =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># hd data</span>
-hd.lib.size.tss &lt;-<span class="st"> </span><span class="kw">apply</span>(hd.tss, <span class="dv">1</span>, sum)
-<span class="kw">barplot</span>(hd.lib.size.tss, <span class="dt">main =</span>  <span class="st">&#39;HD data&#39;</span>, <span class="dt">las =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="Managing_batch_effects_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+hd.count.keep &lt;-<span class="st"> </span>hd.count.keep <span class="op">+</span><span class="st"> </span><span class="dv">1</span></code></pre></div>
 </div>
 <div id="centered-log-ratio-transformation" class="section level3">
 <h3><span class="header-section-number">1.2.3</span> Centered log-ratio transformation</h3>
-<p>Microbiome data are compostional, and not only because of the TSS transformation. The data are restricted to a space where the sum of all OTU proportions for a given sample sums to 1. Using standard statistical methods on such data may lead to spurious results and therefore the data must be further transformed. The CLR is the transformation of choice.</p>
+<p>Microbiome data are compostional and with different library sizes. Using standard statistical methods on such data may lead to spurious results and therefore the data must be further transformed. The CLR is the transformation of choice.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sponge data</span>
 sponge.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(sponge.tss, <span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
 <span class="kw">class</span>(sponge.tss.clr) &lt;-<span class="st"> &#39;matrix&#39;</span> 
 
 <span class="co"># ad data</span>
-ad.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(ad.tss, <span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
-<span class="kw">class</span>(ad.tss.clr) &lt;-<span class="st"> &#39;matrix&#39;</span> 
+ad.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(ad.count.keep, <span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
+<span class="kw">class</span>(ad.clr) &lt;-<span class="st"> &#39;matrix&#39;</span> 
 
 <span class="co"># hd data</span>
-hd.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(hd.tss, <span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
-<span class="kw">class</span>(hd.tss.clr) &lt;-<span class="st"> &#39;matrix&#39;</span></code></pre></div>
-<p>The final TSS-CLR data of sponge study, AD study and HD study contain 32 samples and 24 OTUs, 75 samples and 231 OTUs, 13 samples and 368 OTUs, respectively as described in Table 1.</p>
+hd.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span>(hd.count.keep, <span class="dt">logratio =</span> <span class="st">&#39;CLR&#39;</span>)
+<span class="kw">class</span>(hd.clr) &lt;-<span class="st"> &#39;matrix&#39;</span></code></pre></div>
+<p>The final CLR data of sponge study, AD study and HD study contain 32 samples and 24 OTUs, 75 samples and 231 OTUs, 13 samples and 368 OTUs, respectively as described in Table 1.</p>
 
 </div>
 </div>
@@ -329,6 +317,9 @@ hd.tss.clr &lt;-<span class="st"> </span><span class="kw">logratio.transfo</span
 </div>
 <div id="ref-arumugam2011enterotypes">
 <p>Arumugam, Manimozhiyan, Jeroen Raes, Eric Pelletier, Denis Le Paslier, Takuji Yamada, Daniel R Mende, Gabriel R Fernandes, et al. 2011. “Enterotypes of the Human Gut Microbiome.” <em>Nature</em> 473 (7346). Nature Publishing Group: 174.</p>
+</div>
+<div id="ref-aitchison1986statistical">
+<p>Aitchison, John. 1986. <em>The Statistical Analysis of Compositional Data</em>. Chapman; Hall London.</p>
 </div>
 </div>
             </section>

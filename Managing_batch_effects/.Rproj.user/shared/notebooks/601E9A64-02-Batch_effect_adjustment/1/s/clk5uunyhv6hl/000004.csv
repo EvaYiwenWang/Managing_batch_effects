@@ -1,0 +1,5 @@
+"0","# ad data only"
+"0","ad.replicates <- ad.metadata$sample_name.data.extraction"
+"0","ad.replicates.matrix <- replicate.matrix(ad.replicates)"
+"0","ad.ruvIII <- RUVIII(Y = ad.clr, M = ad.replicates.matrix, ctl = ad.nc)"
+"0","rownames(ad.ruvIII) <- rownames(ad.clr)"

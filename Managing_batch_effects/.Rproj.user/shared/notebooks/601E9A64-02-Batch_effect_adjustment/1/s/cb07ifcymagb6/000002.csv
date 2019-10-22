@@ -1,0 +1,4 @@
+"0","sponge.mod.bat <- cbind(sponge.mod, sponge.sva$sv)"
+"0","sponge.mod0.bat <- cbind(sponge.mod0, sponge.sva$sv)"
+"0","sponge.sva.trt_p <- f.pvalue(t(sponge.tss.clr), sponge.mod.bat, sponge.mod0.bat)"
+"0","sponge.sva.trt_adjp <- p.adjust(sponge.sva.trt_p, method='fdr')"

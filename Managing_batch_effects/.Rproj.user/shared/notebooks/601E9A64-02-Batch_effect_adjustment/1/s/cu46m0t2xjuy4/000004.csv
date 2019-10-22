@@ -1,0 +1,17 @@
+"0","# sponge data"
+"0","sponge.fabatch.obj <- fabatch(x = sponge.tss.clr, "
+"0","                             y = as.factor(as.numeric(sponge.trt)), "
+"0","                             batch = sponge.batch)"
+"2","Iteration aborted at crit = 1.01028142966603e-05 > 1e-06 because there occured zero values in the estimated residual variances."
+"2","Iteration aborted at crit = 3.80686240417225e-06 > 1e-06 because there occured zero values in the estimated residual variances."
+"0","sponge.fabatch <- sponge.fabatch.obj$xadj"
+"0","# ad data"
+"0","ad.fabatch.obj <- fabatch(x = ad.clr, "
+"0","                         y = as.factor(as.numeric(ad.trt)), "
+"0","                         batch = as.factor(as.numeric(ad.batch)))"
+"2","Iteration aborted at crit = 1.29802331156522e-06 > 1e-06 because there occured zero values in the estimated residual variances."
+"2","Iteration aborted at crit = 5.05994243502252e-06 > 1e-06 because there occured zero values in the estimated residual variances."
+"2","Iteration aborted at crit = 1.24304257858546e-05 > 1e-06 because there occured zero values in the estimated residual variances."
+"2","Error in solve.default(diag(nbf) + tBPsiinv %*% B) : 
+  system is computationally singular: reciprocal condition number = 1.05112e-16
+"

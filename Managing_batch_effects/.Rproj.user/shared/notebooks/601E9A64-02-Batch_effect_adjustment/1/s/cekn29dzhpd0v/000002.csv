@@ -1,0 +1,6 @@
+"0","# sponge data"
+"0","sponge.nc <- sponge.trt_adjp > 0.05"
+"0","# AD data"
+"0","ad.nc <- ad.trt_adjp > 0.05"
+"0","# HD data"
+"0","hd.nc <- hd.trt_p > 0.05"

@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1571736825433.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1565811998",
+    "id" : "4117BDC5",
+    "lastKnownWriteTime" : 1571733878,
+    "last_content_update" : 1571736839356,
+    "path" : "~/Documents/GitHub/Managing_batch_effects/Managing_batch_effects/02-Batch_effect_adjustment.Rmd",
+    "project_path" : "02-Batch_effect_adjustment.Rmd",
+    "properties" : {
+        "cursorPosition" : "245,0",
+        "docOutlineVisible" : "1",
+        "scrollLine" : "236"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

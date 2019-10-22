@@ -1,0 +1,239 @@
+"0","# HD data"
+"0","hd.trt_p <- apply(hd.clr, 2, FUN = function(x){"
+"0","  res.lmm <- lmer(x ~ hd.trt + (1|hd.batch))"
+"0","  summary.res <- summary(res.lmm)"
+"0","  p <- summary.res$coefficients[2,5]"
+"0","})"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"2","singular fit
+"
+"0","hd.trt_adjp <- p.adjust(hd.trt_p, method = 'fdr')"

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1571726230331.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4161665046",
+    "id" : "C0B6890A",
+    "lastKnownWriteTime" : 1571726292,
+    "last_content_update" : 1571726296874,
+    "path" : "~/Documents/GitHub/Managing_batch_effects/Managing_batch_effects/04-Simulations.Rmd",
+    "project_path" : "04-Simulations.Rmd",
+    "properties" : {
+        "cursorPosition" : "163,1",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

@@ -1,0 +1,8 @@
+"0","# ad data"
+"0","ad.batch_05 <- ad.batch[ad.trt == '0-0.5']"
+"0","ad.batch_2 <- ad.batch[ad.trt == '1-2'] "
+"0","ad.before_05 <- ad.clr[ad.trt == '0-0.5', ]"
+"0","ad.before_2 <- ad.clr[ad.trt == '1-2', ]"
+"0","RleMicroRna2(object = t(ad.before_05), batch = ad.batch_05, "
+"0","             maintitle = 'AD (initial phenol conc: 0-0.5 g/L)', "
+"0","             legend.cex = 0.5)"

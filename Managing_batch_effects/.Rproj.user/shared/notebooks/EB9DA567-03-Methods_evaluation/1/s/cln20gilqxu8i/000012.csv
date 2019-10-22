@@ -1,0 +1,2 @@
+"0","grid.arrange(ad.pca.plot.before, ad.pca.plot.bmc, "
+"0","             ad.pca.plot.combat, ad.pca.plot.limma, ncol = 2)"

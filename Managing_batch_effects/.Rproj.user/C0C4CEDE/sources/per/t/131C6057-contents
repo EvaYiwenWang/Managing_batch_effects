@@ -90,8 +90,7 @@ Here are the processing steps for the **raw count** microbiome data:
 
 1. Prefilter the count data to remove features with excess zeroes across all samples        
 2. Add an offset of 1 to the whole data matrix --- note that this is not ideal but provides a pracitical way to handle zero counts.       
-3. Total Sum Scaling transformation         
-4. Log-ratio transformation with Centered Log Ratio (CLR)          
+3. Log-ratio transformation with Centered Log Ratio (CLR)          
 
 ### Prefiltering
 
@@ -107,42 +106,29 @@ dim(ad.count.keep)
 hd.count.keep <- hd.count
 dim(hd.count.keep)
 ```
+
 **Note:** The HD data only include 13 samples, which are a small part of a big dataset that has already been prefiltered. We retained all the OTUs in the data and did not redo the prefiltering again.
 
 
-### Total sum scaling
+### Adding offset
 
-Now, let’s apply a TSS scaling on the filtered data:
-
-**Note:** We need to add an offset of 1 to all count data to handle zeroes for the CLR transformation. As the sponge data were already TSS scaled, a small offset is added in this specific case. However, we recommend starting from the raw count (not TSS) for those analyses. 
+We need to add an offset of 1 to all count data to handle zeroes for the CLR transformation. As the sponge data were TSS scaled, a small offset is added in this specific case. According to scale invariance principle [@aitchison1986statistical], it returns the same results with CLR transformation on raw counts or TSS data. However, we recommend starting from the raw counts (not TSS) for those analyses. 
 
 ```{r}
 # sponge data
-sponge.tss <- t(apply(sponge.tss + 0.01, 1, TSS.divide))
+sponge.tss <- sponge.tss + 0.01
 
 # ad data
-ad.tss <- t(apply(ad.count.keep + 1, 1, TSS.divide))
+ad.count.keep <- ad.count.keep + 1
 
 # hd data
-hd.tss <- t(apply(hd.count.keep + 1, 1, TSS.divide))
+hd.count.keep <- hd.count.keep + 1
 ```
 
-We then check the library size that sums to 1 for each sample for the AD and HD data. 
-      
-```{r}
-# ad data
-ad.lib.size.tss <- apply(ad.tss, 1, sum)
-barplot(ad.lib.size.tss, main =  'AD data', las = 2)
-
-
-# hd data
-hd.lib.size.tss <- apply(hd.tss, 1, sum)
-barplot(hd.lib.size.tss, main =  'HD data', las = 2)
-```
 
 ### Centered log-ratio transformation
 
-Microbiome data are compostional, and not only because of the TSS transformation. The data are restricted to a space where the sum of all OTU proportions for a given sample sums to 1. Using standard statistical methods on such data may lead to spurious results and therefore the data must be further transformed. The CLR is the transformation of choice.
+Microbiome data are compostional and with different library sizes. Using standard statistical methods on such data may lead to spurious results and therefore the data must be further transformed. The CLR is the transformation of choice.
 
 ```{r}
 # sponge data
@@ -150,13 +136,13 @@ sponge.tss.clr <- logratio.transfo(sponge.tss, logratio = 'CLR')
 class(sponge.tss.clr) <- 'matrix' 
 
 # ad data
-ad.tss.clr <- logratio.transfo(ad.tss, logratio = 'CLR')
-class(ad.tss.clr) <- 'matrix' 
+ad.clr <- logratio.transfo(ad.count.keep, logratio = 'CLR')
+class(ad.clr) <- 'matrix' 
 
 # hd data
-hd.tss.clr <- logratio.transfo(hd.tss, logratio = 'CLR')
-class(hd.tss.clr) <- 'matrix'
+hd.clr <- logratio.transfo(hd.count.keep, logratio = 'CLR')
+class(hd.clr) <- 'matrix'
 ```
 
-The final TSS-CLR data of sponge study, AD study and HD study contain 32 samples and 24 OTUs, 75 samples and 231 OTUs, 13 samples and 368 OTUs, respectively as described in Table 1.
+The final CLR data of sponge study, AD study and HD study contain 32 samples and 24 OTUs, 75 samples and 231 OTUs, 13 samples and 368 OTUs, respectively as described in Table 1.
 

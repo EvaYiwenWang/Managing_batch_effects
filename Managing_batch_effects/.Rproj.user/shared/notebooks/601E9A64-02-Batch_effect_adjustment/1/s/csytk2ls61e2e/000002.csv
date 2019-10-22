@@ -1,0 +1,5 @@
+"0","# Sponge data"
+"0","sponge.b1 <- scale(sponge.tss.clr[sponge.batch == 1, ], center = TRUE, scale = FALSE)"
+"0","sponge.b2 <- scale(sponge.tss.clr[sponge.batch == 2, ], center = TRUE, scale = FALSE)"
+"0","sponge.bmc <- rbind(sponge.b1, sponge.b2)"
+"0","sponge.bmc <- sponge.bmc[rownames(sponge.tss.clr), ]"

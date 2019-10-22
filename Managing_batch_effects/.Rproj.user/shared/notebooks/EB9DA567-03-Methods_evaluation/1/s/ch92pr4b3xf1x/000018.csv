@@ -1,0 +1,2 @@
+"0","grid.arrange(sponge.pca.plot.before, sponge.pca.plot.percentile, "
+"0","             sponge.pca.plot.svd, ncol = 2)"
