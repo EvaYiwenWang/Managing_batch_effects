@@ -9,7 +9,7 @@ Yiwen Wang, Kim-Anh Lê Cao
 
 **Keywords:** Unwanted variation; batch sources; systematic batch effects; methods selection; methods assessment
 
-The literature review was accepted by the journal "Briefing in Bioinformatics" at Jul. 24th, 2019. 
+The literature review was accepted by the journal "Briefing in Bioinformatics" at Jul. 24th, 2019. \\
 Link: https://academic.oup.com/bib/advance-article/doi/10.1093/bib/bbz105/5643537
 
 We have also implemented a bookdown: https://evayiwenwang.github.io/Managing_batch_effects/.
