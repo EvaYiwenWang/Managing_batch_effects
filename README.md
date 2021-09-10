@@ -11,7 +11,7 @@ Yiwen Wang, Kim-Anh Lê Cao
 
 This article has been published and available as:
 
-Yiwen Wang, Kim-Anh Lê Cao, Managing batch effects in microbiome data, *Briefings in Bioinformatics*, Volume 21, Issue 6, November 2020, Pages 1954?1970.
+Yiwen Wang, Kim-Anh Lê Cao, Managing batch effects in microbiome data, *Briefings in Bioinformatics*, Volume 21, Issue 6, November 2020, Pages 1954-1970.
 
 Link: <https://doi.org/10.1093/bib/bbz105>.
 
