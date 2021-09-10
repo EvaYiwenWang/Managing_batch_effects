@@ -1,6 +1,0 @@
-"0","# sponge data"
-"0","sponge.tss <- sponge.tss + 0.01"
-"0","# ad data"
-"0","ad.count.keep <- ad.count.keep + 1"
-"0","# hd data"
-"0","hd.count.keep <- hd.count.keep + 1"

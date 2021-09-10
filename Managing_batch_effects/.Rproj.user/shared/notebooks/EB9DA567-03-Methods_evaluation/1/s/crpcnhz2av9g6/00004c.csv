@@ -1,8 +1,0 @@
-"0","sponge.pca.plot.percentile <- Scatter_Density(data = sponge.pca.percentile$variates$X, "
-"0","                                             batch = sponge.batch, trt = sponge.trt, "
-"0","                                             expl.var = sponge.pca.percentile$explained_variance, "
-"0","                                             xlim = c(-4.5,5), ylim = c(-3,4), "
-"0","                                             batch.legend.title = 'Gel (batch)', "
-"0","                                             trt.legend.title = 'Tissue (trt)', "
-"0","                                             title = 'Batch correction with PN (Sponge)', "
-"0","                                             title.cex = 1, legend.title.cex = 0.6)"

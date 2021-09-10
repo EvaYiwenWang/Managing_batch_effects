@@ -1,3 +1,0 @@
-"0","par(mfrow = c(2,3), mai = c(0.4,0.6,0.3,0.1))"
-"0","RleMicroRna2(object = t(sponge.before_e), batch = sponge.batch_e, "
-"0","             maintitle = 'Sponge: before (ectosome)', title.cex = 1)"

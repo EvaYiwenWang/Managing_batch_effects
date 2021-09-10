@@ -1,6 +1,0 @@
-"0","# ad data"
-"0","ad.before.df <- data.frame(value = ad.clr[,1], batch = ad.batch)"
-"0","box_plot_fun(data = ad.before.df,x = ad.before.df$batch,"
-"0","             y = ad.before.df$value, title = 'OTU12 (AD)',"
-"0","             batch.legend.title = 'Date (batch)',"
-"0","             x.angle = 45, x.hjust = 1)"

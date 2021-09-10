@@ -1,4 +1,0 @@
-"0","# sponge data"
-"0","sponge.mod <- model.matrix( ~ sponge.trt) # full model"
-"0","sponge.mod0 <- model.matrix( ~ 1,data = sponge.trt) # null model"
-"0","sponge.sva.n <- num.sv(dat = t(sponge.tss.clr), mod = sponge.mod)"
